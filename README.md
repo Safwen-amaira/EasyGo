@@ -1,5 +1,6 @@
 ﻿# 🚀 EasyGo 
-**EasyGo , Easy Life ! ** <br/>
+**EasyGo , Easy Life !** 
+<br/>
 <br/> 
 **Integrated Project @ Esprit Engineering School**  
 *A Symfony-based web application demonstrating full-stack development capabilities*
