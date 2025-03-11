@@ -12,7 +12,7 @@
 - [Key Features](#-key-features)
 - [Tech Stack](#-tech-stack)
 - [Installation](#-installation)
-- [Team](#-team)
+- [Team](#-Our-Team)
 - [License](#-license)
 
 ---
@@ -60,7 +60,7 @@ A comprehensive web application developed using Symfony PHP framework for the In
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/project-name.git
+git clone https://github.com/Safwen-amaira/EasyGo.git
 
 # Install dependencies
 composer install
@@ -81,8 +81,11 @@ symfony server:start
 <br/><br/>
 ________________________________________________________________
 <br/>
-# 👥 Our Team  
+## 👥 Our Team  
+
+
 **Esprit Engineering School - Class of 3A23**  
+
 
 | Team Member          | Mission in Project       |
 |----------------------|--------------------------|
@@ -98,6 +101,6 @@ _________________________________________________
 <br/> 
 
 
-#  Developed as part of the Integrated Project curriculum at Esprit Engineering School - School Website
+###  Developed as part of the Integrated Project curriculum at Esprit Engineering School - School Website
 
 
