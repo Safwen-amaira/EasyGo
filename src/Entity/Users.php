@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
-class Users
+class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,6 +32,15 @@ class Users
 
     #[ORM\OneToOne(mappedBy: 'userId', cascade: ['persist', 'remove'])]
     private ?Profiles $profile = null;
+
+    #[ORM\Column]
+    private ?bool $isRider = null;
+
+    #[ORM\Column]
+    private ?bool $isAdmin = null;
+
+    #[ORM\Column]
+    private ?bool $isDriver = null;
 
     public function getId(): ?int
     {
@@ -112,4 +123,60 @@ class Users
 
         return $this;
     }
+
+    public function isRider(): ?bool
+    {
+        return $this->isRider;
+    }
+
+    public function setIsRider(bool $isRider): static
+    {
+        $this->isRider = $isRider;
+
+        return $this;
+    }
+
+    public function isAdmin(): ?bool
+    {
+        return $this->isAdmin;
+    }
+
+    public function setIsAdmin(bool $isAdmin): static
+    {
+        $this->isAdmin = $isAdmin;
+
+        return $this;
+    }
+
+    public function isDriver(): ?bool
+    {
+        return $this->isDriver;
+    }
+
+    public function setIsDriver(bool $isDriver): static
+    {
+        $this->isDriver = $isDriver;
+
+        return $this;
+    }
+
+    //implementation of abstr. fonctoins of the interface 
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Clear any temporary sensitive data if stored
+    }
+
+
+
 }
