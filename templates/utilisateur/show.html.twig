@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails utilisateur{% endblock %}
+
+{% block body %}
+    <h1>Détails de l'utilisateur</h1>
+
+    <ul>
+        <li>ID: {{ utilisateur.id }}</li>
+        <li>Nom: {{ utilisateur.nomUtilisateur }}</li>
+        <li>Points: {{ utilisateur.pointsAccumules }}</li>
+        <li>Trajets: {{ utilisateur.totalTrajetsEffectues }}</li>
+        <li>Montant: {{ utilisateur.totalMontantDepense }}</li>
+        <li>Dernière mise à jour: {{ utilisateur.dateDerniereMiseAJour|date('Y-m-d H:i') }}</li>
+    </ul>
+
+    <a href="{{ path('utilisateur_edit', {id: utilisateur.id}) }}">✏️ Modifier</a>
+    <br>
+    <a href="{{ path('utilisateur_index') }}">⬅️ Retour à la liste</a>
+{% endblock %}

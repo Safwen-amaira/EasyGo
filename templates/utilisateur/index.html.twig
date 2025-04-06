@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des utilisateurs fidélité{% endblock %}
+
+{% block body %}
+    <h1>Utilisateurs Fidélité</h1>
+
+    <a href="{{ path('utilisateur_new') }}">➕ Ajouter un utilisateur</a>
+
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Points</th>
+                <th>Trajets</th>
+                <th>Montant</th>
+                <th>Dernière MAJ</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for utilisateur in utilisateurs %}
+            <tr>
+                <td>{{ utilisateur.id }}</td>
+                <td>{{ utilisateur.nomUtilisateur }}</td>
+                <td>{{ utilisateur.pointsAccumules }}</td>
+                <td>{{ utilisateur.totalTrajetsEffectues }}</td>
+                <td>{{ utilisateur.totalMontantDepense }}</td>
+                <td>{{ utilisateur.dateDerniereMiseAJour|date('Y-m-d H:i') }}</td>
+                <td>
+                    <a href="{{ path('utilisateur_show', {id: utilisateur.id}) }}">👁️ Voir</a> |
+                    <a href="{{ path('utilisateur_edit', {id: utilisateur.id}) }}">✏️ Modifier</a> |
+                    <a href="{{ path('utilisateur_delete', {id: utilisateur.id}) }}">🗑️ Supprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="7">Aucun utilisateur trouvé.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

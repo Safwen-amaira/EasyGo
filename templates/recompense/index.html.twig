@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des récompenses{% endblock %}
+
+{% block body %}
+    <h1>Récompenses Fidélité</h1>
+
+    <a href="{{ path('recompense_new') }}">➕ Ajouter une récompense</a>
+
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Points Requis</th>
+                <th>Type</th>
+                <th>Date Expiration</th>
+                <th>Bonus</th>
+                <th>Utilisateur</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for recompense in recompenses %}
+            <tr>
+                <td>{{ recompense.id }}</td>
+                <td>{{ recompense.descriptionRecompense }}</td>
+                <td>{{ recompense.pointsRequis }}</td>
+                <td>{{ recompense.typeRecompense }}</td>
+                <td>{{ recompense.dateExpiration|date('Y-m-d') }}</td>
+                <td>{{ recompense.bonusPoints }}</td>
+                <td>{{ recompense.utilisateurFidelite.nomUtilisateur ?? '–' }}</td>
+                <td>
+                    <a href="{{ path('recompense_show', {id: recompense.id}) }}">👁️ Voir</a> |
+                    <a href="{{ path('recompense_edit', {id: recompense.id}) }}">✏️ Modifier</a> |
+                    <a href="{{ path('recompense_delete', {id: recompense.id}) }}">🗑️ Supprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="8">Aucune récompense trouvée.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

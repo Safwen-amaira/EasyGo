@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une récompense{% endblock %}
+
+{% block body %}
+    <h1>Modifier la récompense</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn">Mettre à jour</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('recompense_index') }}">⬅️ Retour à la liste</a>
+{% endblock %}

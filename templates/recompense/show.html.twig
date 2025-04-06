@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails récompense{% endblock %}
+
+{% block body %}
+    <h1>Détails de la récompense</h1>
+
+    <ul>
+        <li>ID: {{ recompense.id }}</li>
+        <li>Description: {{ recompense.descriptionRecompense }}</li>
+        <li>Points Requis: {{ recompense.pointsRequis }}</li>
+        <li>Type: {{ recompense.typeRecompense }}</li>
+        <li>Date Expiration: {{ recompense.dateExpiration|date('Y-m-d') }}</li>
+        <li>Bonus Points: {{ recompense.bonusPoints }}</li>
+        <li>Utilisateur: {{ recompense.utilisateurFidelite.nomUtilisateur ?? '–' }}</li>
+    </ul>
+
+    <a href="{{ path('recompense_edit', {id: recompense.id}) }}">✏️ Modifier</a>
+    <br>
+    <a href="{{ path('recompense_index') }}">⬅️ Retour à la liste</a>
+{% endblock %}
