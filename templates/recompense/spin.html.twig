@@ -1,0 +1,71 @@
+<h2>🎡 Spin the Wheel!</h2>
+<canvas id="spinWheel" width="400" height="400"></canvas>
+<button onclick="spin()">Spin!</button>
+
+<script>
+    const rewards = {{ rewardsJson|raw }};
+    const userId = {{ app.user ? app.user.id : 1 }}; // adapte selon auth réelle
+
+    const canvas = document.getElementById('spinWheel');
+    const ctx = canvas.getContext('2d');
+    const segments = rewards.length;
+    const anglePerSegment = 360 / segments;
+    const colors = ['#FF6666', '#66CC66', '#6699FF', '#FFCC66'];
+
+    function drawWheel() {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 150;
+
+        for (let i = 0; i < segments; i++) {
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.arc(centerX, centerY, radius,
+                i * anglePerSegment * Math.PI / 180,
+                (i + 1) * anglePerSegment * Math.PI / 180);
+            ctx.fill();
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate((i + 0.5) * anglePerSegment * Math.PI / 180);
+            ctx.fillStyle = 'black';
+            ctx.font = '14px Arial';
+            ctx.fillText(rewards[i].descriptionRecompense, 70, 0);
+            ctx.restore();
+        }
+    }
+
+    function spin() {
+        const angle = Math.floor(Math.random() * 360 + 1080);
+        canvas.style.transition = 'transform 3s ease-out';
+        canvas.style.transform = `rotate(${angle}deg)`;
+
+        setTimeout(() => {
+            const finalAngle = angle % 360;
+            const index = Math.floor((segments - (finalAngle / anglePerSegment)) % segments);
+            const reward = rewards[index];
+
+            alert("🎉 You won: " + reward.descriptionRecompense);
+
+            fetch("/recompense/spin", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: userId,
+                    reward: reward.descriptionRecompense
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log("✅ Reward assigned:", data);
+            })
+            .catch(err => {
+                console.error("❌ Error saving reward:", err);
+            });
+
+        }, 3200);
+    }
+
+    drawWheel();
+</script>

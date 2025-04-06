@@ -111,5 +111,14 @@ public function stats(EntityManagerInterface $em): Response
         'spending' => json_encode($spending),
     ]);
 }
+#[Route('/utilisateur/{id}/rewards', name: 'user_rewards')]
+public function rewards(Utilisateurfidelite $user): Response
+{
+    return $this->render('utilisateur/rewards.html.twig', [
+        'user' => $user,
+        'rewards' => $user->getRecompensefidelites()
+    ]);
+}
+
 
 }
