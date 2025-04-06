@@ -53,8 +53,9 @@ public function index(Request $request, EntityManagerInterface $em): Response
         ]);
     }
 
-    #[Route('/{id}', name: 'utilisateur_show')]
-    public function show(Utilisateurfidelite $utilisateur): Response
+    #[Route('/{id<\d+>}', name: 'utilisateur_show')]
+public function show(Utilisateurfidelite $utilisateur): Response
+
     {
         return $this->render('utilisateur/show.html.twig', [
             'utilisateur' => $utilisateur,
@@ -87,4 +88,28 @@ public function index(Request $request, EntityManagerInterface $em): Response
 
         return $this->redirectToRoute('utilisateur_index');
     }
+
+    #[Route('/statistiques', name: 'utilisateur_stats')]
+public function stats(EntityManagerInterface $em): Response
+{
+    $repo = $em->getRepository(Utilisateurfidelite::class);
+    $users = $repo->findAll();
+
+    $labels = [];
+    $trips = [];
+    $spending = [];
+
+    foreach ($users as $user) {
+        $labels[] = $user->getNomUtilisateur();
+        $trips[] = $user->getTotalTrajetsEffectues();
+        $spending[] = $user->getTotalMontantDepense();
+    }
+
+    return $this->render('utilisateur/statistics.html.twig', [
+        'labels' => json_encode($labels),
+        'trips' => json_encode($trips),
+        'spending' => json_encode($spending),
+    ]);
+}
+
 }

@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques{% endblock %}
+
+{% block body %}
+<h2 class="text-center mt-4">📊 Statistiques des utilisateurs fidélité</h2>
+
+<canvas id="tripsChart" height="100"></canvas>
+<canvas id="spendingChart" height="100" class="mt-5"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = {{ labels|raw }};
+    const trips = {{ trips|raw }};
+    const spending = {{ spending|raw }};
+
+    new Chart(document.getElementById('tripsChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '🚗 Trajets effectués',
+                data: trips,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            }]
+        }
+    });
+
+    new Chart(document.getElementById('spendingChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '💸 Dépenses totales (€)',
+                data: spending,
+                backgroundColor: 'rgba(255, 99, 132, 0.6)'
+            }]
+        }
+    });
+</script>
+{% endblock %}
