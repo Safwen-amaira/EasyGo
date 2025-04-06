@@ -6,6 +6,10 @@
     <h1>Récompenses Fidélité</h1>
 
     <a href="{{ path('recompense_new') }}">➕ Ajouter une récompense</a>
+<form method="get" action="{{ path('recompense_index') }}">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search description">
+    <button type="submit">Search</button>
+</form>
 
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>

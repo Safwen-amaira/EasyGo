@@ -14,14 +14,25 @@ use Symfony\Component\Routing\Annotation\Route;
 class RecompenseFideliteController extends AbstractController
 {
     #[Route('/', name: 'recompense_index')]
-    public function index(EntityManagerInterface $em): Response
+    public function index(Request $request, EntityManagerInterface $em): Response
     {
-        $recompenses = $em->getRepository(recompenseFidelite::class)->findAll();
-
+        $searchTerm = $request->query->get('search');
+        $repository = $em->getRepository(Recompensefidelite::class);
+    
+        $recompenses = $searchTerm
+            ? $repository->createQueryBuilder('r')
+                ->where('r.descriptionRecompense LIKE :search')
+                ->setParameter('search', '%' . $searchTerm . '%')
+                ->getQuery()
+                ->getResult()
+            : $repository->findAll();
+    
         return $this->render('recompense/index.html.twig', [
             'recompenses' => $recompenses,
+            'search' => $searchTerm,
         ]);
     }
+    
 
     #[Route('/new', name: 'recompense_new')]
     public function new(Request $request, EntityManagerInterface $em): Response

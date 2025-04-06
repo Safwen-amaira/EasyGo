@@ -14,14 +14,25 @@ use Symfony\Component\Routing\Annotation\Route;
 class UtilisateurFideliteController extends AbstractController
 {
     #[Route('/', name: 'utilisateur_index')]
-    public function index(EntityManagerInterface $em): Response
-    {
-        $utilisateurs = $em->getRepository(Utilisateurfidelite::class)->findAll();
+public function index(Request $request, EntityManagerInterface $em): Response
+{
+    $searchTerm = $request->query->get('search');
+    $repository = $em->getRepository(UtilisateurFidelite::class);
 
-        return $this->render('utilisateur/index.html.twig', [
-            'utilisateurs' => $utilisateurs,
-        ]);
-    }
+    $utilisateurs = $searchTerm
+        ? $repository->createQueryBuilder('u')
+            ->where('u.nomUtilisateur LIKE :search')
+            ->setParameter('search', '%' . $searchTerm . '%')
+            ->getQuery()
+            ->getResult()
+        : $repository->findAll();
+
+    return $this->render('utilisateur/index.html.twig', [
+        'utilisateurs' => $utilisateurs,
+        'search' => $searchTerm,
+    ]);
+}
+
 
     #[Route('/new', name: 'utilisateur_new')]
     public function new(Request $request, EntityManagerInterface $em): Response

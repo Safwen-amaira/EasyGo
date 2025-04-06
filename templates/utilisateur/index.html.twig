@@ -6,6 +6,11 @@
     <h1>Utilisateurs Fidélité</h1>
 
     <a href="{{ path('utilisateur_new') }}">➕ Ajouter un utilisateur</a>
+<form method="get" action="{{ path('utilisateur_index') }}">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search by username">
+    <button type="submit">Search</button>
+</form>
+
 
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
