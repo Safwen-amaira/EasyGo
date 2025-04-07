@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du contrat{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Détails du Contrat</h1>
+
+        <div class="card p-4">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ contrat.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nom et Prénom</th>
+                        <td>{{ contrat.nomprenom }}</td>
+                    </tr>
+                    <tr>
+                        <th>Adresse</th>
+                        <td>{{ contrat.adresse }}</td>
+                    </tr>
+                    <tr>
+                        <th>Téléphone</th>
+                        <td>{{ contrat.telephone }}</td>
+                    </tr>
+                    <tr>
+                        <th>Type de contrat</th>
+                        <td>{{ contrat.typeContrat }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de début</th>
+                        <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : 'Non spécifiée' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de fin</th>
+                        <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : 'Non spécifiée' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ contrat.description }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ path('app_contrat_index') }}" class="btn btn-secondary">Retour à la liste</a>
+            <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-warning ml-2">Modifier</a>
+
+            {{ include('contrat/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}
