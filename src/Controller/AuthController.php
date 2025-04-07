@@ -2,37 +2,49 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
+use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 class AuthController extends AbstractController
 {
-    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
-    public function login(#[CurrentUser] ?Users $user): JsonResponse
-    {
-        if (null === $user) {
-            return $this->json([
-                'message' => 'Invalid credentials',
-            ], 401);
+    #[Route('/api/login', name: 'api_login_check', methods: ['POST'])]
+    public function ApiLogin(
+        Request $request,
+        EntityManagerInterface $em,
+        JWTTokenManagerInterface $jwtManager,
+        UserPasswordHasherInterface $hasher
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+    
+        // Add validation
+        if (!isset($data['cin']) || !isset($data['password'])) {
+            return new JsonResponse(['error' => 'CIN and password are required'], 400);
         }
-
-        return $this->json([
-            'user'  => $user->getEmail(),
-            'roles' => $user->getRoles(),
-            'token' => $this->container->get('lexik_jwt_authentication.encoder')
-                ->encode([
-                    'email' => $user->getEmail(),
-                    'roles' => $user->getRoles(),
-                ]),
+    
+        $user = $em->getRepository(Users::class)->findOneBy(['cin' => $data['cin']]);
+    
+        if (!$user || !$hasher->isPasswordValid($user, $data['password'])) {
+            return new JsonResponse(['error' => 'Invalid credentials'], 401);
+        }
+    
+        // Explicitly return user data
+        return new JsonResponse([
+            'token' => $jwtManager->create($user),
+            'user' => [
+                'id' => $user->getId(),
+                'cin' => $user->getCin(),
+                'email' => $user->getEmail(),
+                'isAdmin' => $user->isAdmin(),
+                'isDriver' => $user->isDriver(),
+                'isRider' => $user->isRider(),
+                'is2_faenabled'=>$user->is2FAEnabled()
+            ]
         ]);
-    }
-
-    #[Route('/logout', name: 'app_logout', methods: ['POST'])]
-    public function logout(): void
-    {
-        //a été fait by the firewall
     }
 }

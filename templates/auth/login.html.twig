@@ -1,0 +1,225 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .form-errors,
+        .form-error-message,
+        .form-errors li {
+            color: red !important;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .registration-container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .security-info {
+            background: #f8f9fa;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .security-image {
+            max-width: 100px !important;
+            max-height:200px;
+            margin-bottom: 2rem;
+        }
+
+        .form-column {
+            padding: 2.5rem;
+        }
+
+        .form-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4e73df 0%, #3b5bdb 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="sitename">EasyGo</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="/#hero" class="active">Home</a></li>
+          <li><a href="/#about">About</a></li>
+          <li><a href="/#features">Features</a></li>
+          <li><a href="/#services">Services</a></li>
+          <li><a href="/#pricing">Pricing</a></li>
+          <li><a href="/#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="/register">Get Started</a>
+    </div>
+  </header>
+
+  <br/><br/><br/><br/><br/><br/>
+
+  <div class="registration-container">
+    <div class="row g-0">
+        <!-- Image Column -->
+        <div class="col-md-6 security-info">
+            <img src="{{ asset('assets/img/signup.png') }}" height="500px" width="450px" alt="Login Image" class="security-image">
+            <a href="{{ path('app_register') }}" class="btn btn-outline-primary mt-3">
+                <i class="fas fa-user-plus me-2"></i>New User? Register
+            </a>
+        </div>
+
+        <!-- Form Column -->
+        <div class="col-md-6 form-column">
+            <h1 class="form-title">Login to Your Account</h1>
+            <div id="error-message" class="alert alert-danger d-none"></div>
+
+            <form id="loginForm" action="{{ path('api_login_check') }}" method="post">
+                <div class="mb-3">
+                    <label for="cin">CIN</label>
+                    <input type="text" name="cin" id="cin" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </form>
+        </div>
+    </div>
+  </div>
+
+  <footer id="footer" class="footer">
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="index.html" class="logo d-flex align-items-center">
+            <span class="sitename">EasyGo</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>A108 Adam Street</p>
+            <p>New York, NY 535022</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+            <p><strong>Email:</strong> <span>info@example.com</span></p>
+          </div>
+          <div class="social-links d-flex mt-4">
+            <a href=""><i class="bi bi-twitter-x"></i></a>
+            <a href=""><i class="bi bi-facebook"></i></a>
+            <a href=""><i class="bi bi-instagram"></i></a>
+            <a href=""><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About us</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Terms of service</a></li>
+            <li><a href="#">Privacy policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><a href="#">Web Design</a></li>
+            <li><a href="#">Web Development</a></li>
+            <li><a href="#">Product Management</a></li>
+            <li><a href="#">Marketing</a></li>
+            <li><a href="#">Graphic Design</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+<script>
+const form = document.getElementById('loginForm');
+const errorMessage = document.getElementById('error-message');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMessage.classList.add('d-none');
+
+    const cin = form.cin.value.trim();
+    const password = form.password.value.trim();
+
+    // Debug logs
+    console.log("CIN:", cin);
+    console.log("Password:", password);
+
+    try {
+        const response = await fetch("http://127.0.0.1:8001/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                cin: cin,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Login failed');
+        }
+
+        // Store token and user data
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // Manual role redirect
+        const user = data.user;
+        let redirectPath = '/dashboard';
+        if (user.is2_faenabled) redirectPath = '/2fa/enter';
+        else if (!user.isDriver) redirectPath ='/2fa/setup';
+
+      
+        window.location.href = redirectPath;
+
+    } catch (err) {
+        errorMessage.textContent = err.message;
+        errorMessage.classList.remove('d-none');
+        setTimeout(() => errorMessage.classList.add('d-none'), 5000);
+    }
+});
+</script>
+{% endblock %}

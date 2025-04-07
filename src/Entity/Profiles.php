@@ -30,7 +30,7 @@ class Profiles
     private ?string $requirements = null;
 
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'user_id_id', referencedColumnName: 'id', nullable: false)] // Explicit column name
     private ?Users $userId = null;
 
     public function getId(): ?int

@@ -2,20 +2,427 @@
 
 {% block title %}Register{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    .col-md-6 form-column{
+        color : red ! important;
+    }
+      .col-md-6 .form-column{
+        color : red ! important;
+    }
+        .form-errors,
+        .form-errors li,
+        .form-error-message {
+            color: rgb(255, 0, 0) !important;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            list-style: none;
+            padding-left: 0;
+            text:rgb(255, 0, 0);
+        }
+        .invalid-feedback {
+            display: block;
+        color: red !important;
+    }
+
+
+        .form-error-message {
+            display: block;
+        }
+
+        .form-control.is-invalid {
+            border-color: rgb(255, 0, 0) !important;
+        }
+
+        .form-control + .form-errors,
+        .form-control + .form-error-message {
+            color: red !important;
+        }
+   
+        .registration-container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .security-info {
+            background: #f8f9fa;
+            padding: 2.5rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .security-image {
+            max-width: 100px !important;
+            max-height:200px;
+            margin-bottom: 2rem;
+        }
+
+        .form-column {
+            padding: 2.5rem;
+        }
+
+        .form-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4e73df 0%, #3b5bdb 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .login-link {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <div class="container">
-        <h1>Register</h1>
+ <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
-        {{ form_start(registrationForm) }}
-            {{ form_row(registrationForm.email) }}
-            {{ form_row(registrationForm.nom) }}
-            {{ form_row(registrationForm.prenom) }}
-            {{ form_row(registrationForm.cin) }}
-            {{ form_row(registrationForm.PasswordNet) }}
-            {{ form_row(registrationForm.isRider) }}
-            {{ form_row(registrationForm.isDriver) }}
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1 class="sitename">EasyGo</h1>
+      </a>
 
-            <button type="submit" class="btn btn-primary">Register</button>
-        {{ form_end(registrationForm) }}
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="/#hero" >Home</a></li>
+          <li><a href="/#about">About</a></li>
+          <li><a href="/#features">Features</a></li>
+          <li><a href="/#services">Services</a></li>
+          <li><a href="/#pricing">Pricing</a></li>
+          <li class="dropdown"><a href="#"><span>Team</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="#">Dropdown 1</a></li>
+              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="#">Deep Dropdown 1</a></li>
+                  <li><a href="#">Deep Dropdown 2</a></li>
+                  <li><a href="#">Deep Dropdown 3</a></li>
+                  <li><a href="#">Deep Dropdown 4</a></li>
+                  <li><a href="#">Deep Dropdown 5</a></li>
+                </ul>
+              </li>
+              <li><a href="#">Dropdown 2</a></li>
+              <li><a href="#">Dropdown 3</a></li>
+              <li><a href="#">Dropdown 4</a></li>
+            </ul>
+          </li>
+          <li><a href="/#contact">Contact</a></li>
+                    <li><a href="/#auth">Login</a></li>
+
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="index.html#about">Get Started</a>
+
     </div>
+  </header>
+  <br/><br/><br/><br/><br/>
+    <div class="registration-container">
+    
+        <div class="row g-0">
+            <!-- Security Image Section -->
+            <div class="col-md-6 security-info">
+                            <center>
+
+                <img src="{{ asset('assets/img/signup.png') }}" height="500px" width="450px" alt="Security Shield" class="security-image">
+             <br/>
+                <a href="{{ path('app_auth') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Existing User? Login Here
+                </a>
+                </center>
+            </div>
+
+
+            <!-- Registration Form Column -->
+            <div class="col-md-6 form-column">
+                <h1 class="form-title">Create New Account</h1>
+                {% if errorMessage %}
+                     <div class="alert alert-danger text-center" role="alert">
+                      {{ errorMessage }}
+                    </div>
+                {% endif %}
+
+               {{ form_start(registrationForm, {'attr': {'id': 'registrationForm'}}) }}
+    <div class="mb-3">
+        {{ form_label(registrationForm.email, 'Email Address') }}
+        {{ form_widget(registrationForm.email, {'attr': {
+            'class': 'form-control',
+            'placeholder': 'example@email.com',
+            'id': 'email'
+        }}) }}
+                {{ form_errors(registrationForm.email) }}
+
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_label(registrationForm.nom, 'Last Name') }}
+            {{ form_widget(registrationForm.nom, {'attr': {
+                'class': 'form-control',
+                'placeholder': 'Nom',
+                'id': 'nom'
+            }}) }}
+                    {{ form_errors(registrationForm.nom) }}
+
+        </div>
+        <div class="col-md-6">
+            {{ form_label(registrationForm.prenom, 'First Name') }}
+            {{ form_widget(registrationForm.prenom, {'attr': {
+                'class': 'form-control',
+                'placeholder': 'Prenom',
+                'id': 'prenom'
+            }}) }}
+                    {{ form_errors(registrationForm.prenom) }}
+
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        {{ form_label(registrationForm.cin) }}
+         {{ form_widget(registrationForm.cin, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(registrationForm.cin) }}
+    </div>
+
+
+    <div class="mb-3">
+        {{ form_label(registrationForm.PasswordNet.first, 'Password') }}
+        {{ form_widget(registrationForm.PasswordNet.first, {'attr': {
+            'class': 'form-control',
+            'placeholder': '••••••••',
+            'id': 'password'
+        }}) }}
+        {{ form_errors(registrationForm.PasswordNet.first) }}
+
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(registrationForm.PasswordNet.second, 'Confirm Password') }}
+        {{ form_widget(registrationForm.PasswordNet.second, {'attr': {
+            'class': 'form-control',
+            'placeholder': '••••••••',
+            'id': 'confirmPassword'
+        }}) }}
+    {{ form_errors(registrationForm.PasswordNet.second) }}
+
+    </div>
+
+    <div class="d-flex gap-4 mb-4">
+        <div class="form-check">
+            {{ form_widget(registrationForm.isRider, {'attr': {'id': 'rider'}}) }}
+            {{ form_label(registrationForm.isRider, 'I am a Rider') }}
+        </div>
+        <div class="form-check">
+            {{ form_widget(registrationForm.isDriver, {'attr': {'id': 'driver'}}) }}
+            {{ form_label(registrationForm.isDriver, 'I am a Driver') }}
+        </div>
+    </div>
+
+    <button id="submitBtn" class="btn btn-primary" type="submit">
+        <i class="fas fa-user-plus me-2"></i>Create Account
+    </button>
+{{ form_end(registrationForm) }}
+
+            </div>
+        </div>
+    </div>
+
+  <footer id="footer" class="footer">
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="index.html" class="logo d-flex align-items-center">
+            <span class="sitename">EasyGo</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>A108 Adam Street</p>
+            <p>New York, NY 535022</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+            <p><strong>Email:</strong> <span>info@example.com</span></p>
+          </div>
+          <div class="social-links d-flex mt-4">
+            <a href=""><i class="bi bi-twitter-x"></i></a>
+            <a href=""><i class="bi bi-facebook"></i></a>
+            <a href=""><i class="bi bi-instagram"></i></a>
+            <a href=""><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><a href="/#">Home</a></li>
+            <li><a href="/#">About us</a></li>
+            <li><a href="/#">Services</a></li>
+            <li><a href="/#">Terms of service</a></li>
+            <li><a href="/#">Privacy policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><a href="/#">Web Design</a></li>
+            <li><a href="/#">Web Development</a></li>
+            <li><a href="/#">Product Management</a></li>
+            <li><a href="/#">Marketing</a></li>
+            <li><a href="/#">Graphic Design</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Hic solutasetp</h4>
+          <ul>
+            <li><a href="/#">Molestiae accusamus iure</a></li>
+            <li><a href="/#">Excepturi dignissimos</a></li>
+            <li><a href="/#">Suscipit distinctio</a></li>
+            <li><a href="/#">Dilecta</a></li>
+            <li><a href="/#">Sit quas consectetur</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Nobis illum</h4>
+          <ul>
+            <li><a href="/#">Ipsam</a></li>
+            <li><a href="/#">Laudantium dolorum</a></li>
+            <li><a href="/#">Dinera</a></li>
+            <li><a href="/#">Trodelas</a></li>
+            <li><a href="/#">Flexo</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">EasyGo</strong> <span>All Rights Reserved</span></p>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you've purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> Distributed By <a href="https://themewagon.com">ThemeWagon</a>
+      </div>
+    </div>
+
+  </footer>
+
+{% endblock %}
+{% block javascripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("registrationForm");
+        const submitBtn = document.getElementById("submitBtn");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const nom = document.getElementById("nom").value.trim();
+            const prenom = document.getElementById("prenom").value.trim();
+            const cin = document.getElementById("cin").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const isRider = document.getElementById("rider").checked;
+            const isDriver = document.getElementById("driver").checked;
+
+            if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nom)) {
+                return showError("Last name must contain only letters and spaces.");
+            }
+
+            if (!/^[A-Za-zÀ-ÿ\s]+$/.test(prenom)) {
+                return showError("First name must contain only letters and spaces.");
+            }
+
+            if (!/^\d{8}$/.test(cin)) {
+                return showError("CIN must be exactly 8 digits.");
+            }
+
+            if (password !== confirmPassword) {
+                return showError("Passwords do not match.");
+            }
+
+            if ((isRider && isDriver) || (!isRider && !isDriver)) {
+                return showError("Please select either Rider or Driver — not both or none.");
+            }
+
+            const formData = new FormData(form);
+
+            fetch("{{ path('app_register') }}", {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => {
+                    if (!response.ok) throw new Error("Server error");
+                    return response.text();
+                })
+                .then((html) => {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Your account has been created successfully.",
+                        icon: "success",
+                    }).then(() => {
+                        window.location.href = "{{ path('app_login') }}";
+                    });
+                })
+                .catch((error) => {
+                    showError("Something went wrong. Try again.");
+                });
+        });
+
+        function showError(message) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops!",
+                text: message,
+            });
+        }
+    });
+</script>
+
+    {{ parent() }}
+    <!-- Load SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Flash Message Handling -->
+    {% for message in app.flashes('success') %}
+    <script>
+            Swal.fire({
+                title: 'Success!',
+                text: '{{ message|e }}',
+                icon: 'success'
+            }).then(() => {
+                window.location.href = "{{ path('app_login') }}";
+            });
+            console.log("registred");
+        </script>
+    {% endfor %}
 {% endblock %}

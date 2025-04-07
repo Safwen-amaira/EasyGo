@@ -1,0 +1,290 @@
+{# templates/admin/dashboard.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard | EasyGo{% endblock %}
+
+{% block css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    .admin-container {
+        display: flex;
+        min-height: 100vh;
+        background: #fff;
+    }
+
+    /* Sidebar */
+    .admin-sidebar {
+        width: 280px;
+        padding: 32px;
+        border-right: 1px solid #EAECF0;
+        background: #fff;
+    }
+
+    .nav-title {
+        font-size: 16px;
+        color: #101828;
+        margin-bottom: 24px;
+        font-weight: 600;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+        background: #F9FAFB;
+    }
+
+    .nav-item.active {
+        background: #3F5BF61A;
+        color: #3F5BF6;
+    }
+
+    .nav-item i {
+        width: 24px;
+        text-align: center;
+    }
+
+    /* Main Content */
+    .admin-main {
+        flex: 1;
+        padding: 48px;
+        background: #F9FAFB;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        color: #101828;
+    }
+
+    /* Profile Section */
+    .profile-card {
+        background: white;
+        padding: 32px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+    }
+
+    .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #F2F4F7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    /* User List */
+    .users-table {
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        border-collapse: collapse;
+        box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid #EAECF0;
+    }
+
+    .users-table th {
+        background: #F9FAFB;
+        color: #667085;
+        font-weight: 500;
+    }
+
+    .user-actions button {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 8px;
+    }
+
+    /* Logout Modal */
+    .logout-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 32px;
+        border-radius: 12px;
+        width: 400px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="admin-container">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <div class="nav-title">Admin Panel</div>
+        
+        <div class="nav-item active">
+            <i class="fas fa-user"></i>
+            Profile
+        </div>
+        
+        <div class="nav-item">
+            <i class="fas fa-users"></i>
+            User List
+        </div>
+        
+        <div class="nav-item" id="logoutTrigger">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="section-header">
+                <h2 class="section-title">Admin Profile</h2>
+            </div>
+            
+            <div class="profile-card">
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <div>
+                        <h3>Admin Name</h3>
+                        <p>admin@easygo.com</p>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User List Section (Hidden by default) -->
+        <div class="user-list-section" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">User Management</h2>
+            </div>
+            
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Sample Data -->
+                    <tr>
+                        <td>John Doe</td>
+                        <td>john@example.com</td>
+                        <td>User</td>
+                        <td class="user-actions">
+                            <button class="edit-btn">Edit</button>
+                            <button class="delete-btn">Delete</button>
+                        </td>
+                    </tr>
+                    <!-- Add more rows dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div class="logout-modal" id="logoutModal">
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div style="margin-top: 24px;">
+                <button class="cancel-btn">Cancel</button>
+                <button class="confirm-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Navigation handling
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove active class from all items
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Handle section visibility
+            const sectionMap = {
+                'Profile': '.profile-section',
+                'User List': '.user-list-section'
+            };
+            
+            const sectionText = this.textContent.trim();
+            Object.values(sectionMap).forEach(selector => {
+                document.querySelector(selector).style.display = 'none';
+            });
+            
+            if (sectionMap[sectionText]) {
+                document.querySelector(sectionMap[sectionText]).style.display = 'block';
+            }
+        });
+    });
+
+    // Logout handling
+    document.getElementById('logoutTrigger').addEventListener('click', () => {
+        document.getElementById('logoutModal').style.display = 'flex';
+    });
+
+    document.querySelector('.cancel-btn').addEventListener('click', () => {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+
+    document.querySelector('.confirm-btn').addEventListener('click', () => {
+        window.location.href = "{{ path('app_logout') }}";
+    });
+</script>
+{% endblock %}

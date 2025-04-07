@@ -23,27 +23,45 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
+        $errorMessage = null;
+
         if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('PasswordNet')->getData();
 
-            $user->setPassword(
-                $passwordHasher->hashPassword(
-                    $user,
-                    $form->get('PasswordNet')->getData()
-                )
-            );
+            $isRider = $form->get('isRider')->getData();
+            $isDriver = $form->get('isDriver')->getData();
 
-            $user->setIsAdmin(false);
-            $user->setIsDriver($form->get('isDriver')->getData() ?? false);
-            $user->setIsRider($form->get('isRider')->getData() ?? false);
+            if (($isRider && $isDriver) || (!$isRider && !$isDriver)) {
+                $errorMessage = "Please select either Rider or Driver (not both).";
+            } else {
+                $user->setPassword(
+                    $passwordHasher->hashPassword($user, $plainPassword)
+                );
+                $user->setIsAdmin(false);
+                $user->setIsRider($isRider);
+                $user->setIsDriver($isDriver);
 
-            $entityManager->persist($user);
-            $entityManager->flush();
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            return $this->redirectToRoute('app_login');
+                $this->addFlash('success', 'Account created successfully! You can now log in.');
+                return $this->redirectToRoute('app_register');
+            }
         }
 
         return $this->render('registration/registration.html.twig', [
             'registrationForm' => $form->createView(),
+            'errorMessage' => $errorMessage,
+            
         ]);
     }
+    #[Route('/auth', name: 'app_auth')]
+        public function authpage(): Response
+        {
+            return $this->render('auth/login.html.twig',[
+                'registrationForm' => $form->createView(),
+                'errorMessage' => $errorMessage,
+            ]);
+        }
+
 }

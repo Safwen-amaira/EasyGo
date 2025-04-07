@@ -1,52 +1,43 @@
 security:
+    enable_authenticator_manager: true
     password_hashers:
         App\Entity\Users:
             algorithm: auto
 
     providers:
-        app_user_provider:
+        # Configure how users are loaded from the database
+        database_users:
             entity:
                 class: App\Entity\Users
-                property: email
-
+                property: cin 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-
-        login:
-            pattern: ^/api/login
-            stateless: true
-            json_login:
-                check_path: /api/login
-                username_path: email
-                password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
-        api:
-            pattern: ^/api
-            stateless: true
-            jwt: ~
-
+            security: 
+            
         main:
             lazy: true
-            provider: app_user_provider
+
+
+        api_profile:
+            pattern: ^/api/profile
+            stateless: true
+            security: false
+
+        api:    
+            pattern: ^/api/(?!login) 
+            stateless: true
+            jwt : ~
+            security: false 
+
 
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/register,  roles: PUBLIC_ACCESS }
-        - { path: ^/logout,    roles: PUBLIC_ACCESS }
-when@test:
-    security:
-        password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+        - { path: ^/admin, roles: PUBLIC_ACCESS }
+        - { path: ^/driver, roles: ROLE_DRIVER }
+        - { path: ^/rider, roles: ROLE_RIDER }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/2fa/enter, roles: PUBLIC_ACCESS }
+        - { path: ^/2fa/check, roles: PUBLIC_ACCESS }
