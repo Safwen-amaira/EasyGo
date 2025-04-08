@@ -4,11 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Utilisateurfidelite;
 use App\Form\UtilisateurFideliteType;
+use App\Repository\UtilisateurfideliteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Security;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
+
+
 
 #[Route('/utilisateur')]
 class UtilisateurFideliteController extends AbstractController
@@ -119,6 +125,20 @@ public function rewards(Utilisateurfidelite $user): Response
         'rewards' => $user->getRecompensefidelites()
     ]);
 }
+
+
+#[Route('/mon-profil', name: 'mon_profil')]
+public function monProfil(UtilisateurfideliteRepository $repo): Response
+{
+    $user = $repo->find(2); // ou utilise l'utilisateur connecté si dispo
+
+    return $this->render('utilisateur/mon_profil.html.twig', [
+        'user' => $user,
+        'recompenses' => $user->getRecompensefidelites(),
+        'now' => new \DateTime(), // ✅ on ajoute la date actuelle
+    ]);
+}
+
 
 
 }

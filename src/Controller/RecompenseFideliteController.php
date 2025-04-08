@@ -97,39 +97,42 @@ public function show(int $id, EntityManagerInterface $em): Response
     }
 
     #[Route('/spin', name: 'spin_reward', methods: ['POST'])]
-    public function spin(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $userId = $data['userId'] ?? null;
-    
-        if (!$userId) {
-            return new JsonResponse(['error' => 'Missing user ID'], 400);
-        }
-    
-        $user = $em->getRepository(Utilisateurfidelite::class)->find($userId);
-    
-        if (!$user) {
-            return new JsonResponse(['error' => 'User not found'], 404);
-        }
-    
-        $rewards = $em->getRepository(Recompensefidelite::class)->findBy([
-            'Utilisateurfidelite' => null
-        ]);
-    
-        if (empty($rewards)) {
-            return new JsonResponse(['error' => 'No unassigned rewards available'], 404);
-        }
-    
-        $reward = $rewards[array_rand($rewards)];
-        $reward->setUtilisateurfidelite($user);
-        $em->flush();
-    
-        return new JsonResponse([
-            'message' => 'Reward assigned!',
-            'reward' => $reward->getDescriptionRecompense()
-        ]);
+public function spin(Request $request, EntityManagerInterface $em): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    $userId = $data['userId'] ?? null;
+
+    if (!$userId) {
+        return new JsonResponse(['error' => 'Missing user ID'], 400);
     }
-    
+
+    $user = $em->getRepository(Utilisateurfidelite::class)->find($userId);
+
+    if (!$user) {
+        return new JsonResponse(['error' => 'User not found'], 404);
+    }
+
+    $rewards = $em->getRepository(Recompensefidelite::class)->findBy([
+        'Utilisateurfidelite' => null
+    ]);
+
+    if (empty($rewards)) {
+        return new JsonResponse(['error' => 'No unassigned rewards available'], 404);
+    }
+
+    $rewardIndex = array_rand($rewards);
+    $reward = $rewards[$rewardIndex];
+
+    $reward->setUtilisateurfidelite($user);
+    $em->flush();
+
+    return new JsonResponse([
+        'message' => 'Reward assigned!',
+        'reward' => $reward->getDescriptionRecompense(),
+        'index' => $rewardIndex
+    ]);
+}
+
     #[Route('/assign', name: 'assign_reward', methods: ['POST'])]
     public function assign(Request $request, EntityManagerInterface $em): JsonResponse
     {
@@ -144,7 +147,6 @@ public function show(int $id, EntityManagerInterface $em): Response
         $user = $em->getRepository(Utilisateurfidelite::class)->find($userId);
         $reward = $em->getRepository(Recompensefidelite::class)->findOneBy([
             'descriptionRecompense' => $rewardDescription,
-            'Utilisateurfidelite' => null // 👈 assure que la récompense n’est pas déjà assignée
         ]);
 
         if (!$user || !$reward) {
@@ -171,10 +173,15 @@ public function show(int $id, EntityManagerInterface $em): Response
     #[Route('/recompense/spin-page', name: 'recompense_spin_page')]
 public function spinPage(EntityManagerInterface $em): Response
 {
-    $rewards = $em->getRepository(Recompensefidelite::class)->findAll();
+    $rewards = $em->getRepository(Recompensefidelite::class)->findBy([
+        'Utilisateurfidelite' => null
+    ]);
+
+    // on extrait juste les descriptions (pour JS)
+    $rewardDescriptions = array_map(fn($r) => $r->getDescriptionRecompense(), $rewards);
 
     return $this->render('recompense/spin.html.twig', [
-        'rewardsJson' => json_encode($rewards),
+        'rewardsJson' => json_encode($rewardDescriptions),
     ]);
 }
 

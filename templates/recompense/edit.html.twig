@@ -1,14 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier une récompense{% endblock %}
+{% block title %}✏️ Modifier une Récompense{% endblock %}
 
 {% block body %}
-    <h1>Modifier la récompense</h1>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">✏️ Modifier la Récompense</h2>
+        <a href="{{ path('recompense_index') }}" class="btn btn-outline-secondary">⬅️ Retour à la liste</a>
+    </div>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button class="btn">Mettre à jour</button>
-    {{ form_end(form) }}
+    <div class="card shadow-sm p-4 rounded">
+        {{ form_start(form) }}
+            <div class="row g-3">
+                {% for field in form %}
+                    <div class="col-md-6">
+                        {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(field) }}
+                    </div>
+                {% endfor %}
+            </div>
 
-    <a href="{{ path('recompense_index') }}">⬅️ Retour à la liste</a>
+            <div class="mt-4 d-flex justify-content-end">
+                <button class="btn btn-primary px-4">✅ Mettre à jour</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
 {% endblock %}

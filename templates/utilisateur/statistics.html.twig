@@ -1,41 +1,107 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Statistiques{% endblock %}
+{% block title %}📊 Statistiques Fidélité{% endblock %}
 
 {% block body %}
-<h2 class="text-center mt-4">📊 Statistiques des utilisateurs fidélité</h2>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-gradient">📊 Statistiques Fidélité</h2>
+            <p class="text-muted">Vue globale des trajets et dépenses</p>
+        </div>
 
-<canvas id="tripsChart" height="100"></canvas>
-<canvas id="spendingChart" height="100" class="mt-5"></canvas>
+        <div class="d-flex gap-2">
+            <select id="chartType" class="form-select form-select-sm">
+                <option value="bar">📊 Barres</option>
+                <option value="line">📈 Lignes</option>
+            </select>
+            <button class="btn btn-outline-secondary btn-sm" onclick="downloadChart('tripsChart')">📥 Export Trajets</button>
+            <button class="btn btn-outline-danger btn-sm" onclick="downloadChart('spendingChart')">📥 Export Dépenses</button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-4 p-3">
+                <h5 class="text-primary text-center mb-3 fw-semibold">🚗 Trajets</h5>
+                <canvas id="tripsChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-4 p-3">
+                <h5 class="text-danger text-center mb-3 fw-semibold">💸 Dépenses (TND)</h5>
+                <canvas id="spendingChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const labels = {{ labels|raw }};
     const trips = {{ trips|raw }};
     const spending = {{ spending|raw }};
+    let currentType = 'bar';
 
-    new Chart(document.getElementById('tripsChart'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '🚗 Trajets effectués',
-                data: trips,
-                backgroundColor: 'rgba(54, 162, 235, 0.6)'
-            }]
-        }
+    const tripsCanvas = document.getElementById('tripsChart');
+    const spendingCanvas = document.getElementById('spendingChart');
+
+    let tripsChart = createChart(tripsCanvas, '🚗 Trajets', trips, 'rgba(0, 123, 255, 0.7)');
+    let spendingChart = createChart(spendingCanvas, '💸 Dépenses (TND)', spending, 'rgba(220, 53, 69, 0.7)');
+
+    function createChart(canvas, label, data, color) {
+        return new Chart(canvas, {
+            type: currentType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: color,
+                    borderColor: color,
+                    fill: currentType !== 'line',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    document.getElementById('chartType').addEventListener('change', function () {
+        currentType = this.value;
+        tripsChart.destroy();
+        spendingChart.destroy();
+        tripsChart = createChart(tripsCanvas, '🚗 Trajets', trips, 'rgba(0, 123, 255, 0.7)');
+        spendingChart = createChart(spendingCanvas, '💸 Dépenses (TND)', spending, 'rgba(220, 53, 69, 0.7)');
     });
 
-    new Chart(document.getElementById('spendingChart'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '💸 Dépenses totales (€)',
-                data: spending,
-                backgroundColor: 'rgba(255, 99, 132, 0.6)'
-            }]
-        }
-    });
+    function downloadChart(chartId) {
+        const canvas = document.getElementById(chartId);
+        const url = canvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        link.download = `${chartId}.png`;
+        link.href = url;
+        link.click();
+    }
+
+   
 </script>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(to right, #4e54c8, #8f94fb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    select.form-select {
+        width: auto;
+    }
+</style>
 {% endblock %}

@@ -8,8 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+
+
 #[ORM\Entity(repositoryClass: UtilisateurfideliteRepository::class)]
-class Utilisateurfidelite
+class Utilisateurfidelite 
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -136,4 +138,6 @@ class Utilisateurfidelite
 
         return $this;
     }
+
+    
 }

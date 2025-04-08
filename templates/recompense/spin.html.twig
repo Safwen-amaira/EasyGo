@@ -1,71 +1,160 @@
-<h2>🎡 Spin the Wheel!</h2>
-<canvas id="spinWheel" width="400" height="400"></canvas>
-<button onclick="spin()">Spin!</button>
-
-<script>
-    const rewards = {{ rewardsJson|raw }};
-    const userId = {{ app.user ? app.user.id : 1 }}; // adapte selon auth réelle
-
-    const canvas = document.getElementById('spinWheel');
-    const ctx = canvas.getContext('2d');
-    const segments = rewards.length;
-    const anglePerSegment = 360 / segments;
-    const colors = ['#FF6666', '#66CC66', '#6699FF', '#FFCC66'];
-
-    function drawWheel() {
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const radius = 150;
-
-        for (let i = 0; i < segments; i++) {
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.fillStyle = colors[i % colors.length];
-            ctx.arc(centerX, centerY, radius,
-                i * anglePerSegment * Math.PI / 180,
-                (i + 1) * anglePerSegment * Math.PI / 180);
-            ctx.fill();
-
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate((i + 0.5) * anglePerSegment * Math.PI / 180);
-            ctx.fillStyle = 'black';
-            ctx.font = '14px Arial';
-            ctx.fillText(rewards[i].descriptionRecompense, 70, 0);
-            ctx.restore();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spin the Wheel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: #f4f7fa;
         }
-    }
 
-    function spin() {
-        const angle = Math.floor(Math.random() * 360 + 1080);
-        canvas.style.transition = 'transform 3s ease-out';
-        canvas.style.transform = `rotate(${angle}deg)`;
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
 
-        setTimeout(() => {
-            const finalAngle = angle % 360;
-            const index = Math.floor((segments - (finalAngle / anglePerSegment)) % segments);
-            const reward = rewards[index];
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
 
-            alert("🎉 You won: " + reward.descriptionRecompense);
+        #spinWheel {
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
 
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid #e74c3c;
+            z-index: 10;
+        }
+
+        button {
+            margin-top: 30px;
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #27ae60;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h2>🎡 Spin the Wheel!</h2>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="spinWheel" width="400" height="400"></canvas>
+    </div>
+
+    <button onclick="spin()">Spin!</button>
+
+    <div id="result"></div>
+
+    <script>
+        const rewards = {{ rewardsJson|raw }};
+        const userId = {{ app.user ? app.user.id : 2 }};
+
+        const canvas = document.getElementById('spinWheel');
+        const ctx = canvas.getContext('2d');
+        const segments = rewards.length;
+        const anglePerSegment = 360 / segments;
+        const colors = ['#FF6666', '#66CC66', '#6699FF', '#FFCC66', '#FF99CC', '#CCCCFF'];
+
+        let currentRotation = 0;
+
+        function drawWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 150;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < segments; i++) {
+                const startAngle = (i * anglePerSegment) * Math.PI / 180;
+                const endAngle = ((i + 1) * anglePerSegment) * Math.PI / 180;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.fill();
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate((i + 0.5) * anglePerSegment * Math.PI / 180);
+                ctx.fillStyle = 'black';
+                ctx.font = '13px Arial';
+                ctx.fillText(rewards[i], 70, 0);
+                ctx.restore();
+            }
+        }
+
+        function spin() {
             fetch("/recompense/spin", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: userId,
-                    reward: reward.descriptionRecompense
-                })
+                body: JSON.stringify({ userId: userId })
             })
             .then(res => res.json())
             .then(data => {
-                console.log("✅ Reward assigned:", data);
+                if (data.error) {
+                    alert("❌ " + data.error);
+                    return;
+                }
+
+                const rewardName = data.reward;
+                const index = data.index;
+
+                const targetAngle = 360 - (index * anglePerSegment) - (anglePerSegment / 2);
+                const spins = 5;
+                const totalRotation = spins * 360 + targetAngle;
+
+                currentRotation += totalRotation;
+
+                canvas.style.transition = 'transform 4s ease-out';
+                canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+                setTimeout(() => {
+                    document.getElementById('result').textContent = `🎉 You won: ${rewardName}!`;
+                }, 4200);
             })
             .catch(err => {
-                console.error("❌ Error saving reward:", err);
+                console.error("❌ Error during spin:", err);
+                alert("❌ Something went wrong. Try again.");
             });
+        }
 
-        }, 3200);
-    }
-
-    drawWheel();
-</script>
+        drawWheel();
+    </script>
+</body>
+</html>

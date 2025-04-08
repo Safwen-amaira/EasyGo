@@ -3,45 +3,55 @@
 {% block title %}Liste des utilisateurs fidélité{% endblock %}
 
 {% block body %}
-    <h1>Utilisateurs Fidélité</h1>
+<a href="{{ path('utilisateur_stats') }}" class="btn btn-info m-2">Voir les statistiques 📊</a>
 
-    <a href="{{ path('utilisateur_new') }}">➕ Ajouter un utilisateur</a>
-<form method="get" action="{{ path('utilisateur_index') }}">
-    <input type="text" name="search" value="{{ search }}" placeholder="Search by username">
-    <button type="submit">Search</button>
-</form>
+<div class="container py-5 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary fw-bold">👥 Utilisateurs Fidélité</h1>
+        <div>
+            <a href="{{ path('mon_profil') }}" class="btn btn-outline-success me-2">🎁 Voir mes points</a>
+            <a href="{{ path('utilisateur_new') }}" class="btn btn-primary">➕ Ajouter un utilisateur</a>
+        </div>
+    </div>
 
+    <form method="get" action="{{ path('utilisateur_index') }}" class="mb-4 d-flex gap-2">
+        <input type="text" name="search" class="form-control" value="{{ search }}" placeholder="🔍 Rechercher par nom...">
+        <button type="submit" class="btn btn-secondary">Rechercher</button>
+    </form>
 
-    <table border="1" cellpadding="8" cellspacing="0">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nom</th>
-                <th>Points</th>
-                <th>Trajets</th>
-                <th>Montant</th>
-                <th>Dernière MAJ</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for utilisateur in utilisateurs %}
-            <tr>
-                <td>{{ utilisateur.id }}</td>
-                <td>{{ utilisateur.nomUtilisateur }}</td>
-                <td>{{ utilisateur.pointsAccumules }}</td>
-                <td>{{ utilisateur.totalTrajetsEffectues }}</td>
-                <td>{{ utilisateur.totalMontantDepense }}</td>
-                <td>{{ utilisateur.dateDerniereMiseAJour|date('Y-m-d H:i') }}</td>
-                <td>
-                    <a href="{{ path('utilisateur_show', {id: utilisateur.id}) }}">👁️ Voir</a> |
-                    <a href="{{ path('utilisateur_edit', {id: utilisateur.id}) }}">✏️ Modifier</a> |
-                    <a href="{{ path('utilisateur_delete', {id: utilisateur.id}) }}">🗑️ Supprimer</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr><td colspan="7">Aucun utilisateur trouvé.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered align-middle shadow-sm rounded">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>Nom</th>
+                    <th>Points</th>
+                    <th>Trajets</th>
+                    <th>Montant</th>
+                    <th>Dernière MAJ</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for utilisateur in utilisateurs %}
+                <tr class="text-center">
+                    <td class="fw-semibold">{{ utilisateur.nomUtilisateur }}</td>
+                    <td><span class="badge bg-success">{{ utilisateur.pointsAccumules }}</span></td>
+                    <td>{{ utilisateur.totalTrajetsEffectues }}</td>
+                    <td>{{ utilisateur.totalMontantDepense }} TND</td>
+                    <td>{{ utilisateur.dateDerniereMiseAJour|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <a href="{{ path('utilisateur_show', {id: utilisateur.id}) }}" class="btn btn-sm btn-outline-info" title="Voir"><i class="bi bi-eye"></i></a>
+                        <a href="{{ path('utilisateur_edit', {id: utilisateur.id}) }}" class="btn btn-sm btn-outline-warning" title="Modifier"><i class="bi bi-pencil"></i></a>
+                        <a href="{{ path('utilisateur_delete', {id: utilisateur.id}) }}" class="btn btn-sm btn-outline-danger" title="Supprimer" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
