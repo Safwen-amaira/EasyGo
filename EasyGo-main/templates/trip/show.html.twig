@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du voyage #{{ trip.id }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-lg overflow-hidden">
+                <div class="card-header bg-primary text-white py-3" style="background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h4 mb-0 font-weight-light">
+                            <i class="bi bi-car-front-fill mr-2"></i> Détails du voyage #{{ trip.id }}
+                        </h1>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_trip_index') }}" class="btn btn-sm btn-light rounded-pill" style="color: #0d47a1;">
+                                <i class="bi bi-arrow-left me-1"></i> Retour
+                            </a>
+                            <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn btn-sm btn-light rounded-pill" style="color: #0d47a1;">
+                                <i class="bi bi-pencil me-1"></i> Modifier
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body px-5 py-4">
+                    <div class="row">
+                        <!-- Colonne gauche - Informations principales -->
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h5 class="mb-3 text-dark d-flex align-items-center">
+                                    <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+                                        <i class="bi bi-calendar-date"></i>
+                                    </span>
+                                    Dates du voyage
+                                </h5>
+                                <div class="ps-5">
+                                    <p class="mb-2">
+                                        <strong class="text-primary">Date :</strong> 
+                                        {{ trip.tripDate ? trip.tripDate|date('d/m/Y') : 'Non spécifié' }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3 text-dark d-flex align-items-center">
+                                    <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+                                        <i class="bi bi-signpost-split"></i>
+                                    </span>
+                                    Itinéraire
+                                </h5>
+                                <div class="ps-5">
+                                    <p class="mb-2">
+                                        <strong class="text-primary">Départ :</strong> 
+                                        {{ trip.departurePoint }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong class="text-primary">Destination :</strong> 
+                                        {{ trip.destination }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3 text-dark d-flex align-items-center">
+                                    <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+                                        <i class="bi bi-clock"></i>
+                                    </span>
+                                    Horaires
+                                </h5>
+                                <div class="ps-5">
+                                    <p class="mb-2">
+                                        <strong class="text-primary">Heure de départ :</strong> 
+                                        {{ trip.departureTime ? trip.departureTime|date('H:i') : 'Non spécifié' }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong class="text-primary">Heure de retour :</strong> 
+                                        {{ trip.returnTime ? trip.returnTime|date('H:i') : 'Non spécifié' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Colonne droite - Informations complémentaires -->
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h5 class="mb-3 text-dark d-flex align-items-center">
+                                    <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+                                        <i class="bi bi-people"></i>
+                                    </span>
+                                    Places disponibles
+                                </h5>
+                                <div class="ps-5">
+                                    <p class="mb-0">
+                                        <strong class="text-primary">Nombre de places :</strong>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                                            {{ trip.availableSeats }} places
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3 text-dark d-flex align-items-center">
+                                    <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+                                        <i class="bi bi-cash-coin"></i>
+                                    </span>
+                                    Cotisation
+                                </h5>
+                                <div class="ps-5">
+                                    <p class="mb-0">
+                                        <strong class="text-primary">Montant :</strong>
+                                        <span class="fw-bold">{{ trip.contribution }} DNT</span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3 text-dark d-flex align-items-center">
+                                    <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+                                        <i class="bi bi-tag"></i>
+                                    </span>
+                                    Type de voyage
+                                </h5>
+                                <div class="ps-5">
+                                    <p class="mb-0">
+                                        {{ trip.tripType ? trip.tripType : 'Non spécifié' }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3 text-dark d-flex align-items-center">
+                                    <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+                                        <i class="bi bi-map"></i>
+                                    </span>
+                                    Points de relais
+                                </h5>
+                                <div class="ps-5">
+                                    {% if trip.relayPoints %}
+                                        <div class="bg-light p-3 rounded border">
+                                            {{ trip.relayPoints }}
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted">Aucun point de relais spécifié</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-light py-3 d-flex justify-content-end">
+                    {{ include('trip/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(30, 136, 229, 0.2);
+    }
+    .badge {
+        padding: 0.35rem 0.65rem;
+        font-weight: 500;
+    }
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+    .text-muted {
+        color: #6c757d !important;
+    }
+    .border-primary {
+        border-color: rgba(30, 136, 229, 0.5) !important;
+    }
+    .bg-light {
+        background-color: #f8f9fa!important;
+    }
+</style>
+{% endblock %}

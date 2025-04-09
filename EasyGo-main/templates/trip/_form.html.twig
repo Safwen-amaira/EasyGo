@@ -1,0 +1,125 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+<!-- Informations de base -->
+<div class="mb-4 pb-3 border-bottom border-primary">
+    <h5 class="mb-4 text-primary d-flex align-items-center">
+        <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+            <i class="bi bi-info-circle"></i>
+        </span>
+        Informations de base
+    </h5>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_label(form.trip_date, 'Date du voyage', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-calendar3"></i></span>
+                {{ form_widget(form.trip_date, {'attr': {'class': 'form-control datepicker border-start-0'}}) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.trip_type, 'Type de voyage', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-tag"></i></span>
+                {{ form_widget(form.trip_type, {'attr': {'class': 'form-select border-start-0'}}) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Itinéraire -->
+<div class="mb-4 pb-3 border-bottom border-primary">
+    <h5 class="mb-4 text-primary d-flex align-items-center">
+        <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+            <i class="bi bi-signpost-split"></i>
+        </span>
+        Itinéraire
+    </h5>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_label(form.departure_point, 'Point de départ', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-geo-alt"></i></span>
+                {{ form_widget(form.departure_point, {'attr': {'class': 'form-control border-start-0'}}) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.destination, 'Destination', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-geo-alt-fill"></i></span>
+                {{ form_widget(form.destination, {'attr': {'class': 'form-control border-start-0'}}) }}
+            </div>
+        </div>
+        <div class="col-12">
+            {{ form_label(form.relay_points, 'Points de relais', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-map"></i></span>
+                {{ form_widget(form.relay_points, {'attr': {'class': 'form-control border-start-0', 'rows': 3}}) }}
+            </div>
+            <small class="text-muted">Séparez les points d'étape par des virgules</small>
+        </div>
+    </div>
+</div>
+
+<!-- Horaires -->
+<div class="mb-4 pb-3 border-bottom border-primary">
+    <h5 class="mb-4 text-primary d-flex align-items-center">
+        <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+            <i class="bi bi-clock"></i>
+        </span>
+        Horaires
+    </h5>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_label(form.departure_time, 'Heure de départ', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-arrow-up-right"></i></span>
+                {{ form_widget(form.departure_time, {'attr': {'class': 'form-control timepicker border-start-0'}}) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.return_time, 'Heure de retour', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-arrow-down-left"></i></span>
+                {{ form_widget(form.return_time, {'attr': {'class': 'form-control timepicker border-start-0'}}) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Détails pratiques -->
+<div class="mb-4">
+    <h5 class="mb-4 text-primary d-flex align-items-center">
+        <span class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 mr-3">
+            <i class="bi bi-people"></i>
+        </span>
+        Détails pratiques
+    </h5>
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_label(form.available_seats, 'Places disponibles', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-person-plus"></i></span>
+                {{ form_widget(form.available_seats, {'attr': {'class': 'form-control border-start-0'}}) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.contribution, 'Contribution (DNT)', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+            <div class="input-group">
+                <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0">DNT</span>
+                {{ form_widget(form.contribution, {'attr': {'class': 'form-control border-start-0'}}) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top border-primary">
+    <button type="reset" class="btn btn-outline-primary rounded-pill px-4">
+        <i class="bi bi-x-circle me-1"></i> Réinitialiser
+    </button>
+    <button type="submit" class="{{ button_attr.class|default('btn btn-primary rounded-pill px-4 shadow-sm') }}" 
+            style="{{ button_attr.style|default('background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%); border: none;') }}">
+        <i class="bi bi-check-circle me-1"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+</div>
+
+{{ form_end(form) }}
