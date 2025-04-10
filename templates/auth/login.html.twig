@@ -205,9 +205,11 @@ form.addEventListener('submit', async (e) => {
         // Store token and user data
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-
+       localStorage.setItem("user_identifier", data.user.email); 
         // Manual role redirect
         const user = data.user;
+        localStorage.setItem("user_identifier", user.email); 
+
         let redirectPath = '/dashboard';
         if (user.is2_faenabled) redirectPath = '/2fa/enter';
         else if (!user.isDriver) redirectPath ='/2fa/setup';

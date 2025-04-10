@@ -55,25 +55,25 @@ public function enter2fa(Request $request): Response
         'error' => $request->query->get('error')
     ]);
 }
-
 #[Route('/2fa/check', name: '2fa_check', methods: ['POST'])]
 public function check2fa(Request $request, EntityManagerInterface $em): Response
 {
-    /** @var Users $user */
-    $user = $this->getUser();
-    $code = $request->request->get('code');
+    // Get the email directly from the request
+    $email = $request->request->get('user_identifier'); // Changed from 'user' to 'user_identifier'
+    $user = $em->getRepository(Users::class)->findOneBy(['email' => $email]); // Removed .getEmail()
 
+    if (!$user) {
+        return $this->redirectToRoute('app_auth');
+    }
+
+    $code = $request->request->get('code');
     if ($this->isCodeValid($user, $code)) {
         $user->setIs2FAEnabled(true);
         $em->flush();
         return $this->redirectToRoute('admin_dashboard');
     }
 
-    // Return JSON response with error
-    return $this->json([
-        'success' => false,
-        'error' => 'Invalid verification code'
-    ], 400);
+    return $this->redirectToRoute('2fa_enter', ['error' => 'Invalid code']);
 }
 
 private function generateQrCode(Users $user): string
