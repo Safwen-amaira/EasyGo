@@ -1,3 +1,4 @@
+{# templates/trip/client_view.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Trajet {{ trip.departurePoint }} → {{ trip.destination }}{% endblock %}
@@ -10,15 +11,12 @@
         border-radius: 12px;
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
         margin-bottom: 2rem;
-        overflow: hidden;
     }
     .trip-header {
         background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
         color: white;
         padding: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        border-radius: 12px 12px 0 0;
     }
     .info-badge {
         background: rgba(255, 255, 255, 0.2);
@@ -32,46 +30,18 @@
         border-radius: 10px;
         padding: 1.5rem;
     }
-    .action-btn {
-        background:rgb(6, 55, 104);
+    .book-btn {
+        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
         border: none;
-        padding: 0.75rem 1.5rem;
+        padding: 1rem;
+        font-size: 1.1rem;
         font-weight: 500;
         border-radius: 50px;
         transition: all 0.3s;
     }
-    .action-btn:hover {
+    .book-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .edit-btn {
-        background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
-        color: white;
-    }
-    .delete-btn {
-        background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
-        color: white;
-    }
-    .back-btn {
-        background: white;
-        color: #0d47a1;
-        border: 1px solid #0d47a1;
-    }
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-    .detail-card {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.25rem;
-        height: 100%;
-    }
-    .detail-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
     }
 </style>
 {% endblock %}
@@ -80,18 +50,15 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-
-    <div class="card trip-card">
-    <div class="card-header trip-header d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">
-            <i class="bi bi-car-front-fill me-2"></i>
-            {{ trip.departurePoint }} → {{ trip.destination }}
-        </h2>
-        <a href="{{ path('app_trip_publication', {'id': trip.id}) }}" class="btn btn-secondary-custom">
-            <i class="bi bi-arrow-left me-2"></i> Retour
-        </a>
-    </div>
-
+            <!-- Carte principale -->
+            <div class="card trip-card">
+                <!-- En-tête -->
+                <div class="card-header trip-header">
+                    <h2 class="h5 mb-0">
+                        <i class="bi bi-car-front-fill me-2"></i>
+                        {{ trip.departurePoint }} → {{ trip.destination }}
+                    </h2>
+                </div>
 
                 <!-- Corps de la carte -->
                 <div class="card-body">
@@ -107,10 +74,10 @@
                             </div>
                         </div>
                         
-                        <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">
+                        <div class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">
                             <i class="bi bi-people-fill me-1"></i>
                             {{ trip.availableSeats }} places disponibles
-                        </span>
+                        </div>
                     </div>
                     
                     <!-- Itinéraire -->
@@ -142,17 +109,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                     
                     <!-- Détails -->
-                     <div class="mb-4 p-3 bg-light rounded">
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
-                            <div class="detail-card">
-                                <div class="detail-icon" style="color: #9C27B0;">
-                                    <i class="bi bi-tag"></i>
-                                </div>
-                                <h5 class="h6 mb-2">Type de trajet</h5>
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="h6 mb-2"><i class="bi bi-tag me-1" style="color: #9C27B0;"></i> Type</h5>
                                 <p class="mb-0">
                                     {% if trip.tripType == 'aller_simple' %}
                                         Aller simple
@@ -166,43 +128,47 @@
                         </div>
                         
                         <div class="col-md-4">
-                            <div class="detail-card">
-                                <div class="detail-icon" style="color: #2196F3;">
-                                    <i class="bi bi-cash-coin"></i>
-                                </div>
-                                <h5 class="h6 mb-2">Contribution</h5>
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="h6 mb-2"><i class="bi bi-cash-coin me-1" style="color: #2196F3;"></i> Contribution</h5>
                                 <p class="mb-0">{{ trip.contribution }} DNT</p>
                             </div>
                         </div>
                         
                         <div class="col-md-4">
-                            <div class="detail-card">
-                                <div class="detail-icon" style="color: rgb(41, 26, 206);">
-                                    <i class="bi bi-signpost-split"></i>
-                                </div>
-                                <h5 class="h6 mb-2">Points de relais</h5>
-                                <p class="mb-0">{{ trip.relayPoints ? trip.relayPoints : 'Aucun' }}</p>
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="h6 mb-2"><i class="bi bi-signpost-split me-1" style="color:rgb(41, 26, 206);"></i> Points de relais</h5>
+                                 <p class="mb-0">{{ trip.relayPoints }}</p>
                             </div>
                         </div>
+          
                     </div>
-                     </div>
-                    <div class="action-buttons d-flex justify-content-center gap-3">
-    <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn edit-btn flex-grow-1 flex-md-grow-0">
-        <i class="bi bi-pencil me-2"></i> Modifier
-    </a>
-    
-    <form method="post" action="{{ path('app_trip_delete', {'id': trip.id}) }}" 
-          onsubmit="return confirm('Confirmer la suppression ?');"
-          class="flex-grow-1 flex-md-grow-0">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trip.id) }}">
-        <button class="btn delete-btn w-100">
-            <i class="bi bi-trash me-2"></i> Supprimer
-        </button>
-    </form>
-</div>
+                    
+                    <!-- Bouton de réservation -->
+                    <div class="d-grid">
+                        <button class="btn btn-success btn-lg rounded-pill py-3 book-btn">
+                            <i class="bi bi-bookmark-check-fill me-2"></i> Réserver ce trajet
+                        </button>
+                    </div>
                 </div>
+                            <!-- Retour à la liste -->
+            <div class="text-center mt-4">
+                <a href="{{ path('app_trip_index') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i> Retour aux trajets disponibles
+                </a>
             </div>
+            </div>
+
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.querySelector('.book-btn').addEventListener('click', function() {
+        // Logique de réservation à implémenter
+        alert('Fonctionnalité de réservation à implémenter');
+    });
+</script>
 {% endblock %}

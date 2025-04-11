@@ -28,20 +28,19 @@ final class TripController extends AbstractController
         $trip = new Trip();
         $form = $this->createForm(TripType::class, $trip);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($trip);
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_trip_index', [], Response::HTTP_SEE_OTHER);
+    
+            return $this->redirectToRoute('app_trip_publication', ['id' => $trip->getId()]);
         }
-
+    
         return $this->render('trip/new.html.twig', [
             'trip' => $trip,
             'form' => $form,
         ]);
     }
-
     #[Route('/{id}', name: 'app_trip_show', methods: ['GET'])]
     public function show(Trip $trip): Response
     {
@@ -71,11 +70,27 @@ final class TripController extends AbstractController
     #[Route('/{id}', name: 'app_trip_delete', methods: ['POST'])]
     public function delete(Request $request, Trip $trip, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$trip->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$trip->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($trip);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_trip_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/publication', name: 'app_trip_publication', methods: ['GET'])]
+    public function publication(Trip $trip): Response
+    {
+        return $this->render('trip/publication.html.twig', [
+            'trip' => $trip,
+        ]);
+    }
+
+    #[Route('/client/{id}', name: 'app_trip_client_view', methods: ['GET'])]
+    public function clientView(Trip $trip): Response
+    {
+        return $this->render('trip/client_view.html.twig', [
+            'trip' => $trip,
+        ]);
     }
 }
