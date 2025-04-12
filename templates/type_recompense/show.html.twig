@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Type{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h2 class="mb-4 text-primary fw-bold">🔍 Détail du Type de Récompense</h2>
+
+    <ul class="list-group">
+        <li class="list-group-item"><strong>ID:</strong> {{ type_recompense.id }}</li>
+        <li class="list-group-item"><strong>Nom:</strong> {{ type_recompense.nom }}</li>
+    </ul>
+
+    <div class="mt-4 d-flex gap-2">
+        <a href="{{ path('type_recompense_edit', {'id': type_recompense.id}) }}" class="btn btn-outline-primary">✏️ Modifier</a>
+        <form method="post" action="{{ path('type_recompense_delete', {'id': type_recompense.id}) }}" onsubmit="return confirm('Confirmer la suppression ?')">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ type_recompense.id) }}">
+            <button class="btn btn-outline-danger">🗑️ Supprimer</button>
+        </form>
+        <a href="{{ path('type_recompense_index') }}" class="btn btn-link">⬅️ Retour</a>
+    </div>
+</div>
+{% endblock %}
