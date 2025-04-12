@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Feedbacks{% endblock %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ asset('css/feedback/index.html.css') }}">
+{% endblock %}
+
+{% block body %}
+  <div class="container mt-4">
+    <h1 class="mb-4 text-center">Liste des Feedbacks</h1>
+
+    <div class="feedback-section">
+      <h6>Feedbacks :</h6>
+      {% if feedbacks is not empty %}
+        {% for feedback in feedbacks %}
+          <div class="feedback-item">
+            <div class="star-rating mb-2">
+              {% for i in 1..5 %}
+                <i class="bi {{ i <= feedback.note ? 'bi-star-fill' : 'bi-star' }}"></i>
+              {% endfor %}
+            </div>
+            <p class="small">{{ feedback.commentaire|default('No comment') }}</p>
+            <div class="d-flex gap-2">
+              <a href="{{ path('app_feedback_edit', {'id': feedback.id}) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+              {{ include('feedback/_delete.html.twig', {'feedback': feedback}) }}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="small text-muted">No feedback yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="mt-4 text-center">
+      <a href="{{ path('app_feedback_new') }}" class="btn btn-primary">Ajouter un feedback</a>
+    </div>
+  </div>
+{% endblock %}
