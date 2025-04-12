@@ -26,7 +26,7 @@ class TripType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('available_seats')
-            ->add('trip_type', ChoiceType::class, [ // Utilisation correcte de ChoiceType
+            ->add('trip_type', ChoiceType::class, [ 
                 'label' => 'Type de trajet',
                 'choices' => [
                     'Aller simple' => 'aller',

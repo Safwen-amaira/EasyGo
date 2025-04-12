@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier réservation{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h2 class="h5 mb-0">Modifier votre réservation</h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill"></i> 
+                        Vous pouvez modifier les détails de votre réservation ci-dessous.
+                    </div>
+
+                    <h3 class="h4">Détails du trajet</h3>
+                    <div class="mb-4">
+                        <p><strong>Départ:</strong> {{ reservation.trip.departurePoint }}</p>
+                        <p><strong>Destination:</strong> {{ reservation.trip.destination }}</p>
+                        <p><strong>Date du trajet:</strong> {{ reservation.trip.tripDate|date('d/m/Y ') }}</p>
+                        <p><strong>Places disponibles:</strong> {{ reservation.trip.availableSeats + reservation.nombrePlaces }}</p>
+                    </div>
+
+                    {{ include('reservation/_form.html.twig', {
+                        'button_label': 'Mettre à jour',
+                        'form_attr': {
+                            'class': 'needs-validation',
+                            'novalidate': 'novalidate'
+                        }
+                    }) }}
+
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à la réservation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

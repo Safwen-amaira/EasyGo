@@ -1,0 +1,148 @@
+{# templates/trip/client_index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Trajets disponibles{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .trip-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .trip-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+    .trip-header {
+        background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+    .route-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+    .seats-available {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(30, 136, 229, 0.1);
+        color: #1e88e5;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+    .seats-warning {
+        background: rgba(244, 67, 54, 0.1);
+        color: #F44336;
+    }
+    .search-bar {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="mb-4">Trajets disponibles</h1>
+    
+    <!-- Barre de recherche -->
+    <div class="search-bar mb-4">
+        <form method="get" action="{{ path('app_trip_client') }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="departure" 
+                           placeholder="Ville de départ" value="{{ app.request.query.get('departure') }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="destination" 
+                           placeholder="Ville d'arrivée" value="{{ app.request.query.get('destination') }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control" name="date" 
+                           value="{{ app.request.query.get('date') }}">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    {% if trips is empty %}
+        <div class="text-center py-5">
+            <i class="bi bi-car-front fs-1 text-muted mb-3"></i>
+            <h3>Aucun trajet disponible</h3>
+            <p class="text-muted">Aucun trajet ne correspond à vos critères de recherche.</p>
+        </div>
+    {% else %}
+        <div class="row">
+            {% for trip in trips %}
+            <div class="col-lg-6 mb-4">
+                <div class="card trip-card">
+                    <div class="card-header trip-header d-flex justify-content-between align-items-center">
+                        <span class="route-badge">
+                            <i class="bi bi-car-front-fill me-1"></i>
+                            {{ trip.departurePoint }} → {{ trip.destination }}
+                        </span>
+                        <span class="seats-available {% if trip.availableSeats <= 3 %}seats-warning{% endif %}">
+                            <i class="bi bi-people-fill me-1"></i>
+                            {{ trip.availableSeats }} place(s)
+                        </span>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <i class="bi bi-calendar-date me-1"></i>
+                                {{ trip.tripDate|date('d/m/Y') }}
+                            </div>
+                            <div>
+                                <i class="bi bi-clock me-1"></i>
+                                {{ trip.departureTime|date('H:i') }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <strong>Départ:</strong> {{ trip.departurePoint }}
+                            </div>
+                            <div>
+                                <strong>Arrivée:</strong> {{ trip.destination }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary bg-opacity-10 text-primary">
+                                {{ trip.contribution }} DNT
+                            </span>
+                            <a href="{{ path('app_trip_show', {'id': trip.id}) }}" class="btn btn-sm btn-outline-primary">
+                                Voir détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center">
+            {{ knp_pagination_render(trips) }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

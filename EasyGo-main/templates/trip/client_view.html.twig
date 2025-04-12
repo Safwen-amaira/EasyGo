@@ -38,10 +38,15 @@
         font-weight: 500;
         border-radius: 50px;
         transition: all 0.3s;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
     }
     .book-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        color: white;
     }
 </style>
 {% endblock %}
@@ -109,6 +114,7 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                     
                     <!-- Détails -->
                     <div class="row g-3 mb-4">
@@ -137,38 +143,20 @@
                         <div class="col-md-4">
                             <div class="p-3 bg-light rounded">
                                 <h5 class="h6 mb-2"><i class="bi bi-signpost-split me-1" style="color:rgb(41, 26, 206);"></i> Points de relais</h5>
-                                 <p class="mb-0">{{ trip.relayPoints }}</p>
+                                <p class="mb-0">{{ trip.relayPoints }}</p>
                             </div>
                         </div>
-          
                     </div>
                     
                     <!-- Bouton de réservation -->
                     <div class="d-grid">
-                        <button class="btn btn-success btn-lg rounded-pill py-3 book-btn">
+                        <a href="{{ path('app_reservation_new', {'tripId': trip.id}) }}" class="btn btn-success btn-lg rounded-pill py-3 book-btn">
                             <i class="bi bi-bookmark-check-fill me-2"></i> Réserver ce trajet
-                        </button>
+                        </a>
                     </div>
                 </div>
-                            <!-- Retour à la liste -->
-            <div class="text-center mt-4">
-                <a href="{{ path('app_trip_index') }}" class="btn btn-outline-primary">
-                    <i class="bi bi-arrow-left me-2"></i> Retour aux trajets disponibles
-                </a>
             </div>
-            </div>
-
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
-<script>
-    document.querySelector('.book-btn').addEventListener('click', function() {
-        // Logique de réservation à implémenter
-        alert('Fonctionnalité de réservation à implémenter');
-    });
-</script>
 {% endblock %}

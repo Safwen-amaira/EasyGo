@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/trip')]
 final class TripController extends AbstractController
 {
-    #[Route(name: 'app_trip_index', methods: ['GET'])]
+    #[Route('/', name: 'app_trip_index', methods: ['GET'])]
     public function index(TripRepository $tripRepository): Response
     {
         return $this->render('trip/index.html.twig', [
@@ -41,6 +41,7 @@ final class TripController extends AbstractController
             'form' => $form,
         ]);
     }
+
     #[Route('/{id}', name: 'app_trip_show', methods: ['GET'])]
     public function show(Trip $trip): Response
     {
@@ -70,7 +71,7 @@ final class TripController extends AbstractController
     #[Route('/{id}', name: 'app_trip_delete', methods: ['POST'])]
     public function delete(Request $request, Trip $trip, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$trip->getId(), $request->getPayload()->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$trip->getId(), $request->request->get('_token'))) {
             $entityManager->remove($trip);
             $entityManager->flush();
         }
@@ -93,4 +94,23 @@ final class TripController extends AbstractController
             'trip' => $trip,
         ]);
     }
+    #[Route('/trip/client', name: 'app_trip_client')]
+public function clientList(Request $request, PaginatorInterface $paginator): Response
+{
+    $query = $this->getDoctrine()
+        ->getRepository(Trip::class)
+        ->createQueryBuilder('t')
+        ->orderBy('t.tripDate', 'ASC')
+        ->getQuery();
+
+    $trips = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1),
+        6 
+    );
+
+    return $this->render('trip/index.html.twig', [
+        'trips' => $trips,
+    ]);
+}
 }
