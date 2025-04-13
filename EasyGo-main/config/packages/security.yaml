@@ -26,6 +26,8 @@ security:
         - { path: ^/reservation/\d+/edit, roles: PUBLIC_ACCESS }
         - { path: ^/reservation/\d+/delete, roles: PUBLIC_ACCESS }
         - { path: ^/reservation/, roles: PUBLIC_ACCESS }
+        - { path: ^/driver/reservations, roles: PUBLIC_ACCESS }
+        - { path: ^/driver/reservation/\d+/manage, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

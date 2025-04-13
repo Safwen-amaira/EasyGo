@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/trip')]
 final class TripController extends AbstractController
@@ -22,20 +23,36 @@ final class TripController extends AbstractController
         ]);
     }
 
+    #[Route('/admin_trip', name: 'app_trip_admin_trip', methods: ['GET'])]
+    public function indexadmintrip(TripRepository $tripRepository): Response
+    {
+        return $this->render('trip/admin_trip.html.twig', [
+            'trips' => $tripRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/publication_admin/{id}', name: 'app_trip_publication_admin', methods: ['GET'])]
+    public function showadmin(Trip $trip): Response
+    {
+        return $this->render('trip/publication_admin.html.twig', [
+            'trip' => $trip,
+        ]);
+    }
+
     #[Route('/new', name: 'app_trip_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $trip = new Trip();
         $form = $this->createForm(TripType::class, $trip);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($trip);
             $entityManager->flush();
-    
+
             return $this->redirectToRoute('app_trip_publication', ['id' => $trip->getId()]);
         }
-    
+
         return $this->render('trip/new.html.twig', [
             'trip' => $trip,
             'form' => $form,
@@ -94,23 +111,22 @@ final class TripController extends AbstractController
             'trip' => $trip,
         ]);
     }
+
     #[Route('/trip/client', name: 'app_trip_client')]
-public function clientList(Request $request, PaginatorInterface $paginator): Response
-{
-    $query = $this->getDoctrine()
-        ->getRepository(Trip::class)
-        ->createQueryBuilder('t')
-        ->orderBy('t.tripDate', 'ASC')
-        ->getQuery();
+    public function clientList(Request $request, TripRepository $tripRepository, PaginatorInterface $paginator): Response
+    {
+        $query = $tripRepository->createQueryBuilder('t')
+            ->orderBy('t.tripDate', 'ASC')
+            ->getQuery();
 
-    $trips = $paginator->paginate(
-        $query,
-        $request->query->getInt('page', 1),
-        6 
-    );
+        $trips = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            6
+        );
 
-    return $this->render('trip/index.html.twig', [
-        'trips' => $trips,
-    ]);
-}
+        return $this->render('trip/index.html.twig', [
+            'trips' => $trips,
+        ]);
+    }
 }

@@ -40,4 +40,5 @@ class TripRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
 }

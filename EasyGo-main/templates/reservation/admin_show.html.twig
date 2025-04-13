@@ -1,51 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Confirmation de réservation{% endblock %}
+{% block title %}Détails de réservation{% endblock %}
 
 {% block body %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0">Confirmation de votre réservation</h2>
-                    <div class="btn-group">
-                        <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-warning">
-                            <i class="bi bi-pencil-fill"></i> Modifier
-                        </a>
-                        <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" 
-                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
-                            <button class="btn btn-sm btn-danger ms-2">
-                                <i class="bi bi-trash-fill"></i> Supprimer
-                            </button>
-                        </form>
-                    </div>
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Détails de la réservation </h2>
                 </div>
                 
                 <div class="card-body">
                     <div class="alert alert-success">
                         <i class="bi bi-check-circle-fill"></i> 
-                        Votre réservation a été enregistrée avec succès !
+                        La réservation a été enregistrée avec succès !
                     </div>
 
                     <h3 class="h4">Détails du trajet</h3>
                     <div class="mb-4">
                         <p><strong>Départ:</strong> {{ reservation.trip.departurePoint }}</p>
                         <p><strong>Destination:</strong> {{ reservation.trip.destination }}</p>
-                        <p><strong>Date du trajet:</strong> {{ reservation.trip.tripDate|date('d/m/Y ') }}</p>
+                        <p><strong>Date du trajet:</strong> {{ reservation.trip.tripDate|date('d/m/Y H:i') }}</p>
                         {% if reservation.trip.user is defined %}
                             <p><strong>Conducteur:</strong> {{ reservation.trip.user.fullName }}</p>
                         {% endif %}
                     </div>
 
-                    <h3 class="h4">Détails de la réservation</h3>
+                    <h3 class="h4">Autres détails de la réservation</h3>
                     <div class="mb-4">
-                        <p><strong>Date de réservation:</strong> {{ reservation.dateReservation|date('d/m/Y ') }}</p>
+                        <p><strong>Date de réservation:</strong> {{ reservation.dateReservation|date('d/m/Y H:i') }}</p>
                         <p><strong>Nombre de places réservées:</strong> {{ reservation.nombrePlaces }}</p>
                         <p><strong>Montant total:</strong> {{ reservation.montantTotal }} DNT</p>
                         <p><strong>Statut:</strong> 
-                            <span class="badge bg-{{ reservation.etatReservation == 'confirmé' ? 'success' : 'warning' }}">
+                            <span class="badge bg-{{ reservation.etatReservation == 'confirmé' ? 'success' : (reservation.etatReservation == 'refusé' ? 'danger' : 'warning') }}">
                                 {{ reservation.etatReservation }}
                             </span>
                         </p>
@@ -62,14 +50,14 @@
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle-fill"></i> 
                         {% if reservation.etatReservation == 'confirmé' %}
-                            Votre réservation est confirmée. Vous recevrez un email avec les détails du trajet.
+                            Un email de confirmation a été envoyé avec les détails du trajet.
                         {% else %}
-                            Votre réservation est en attente de confirmation. Vous recevrez un email une fois confirmée.
+                            La réservation est en attente de confirmation. Un email de confirmation sera envoyé une fois la réservation confirmée.
                         {% endif %}
                     </div>
 
                     <div class="d-grid gap-2">
-                        <a href="{{ path('app_reservation_index') }}" class="btn btn-primary">
+                        <a href="{{ path('app_reservation_admin') }}" class="btn btn-primary">
                             <i class="bi bi-arrow-left"></i> Retour aux réservations
                         </a>
                     </div>

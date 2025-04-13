@@ -13,11 +13,8 @@
                             <i class="bi bi-car-front-fill mr-2"></i> Liste des trajets
                         </h1>
                         <div>
-                            <a href="{{ path('app_reservation_index_driver') }}" class="btn btn-sm btn-light rounded-pill me-2" style="color: #0d47a1;">
+                            <a href="{{ path('app_reservation_admin') }}" class="btn btn-sm btn-light rounded-pill me-2" style="color: #0d47a1;">
                                 <i class="bi bi-journal-check me-1"></i> Voir réservations
-                            </a>
-                            <a href="{{ path('app_trip_new') }}" class="btn btn-sm btn-light rounded-pill" style="color: #0d47a1;">
-                                <i class="bi bi-plus-circle me-1"></i> Créer un trajet
                             </a>
                         </div>
                     </div>
@@ -42,7 +39,7 @@
                             </thead>
                             <tbody>
                             {% for trip in trips %}
-                                <tr onclick="window.location='{{ path('app_trip_show', {'id': trip.id}) }}'" style="cursor: pointer;">
+                                <tr onclick="window.location='{{ path('app_trip_publication_admin', {'id': trip.id}) }}'" style="cursor: pointer;">
                                     <td>{{ trip.id }}</td>
                                     <td>{{ trip.tripDate ? trip.tripDate|date('d/m/Y') : '' }}</td>
                                     <td>{{ trip.departurePoint }}</td>
@@ -58,9 +55,6 @@
                                     <td class="fw-bold">{{ trip.contribution ? trip.contribution ~ ' DNT' : '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-2" onclick="event.stopPropagation()">
-                                            <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
                                             <form method="post" action="{{ path('app_trip_delete', {'id': trip.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce voyage ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trip.id) }}">
                                                 <button class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">

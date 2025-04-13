@@ -1,5 +1,4 @@
 <?php
-// src/Controller/ReservationController.php
 
 namespace App\Controller;
 
@@ -24,6 +23,30 @@ final class ReservationController extends AbstractController
     public function index(ReservationRepository $reservationRepository): Response
     {
         return $this->render('reservation/index.html.twig', [
+            'reservations' => $reservationRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/admin', name: 'app_reservation_admin', methods: ['GET'])]
+    public function indexadmin(ReservationRepository $reservationRepository): Response
+    {
+        return $this->render('reservation/admin_reservation.html.twig', [
+            'reservations' => $reservationRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/admin/{id}', name: 'app_reservation_admin_show', methods: ['GET'])]
+    public function Adminshow(Reservation $reservation): Response
+    {
+        return $this->render('reservation/admin_show.html.twig', [
+            'reservation' => $reservation,
+        ]);
+    }
+
+    #[Route('/driver', name: 'app_reservation_index_driver', methods: ['GET'])]
+    public function indexDriver(ReservationRepository $reservationRepository): Response
+    {
+        return $this->render('reservation/index_driver.html.twig', [
             'reservations' => $reservationRepository->findAll(),
         ]);
     }
@@ -134,5 +157,30 @@ final class ReservationController extends AbstractController
         }
 
         return $this->redirectToRoute('app_reservation_index');
+    }
+
+    #[Route('/{id}/manage-driver', name: 'app_reservation_manage_driver', methods: ['GET', 'POST'])]
+    public function manageDriver(Request $request, Reservation $reservation): Response
+    {
+        if ($request->isMethod('POST')) {
+            $action = $request->request->get('action');
+            
+            if ($action === 'confirm') {
+                $reservation->setEtatReservation('confirmé');
+                $this->addFlash('success', 'Réservation confirmée avec succès');
+            } elseif ($action === 'reject') {
+                $reservation->setEtatReservation('refusé');
+                $trip = $reservation->getTrip();
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+                $this->addFlash('warning', 'Réservation refusée');
+            }
+            
+            $this->entityManager->flush();
+            return $this->redirectToRoute('app_reservation_manage_driver', ['id' => $reservation->getId()]);
+        }
+    
+        return $this->render('reservation/manage_driver.html.twig', [
+            'reservation' => $reservation,
+        ]);
     }
 }
