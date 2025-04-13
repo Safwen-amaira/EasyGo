@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Utilisateurfidelite;
 use App\Form\UtilisateurFideliteType;
+use App\Repository\UtilisateurfideliteRepository;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,4 +65,7 @@ class UtilisateurFideliteController extends AbstractController
 
         return $this->redirectToRoute('utilisateur_fidelite_index');
     }
+    
+
+
 }

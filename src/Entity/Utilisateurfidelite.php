@@ -87,4 +87,50 @@ class Utilisateurfidelite
         return $this;
     }
 
+
+
+    #[ORM\Column(type: 'float', nullable: true)]
+private ?float $totalMontant = 0;
+
+#[ORM\Column(type: 'integer', nullable: true)]
+private ?int $totalTrajets = 0;
+
+// GETTERS & SETTERS
+
+public function getTotalMontant(): ?float
+{
+    return $this->totalMontant;
+}
+
+public function setTotalMontant(?float $totalMontant): self
+{
+    $this->totalMontant = $totalMontant;
+    return $this;
+}
+
+public function getTotalTrajets(): ?int
+{
+    return $this->totalTrajets;
+}
+
+public function setTotalTrajets(?int $totalTrajets): self
+{
+    $this->totalTrajets = $totalTrajets;
+    return $this;
+}
+#[ORM\Column(type: 'string', length: 100, nullable: true)]
+private ?string $nom_utilisateur = null;
+
+public function getNomUtilisateur(): ?string
+{
+    return $this->nom_utilisateur;
+}
+
+public function setNomUtilisateur(?string $nom): self
+{
+    $this->nom_utilisateur = $nom;
+    return $this;
+}
+
+
 }

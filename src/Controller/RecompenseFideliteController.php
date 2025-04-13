@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Controller;
+use App\Repository\RecompenseFideliteRepository;
+use App\Repository\UtilisateurfideliteRepository;
 
 use App\Entity\RecompenseFidelite;
 use App\Entity\UtilisateurFidelite;
@@ -133,6 +135,8 @@ class RecompenseFideliteController extends AbstractController
     public function assign(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        dump($data); // ← ajoute ça
+
         $rewardDescription = $data['reward'] ?? null;
         $userId = $data['userId'] ?? null;
 
@@ -169,10 +173,11 @@ class RecompenseFideliteController extends AbstractController
 
     #[Route('/recompense/spin-page', name: 'recompense_spin_page')]
     public function spinPage(EntityManagerInterface $em): Response
-    {
-        $rewards = $em->getRepository(RecompenseFidelite::class)->findBy([
-            'utilisateurFidelite' => null
-        ]);
+    {$rewards = $em->getRepository(RecompenseFidelite::class)->findBy([
+        'utilisateurfidelite' => null
+    ]);
+    
+        
 
         $rewardDescriptions = array_map(fn($r) => $r->getDescription(), $rewards);
 
@@ -180,4 +185,26 @@ class RecompenseFideliteController extends AbstractController
             'rewardsJson' => json_encode($rewardDescriptions),
         ]);
     }
+
+
+    #[Route('/mon-profil', name: 'mon_profil')]
+    public function monProfil(UtilisateurfideliteRepository $utilisateurFideliteRepository): Response
+    {
+        // 1. Récupérer l'utilisateur spécifique (par exemple ID = 2)
+        $user = $utilisateurFideliteRepository->find(2);
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        }
+    
+        // 2. Récupérer les récompenses de fidélité associées à cet utilisateur
+        $recompenses = $user->getRecompenseFidelites();
+    
+        // 3. Passer les données à la vue Twig et retourner la réponse
+        return $this->render('recompense/profil.html.twig', [
+            'user'  => $user,
+            'recompenses'  => $recompenses,
+        ]);
+    }
+    
+
 }
