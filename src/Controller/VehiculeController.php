@@ -1,0 +1,263 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Vehicule;
+use App\Form\VehiculeType;
+use App\Repository\VehiculeRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
+#[Route('/vehicule')]
+final class VehiculeController extends AbstractController{
+    #[Route(name: 'app_vehicule_index', methods: ['GET'])]
+    public function index(VehiculeRepository $vehiculeRepository): Response
+    {
+        return $this->render('vehicule/index.html.twig', [
+            'vehicules' => $vehiculeRepository->findAll(),
+        ]);
+    }
+
+
+
+    #[Route('/uservehicule', name: 'app_vehicule_indexx', methods: ['GET'])]
+    public function indexx(VehiculeRepository $vehiculeRepository): Response
+    {
+        return $this->render('uservehicule/index.html.twig', [
+            'vehicules' => $vehiculeRepository->findAll(),
+        ]);
+    }
+
+
+
+    #[Route('/vehicule/search', name: 'app_vehicule_search', methods: ['GET'])]
+public function search(Request $request, VehiculeRepository $vehiculeRepository): Response
+{
+    $search = $request->query->get('search');
+    $vehicules = $vehiculeRepository->searchByName($search);
+
+    return $this->render('vehicule/_vehicules_table.html.twig', [
+        'vehicules' => $vehicules,
+    ]);
+}
+
+
+
+#[Route('/vehicule/searchh', name: 'app_vehicule_searcc', methods: ['GET'])]
+public function searchh(Request $request, VehiculeRepository $vehiculeRepository): Response
+{
+    $search = $request->query->get('search');
+    $vehicules = $vehiculeRepository->searchByName($search);
+
+    return $this->render('uservehicule/_vehicule_cards.html.twig', [
+        'vehicules' => $vehicules,
+    ]);
+}
+
+
+
+    #[Route('/generate-pdf', name: 'app_vehicule_generate_pdf', methods: ['GET'])]
+    public function generatePdf(VehiculeRepository $vehiculeRepository): Response
+    {
+        // Récupérer la liste des véhicules
+        $vehicules = $vehiculeRepository->findAll();
+
+        // Générer le contenu HTML à partir de la liste des véhicules
+        $html = $this->renderView('vehicule/pdf.html.twig', [
+            'vehicules' => $vehicules,
+        ]);
+
+        // Initialiser Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Charger le HTML dans Dompdf
+        $dompdf->loadHtml($html);
+
+        // (Optional) Définir la taille du papier
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Rendre le PDF
+        $dompdf->render();
+
+        // Générer un fichier PDF et l'envoyer au navigateur
+        return new Response(
+            $dompdf->output(),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="vehicules_list.pdf"',
+            ]
+        );
+    }
+
+
+    #[Route('/export/csv', name: 'app_vehicule_export_csv')]
+    public function exportCSV(VehiculeRepository $vehiculeRepository): Response
+    {
+        $vehicules = $vehiculeRepository->findAll();
+        $filename = "vehicules_" . date('Ymd_His') . ".csv";
+    
+        $handle = fopen('php://temp', 'r+');
+    
+        // En-tête des colonnes
+        fputcsv($handle, ['ID', 'Nom', 'Cree le', 'Mis a jour', 'Couleur', 'Prix', 'Total en stock'], ';');
+    
+        foreach ($vehicules as $vehicule) {
+            fputcsv($handle, [
+                $vehicule->getId(),
+                $vehicule->getName(),
+                $vehicule->getCreated()?->format('Y-m-d'),
+                $vehicule->getUpdated()?->format('Y-m-d'),
+                $vehicule->getColor(),
+                $vehicule->getPrix(),
+                $vehicule->getTotalEnStock(),
+            ], ';');
+        }
+    
+        rewind($handle);
+        $content = stream_get_contents($handle);
+        fclose($handle);
+    
+        return new Response($content, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+    
+
+
+
+
+    #[Route('/new', name: 'app_vehicule_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $vehicule = new Vehicule();
+        $form = $this->createForm(VehiculeType::class, $vehicule);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Gérer l'upload de l'image
+            $imageFile = $form->get('image')->getData();
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('vehicule_images_directory'),
+                        $newFilename
+                    );
+
+                    // Enregistrer le nom du fichier dans l'entité
+                    $vehicule->setImage($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Erreur lors du téléchargement de l\'image.');
+                }
+            }
+
+            $entityManager->persist($vehicule);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_vehicule_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('vehicule/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_vehicule_show', methods: ['GET'])]
+    public function show(Vehicule $vehicule): Response
+    {
+        return $this->render('vehicule/show.html.twig', [
+            'vehicule' => $vehicule,
+        ]);
+    }
+
+    #[Route('/{id}/show', name: 'app_vehicule_showw', methods: ['GET'])]
+    public function showw(Vehicule $vehicule): Response
+    {
+        return $this->render('uservehicule/show.html.twig', [
+            'vehicule' => $vehicule,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'app_vehicule_edit', methods: ['GET', 'POST'])]
+public function edit(Request $request, Vehicule $vehicule, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+{
+    // Sauvegarde de l'ancienne image avant modification
+    $oldImage = $vehicule->getImage();
+
+    $form = $this->createForm(VehiculeType::class, $vehicule);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Vérifiez si une nouvelle image a été téléchargée
+        $imageFile = $form->get('image')->getData();
+        
+        if ($imageFile) {
+            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+            // Déplacez l'image téléchargée dans le dossier de stockage
+            try {
+                $imageFile->move(
+                    $this->getParameter('vehicule_images_directory'),  // Dossier public/uploads/vehicules
+                    $newFilename
+                );
+            } catch (FileException $e) {
+                // Gérer l'erreur de téléchargement
+                $this->addFlash('error', 'Erreur lors du téléchargement de l\'image.');
+                return $this->redirectToRoute('app_vehicule_edit', ['id' => $vehicule->getId()]);
+            }
+
+            // Mettez à jour l'attribut "image" avec le nouveau nom du fichier
+            $vehicule->setImage($newFilename);
+
+            // Si une ancienne image existait, supprimez-la
+            if ($oldImage) {
+                $oldImagePath = $this->getParameter('vehicule_images_directory') . '/' . $oldImage;
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);  // Supprime l'ancienne image
+                }
+            }
+        }
+
+        // Sauvegarde des modifications dans la base de données
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_vehicule_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    return $this->render('vehicule/edit.html.twig', [
+        'vehicule' => $vehicule,
+        'form' => $form->createView(),
+    ]);
+}
+
+    
+
+    #[Route('/{id}', name: 'app_vehicule_delete', methods: ['POST'])]
+    public function delete(Request $request, Vehicule $vehicule, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$vehicule->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($vehicule);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_vehicule_index', [], Response::HTTP_SEE_OTHER);
+    }
+}
+
+
+

@@ -1,0 +1,30 @@
+<tbody>
+    {% for vehicule in vehicules %}
+        <tr>
+            <td>{{ vehicule.id }}</td>
+            <td>{{ vehicule.name }}</td>
+            <td>{{ vehicule.updated ? vehicule.updated|date('Y-m-d') : '' }}</td>
+            <td>{{ vehicule.created ? vehicule.created|date('Y-m-d') : '' }}</td>
+            <td>
+                {% if vehicule.image %}
+                    <img src="{{ asset('uploads/vehicules/' ~ vehicule.image) }}" alt="{{ vehicule.name }}" style="max-width: 100px;">
+                {% else %}
+                    <span>Aucune image</span>
+                {% endif %}
+            </td>
+            <td>{{ vehicule.content }}</td>
+            <td>{{ vehicule.color }}</td>
+            <td>{{ vehicule.prix }}€</td>
+            <td>{{ vehicule.totalEnStock }}</td>
+            <td>{{ vehicule.categoriesId }}</td>
+            <td>
+                <a href="{{ path('app_vehicule_show', {'id': vehicule.id}) }}" class="btn btn-info btn-sm">Voir</a>
+                <a href="{{ path('app_vehicule_edit', {'id': vehicule.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="11" class="text-center">Aucun véhicule trouvé</td>
+        </tr>
+    {% endfor %}
+</tbody>
