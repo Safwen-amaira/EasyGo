@@ -9,21 +9,21 @@
             <div class="card shadow-lg border-0 rounded-4 p-4">
                 <h2 class="text-center mb-4 text-gradient fw-bold">➕ Ajouter un Type de Récompense</h2>
 
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }} <!-- Disable HTML5 validation -->
                     <div class="row g-3">
                         {% for field in form %}
-                            {% if field.vars.name != '_token' %}
-                                <div class="col-md-12">
-                                    <label class="form-label fw-semibold">{{ form_label(field) }}</label>
-                                    {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
-                                    {{ form_errors(field) }}
-                                </div>
-                            {% endif %}
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">{{ form_label(field) }}</label>
+                                
+                                {# Render the form widget and errors #}
+                                {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(field, {'attr': {'class': 'text-danger'}}) }}
+                            </div>
                         {% endfor %}
                     </div>
 
                     <div class="text-center mt-4">
-                        <button class="btn btn-success px-4 py-2 rounded-pill shadow-sm">✅ Enregistrer</button>
+                        <button type="submit" class="btn btn-success px-4 py-2 rounded-pill shadow-sm">✅ Enregistrer</button>
                     </div>
                 {{ form_end(form) }}
 
