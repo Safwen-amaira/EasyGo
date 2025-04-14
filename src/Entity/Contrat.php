@@ -32,6 +32,11 @@ class Contrat
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $adresse = null;
 
+    #[Assert\NotBlank(message: "Le numéro de téléphone est requis.")]
+    #[Assert\Regex(
+        pattern: "/^\+?[0-9]{8,15}$/",
+        message: "Le numéro de téléphone est invalide."
+    )]    
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $telephone = null;
 
@@ -43,7 +48,11 @@ class Contrat
 
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateFin = null;
-
+    #[Assert\NotBlank(message: "Le type de contrat est requis.")]
+    #[Assert\Choice(
+        choices: ["annuel", "kilométrique"],
+        message: "Le type de contrat doit être soit 'kilométrique'."
+    )]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
