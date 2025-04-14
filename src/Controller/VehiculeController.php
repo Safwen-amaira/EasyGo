@@ -25,6 +25,7 @@ final class VehiculeController extends AbstractController{
         ]);
     }
 
+<<<<<<< HEAD
 
 
     #[Route('/uservehicule', name: 'app_vehicule_indexx', methods: ['GET'])]
@@ -37,6 +38,8 @@ final class VehiculeController extends AbstractController{
 
 
 
+=======
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
     #[Route('/vehicule/search', name: 'app_vehicule_search', methods: ['GET'])]
 public function search(Request $request, VehiculeRepository $vehiculeRepository): Response
 {
@@ -50,6 +53,7 @@ public function search(Request $request, VehiculeRepository $vehiculeRepository)
 
 
 
+<<<<<<< HEAD
 #[Route('/vehicule/searchh', name: 'app_vehicule_searcc', methods: ['GET'])]
 public function searchh(Request $request, VehiculeRepository $vehiculeRepository): Response
 {
@@ -138,6 +142,10 @@ public function searchh(Request $request, VehiculeRepository $vehiculeRepository
 
 
 
+=======
+
+//ajouter
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
     #[Route('/new', name: 'app_vehicule_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -183,6 +191,7 @@ public function searchh(Request $request, VehiculeRepository $vehiculeRepository
         ]);
     }
 
+<<<<<<< HEAD
     #[Route('/{id}/show', name: 'app_vehicule_showw', methods: ['GET'])]
     public function showw(Vehicule $vehicule): Response
     {
@@ -191,15 +200,27 @@ public function searchh(Request $request, VehiculeRepository $vehiculeRepository
         ]);
     }
 
+=======
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
     #[Route('/{id}/edit', name: 'app_vehicule_edit', methods: ['GET', 'POST'])]
 public function edit(Request $request, Vehicule $vehicule, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
 {
     // Sauvegarde de l'ancienne image avant modification
     $oldImage = $vehicule->getImage();
 
+<<<<<<< HEAD
     $form = $this->createForm(VehiculeType::class, $vehicule);
     $form->handleRequest($request);
 
+=======
+    // Création du formulaire lié à l'objet Vehicule
+    $form = $this->createForm(VehiculeType::class, $vehicule);
+    // Traitement de la requête HTTP (pour remplir les champs du formulaire)
+    $form->handleRequest($request);
+
+    
+    // Si le formulaire a été soumis et que les données sont valides
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
     if ($form->isSubmitted() && $form->isValid()) {
         // Vérifiez si une nouvelle image a été téléchargée
         $imageFile = $form->get('image')->getData();
