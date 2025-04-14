@@ -194,26 +194,26 @@ public function new(Request $request, EntityManagerInterface $em): Response
         ]);
     }
 
-
     #[Route('/mon-profil', name: 'mon_profil')]
-    public function monProfil(UtilisateurfideliteRepository $utilisateurFideliteRepository): Response
-    {
-        // 1. Récupérer l'utilisateur spécifique (par exemple ID = 2)
-        $user = $utilisateurFideliteRepository->find(2);
-        if (!$user) {
-            throw $this->createNotFoundException('Utilisateur non trouvé.');
-        }
-    
-        // 2. Récupérer les récompenses de fidélité associées à cet utilisateur
-        $recompenses = $user->getRecompenseFidelites();
-    
-        // 3. Passer les données à la vue Twig et retourner la réponse
-        return $this->render('recompense/profil.html.twig', [
-            'user'  => $user,
-            'recompenses'  => $recompenses,
-        ]);
+public function monProfil(UtilisateurfideliteRepository $utilisateurFideliteRepository): Response
+{
+    // 1. Récupérer l'utilisateur spécifique (par exemple ID = 2)
+    $user = $utilisateurFideliteRepository->find(2);
+    if (!$user) {
+        throw $this->createNotFoundException('Utilisateur non trouvé.');
     }
-    
+
+    // 2. Récupérer les récompenses de fidélité associées à cet utilisateur
+    $recompenses = $user->getRecompenseFidelites();
+
+    // 3. Passer les données à la vue Twig et retourner la réponse
+    return $this->render('recompense/profil.html.twig', [
+        'user'  => $user,
+        'recompenses'  => $recompenses,
+        'now' => new \DateTime(), // Pass the current time to the template
+    ]);
+}
+
 
 
 

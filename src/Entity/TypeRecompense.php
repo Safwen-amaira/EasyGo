@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
-
 use App\Repository\TypeRecompenseRepository;
 
 #[ORM\Entity(repositoryClass: TypeRecompenseRepository::class)]
@@ -17,6 +16,26 @@ class TypeRecompense
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $nom = null;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $categorie = null;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $actif = null;
+
+    #[ORM\OneToMany(targetEntity: RecompenseFidelite::class, mappedBy: 'typeRecompense')]
+    private Collection $recompenseFidelites;
+
+    // Constant for Categories
+    const CATEGORIES = ['Points',  'Discounts', 'Exclusive', 'Loyalty'];
+
+    public function __construct()
+    {
+        $this->recompenseFidelites = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -29,9 +48,6 @@ class TypeRecompense
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nom = null;
-
     public function getNom(): ?string
     {
         return $this->nom;
@@ -43,9 +59,6 @@ class TypeRecompense
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $categorie = null;
-
     public function getCategorie(): ?string
     {
         return $this->categorie;
@@ -53,12 +66,17 @@ class TypeRecompense
 
     public function setCategorie(?string $categorie): self
     {
+        // Normalize category input (make the first letter uppercase and others lowercase)
+        $categorie = ucfirst(strtolower($categorie));
+
+        // Validate category against predefined valid categories
+        if (!in_array($categorie, self::CATEGORIES)) {
+            throw new \InvalidArgumentException('Invalid category');
+        }
+
         $this->categorie = $categorie;
         return $this;
     }
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $actif = null;
 
     public function isActif(): ?bool
     {
@@ -71,22 +89,8 @@ class TypeRecompense
         return $this;
     }
 
-    #[ORM\OneToMany(targetEntity: RecompenseFidelite::class, mappedBy: 'typeRecompense')]
-    private Collection $recompenseFidelites;
-
-    public function __construct()
-    {
-        $this->recompenseFidelites = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, RecompenseFidelite>
-     */
     public function getRecompenseFidelites(): Collection
     {
-        if (!$this->recompenseFidelites instanceof Collection) {
-            $this->recompenseFidelites = new ArrayCollection();
-        }
         return $this->recompenseFidelites;
     }
 
@@ -103,5 +107,4 @@ class TypeRecompense
         $this->getRecompenseFidelites()->removeElement($recompenseFidelite);
         return $this;
     }
-
 }

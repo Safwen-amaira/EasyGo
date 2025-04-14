@@ -8,6 +8,8 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
 class TypeRecompenseType extends AbstractType
@@ -25,15 +27,18 @@ class TypeRecompenseType extends AbstractType
                 ],
                 'label' => 'Nom',
             ])
-            ->add('categorie', TextType::class, [
-                'required' => false,
-                'constraints' => [
-                    new Assert\Length([
-                        'max' => 255,
-                        'maxMessage' => 'La catégorie ne peut pas dépasser {{ limit }} caractères.',
-                    ]),
-                ],
+            ->add('categorie', ChoiceType::class, [
                 'label' => 'Catégorie',
+                'choices' => [
+                    'Electronics' => 'electronics',
+                    'Food' => 'food',
+                    'Clothing' => 'clothing',
+                    'Travel' => 'travel',
+                ],
+                'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'La catégorie est obligatoire.']),
+                ],
             ])
             ->add('actif', CheckboxType::class, [
                 'required' => false,

@@ -19,23 +19,23 @@
         </div>
     </form>
 
-    <div class="table-responsive shadow-sm">
+    <div class="table-responsive shadow-sm" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-bordered table-hover align-middle">
-           <thead class="table-light">
-    <tr>
-        <th>#</th>
-        <th>Nom</th>
-        <th>Catégorie</th>
-        <th>Statut</th>
-        <th class="text-center">Actions</th>
-    </tr>
-</thead>
-<tbody>
-    {% for type in types %}
-        <tr>
-            <td>{{ type.id }}</td>
-            <td>{{ type.nom }}</td>
-            <td>{{ type.categorie }}</td>
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Nom</th>
+                    <th>Catégorie</th>
+                    <th>Statut</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for type in types %}
+                    <tr>
+                        <td>{{ type.id }}</td>
+                        <td>{{ type.nom }}</td>
+                        <td>{{ type.categorie }}</td>
 
                         <td>
                             {% if type.actif %}
