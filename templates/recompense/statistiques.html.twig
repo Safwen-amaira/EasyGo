@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}📈 Statistiques des Récompenses{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h2 class="mb-4">📊 Tableau de Bord des Récompenses</h2>
+
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <div class="bg-light p-3 rounded shadow-sm text-center">
+                <h6>Total des récompenses</h6>
+                <h4 class="fw-bold text-primary">{{ total }}</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-light p-3 rounded shadow-sm text-center">
+                <h6>Points requis moyens</h6>
+                <h4 class="fw-bold text-success">{{ avgPoints }}</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-light p-3 rounded shadow-sm">
+                <h6>Top 3 types les plus utilisés</h6>
+                <ul class="mb-0 ps-3">
+                    {% for t in topTypes %}
+                        <li>{{ t.nom }} — {{ t.total }} fois</li>
+                    {% else %}
+                        <li class="text-muted">Aucune attribution</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h4>👑 Top 5 utilisateurs les plus actifs</h4>
+    <table class="table table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Utilisateur</th>
+                <th>Points</th>
+                <th>Trajets</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in topUsers %}
+                <tr>
+                    <td>{{ user.nomUtilisateur }}</td>
+                    <td><span class="badge bg-success">{{ user.points_accumules }}</span></td>
+                    <td>{{ user.totalTrajets }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4 class="mt-5">📉 Répartition des points par utilisateur</h4>
+    <div class="d-flex flex-column align-items-center mt-3">
+        <canvas id="pointsChart" width="600" height="300" style="background-color: #fff;"></canvas>
+        <button class="btn btn-outline-secondary mt-3" onclick="downloadChart()">📥 Télécharger en JPG</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        window.addEventListener('load', () => {
+            const ctx = document.getElementById('pointsChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        {% for user in topUsers %}
+                            "{{ user.nomUtilisateur }}"{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    datasets: [{
+                        label: 'Points accumulés',
+                        data: [
+                            {% for user in topUsers %}
+                                {{ user.points_accumules }}{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderRadius: 5,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            window.downloadChart = function () {
+                html2canvas(document.getElementById('pointsChart')).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'statistiques-points.jpg';
+                    link.href = canvas.toDataURL('image/jpeg');
+                    link.click();
+                });
+            }
+        });
+    </script>
+{% endblock %}

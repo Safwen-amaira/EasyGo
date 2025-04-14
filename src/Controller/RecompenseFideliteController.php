@@ -5,7 +5,7 @@ use App\Repository\RecompenseFideliteRepository;
 use App\Repository\UtilisateurfideliteRepository;
 
 use App\Entity\RecompenseFidelite;
-use App\Entity\UtilisateurFidelite;
+use App\Entity\Utilisateurfidelite;
 use App\Form\RecompenseFideliteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,6 +36,10 @@ class RecompenseFideliteController extends AbstractController
             'search' => $searchTerm,
         ]);
     }
+    
+    
+
+
 
     #[Route('/new', name: 'recompense_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
@@ -203,6 +207,38 @@ class RecompenseFideliteController extends AbstractController
         return $this->render('recompense/profil.html.twig', [
             'user'  => $user,
             'recompenses'  => $recompenses,
+        ]);
+    }
+    
+
+
+
+    #[Route('/statistiques', name: 'recompense_statistiques')]
+    public function statistiques(EntityManagerInterface $em): Response
+    {
+        $total = $em->getRepository(RecompenseFidelite::class)->count([]);
+    
+        $avgPoints = $em->createQuery(
+            'SELECT AVG(r.points_requis) FROM App\Entity\RecompenseFidelite r'
+        )->getSingleScalarResult();
+    
+        $topTypes = $em->createQuery(
+            'SELECT t.nom, COUNT(r.id) as total
+             FROM App\Entity\RecompenseFidelite r
+             JOIN r.typeRecompense t
+             GROUP BY t.nom
+             ORDER BY total DESC'
+        )->setMaxResults(3)->getResult();
+    
+        $topUsers = $em->createQuery(
+            'SELECT u FROM App\Entity\Utilisateurfidelite u ORDER BY u.points_accumules DESC'
+        )->setMaxResults(5)->getResult();
+    
+        return $this->render('recompense/statistiques.html.twig', [
+            'total' => $total,
+            'avgPoints' => round($avgPoints),
+            'topTypes' => $topTypes,
+            'topUsers' => $topUsers,
         ]);
     }
     

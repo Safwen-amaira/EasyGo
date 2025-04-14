@@ -89,5 +89,10 @@ class TypeRecompenseController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('type_recompense_index');
+ 
     }
+
+
+
+
 }
