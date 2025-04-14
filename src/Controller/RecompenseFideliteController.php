@@ -5,6 +5,8 @@ use App\Repository\RecompenseFideliteRepository;
 use App\Repository\UtilisateurfideliteRepository;
 
 use App\Entity\RecompenseFidelite;
+use App\Entity\TypeRecompense;
+
 use App\Entity\Utilisateurfidelite;
 use App\Form\RecompenseFideliteType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,29 +38,31 @@ class RecompenseFideliteController extends AbstractController
             'search' => $searchTerm,
         ]);
     }
-    
-    
-
-
 
     #[Route('/new', name: 'recompense_new')]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
-        $recompense = new RecompenseFidelite();
-        $form = $this->createForm(RecompenseFideliteType::class, $recompense);
-        $form->handleRequest($request);
+public function new(Request $request, EntityManagerInterface $em): Response
+{
+    $recompense = new RecompenseFidelite();
+    $form = $this->createForm(RecompenseFideliteType::class, $recompense);
+    
+    // Handle the form submission
+    $form->handleRequest($request);
+    
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->persist($recompense);
+        $em->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($recompense);
-            $em->flush();
-
-            return $this->redirectToRoute('recompense_index');
-        }
-
-        return $this->render('recompense/new.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        return $this->redirectToRoute('recompense_index');
     }
+
+    return $this->render('recompense/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
+
+
+
 
     #[Route('/show/{id}', name: 'recompense_show')]
     public function show(int $id, EntityManagerInterface $em): Response
