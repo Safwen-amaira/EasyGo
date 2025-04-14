@@ -26,6 +26,39 @@ final class VehiculeController extends AbstractController{
             'vehicules' => $vehiculeRepository->findAll(),
         ]);
     }
+    #[Route('/uservehicule', name: 'app_vehicule_indexx', methods: ['GET'])]
+    public function indexx(VehiculeRepository $vehiculeRepository): Response
+    {
+        return $this->render('uservehicule/index.html.twig', [
+            'vehicules' => $vehiculeRepository->findAll(),
+        ]);
+    }
+
+
+    #[Route('/{id}/show', name: 'app_vehicule_showw', methods: ['GET'])]
+    public function showw(Vehicule $vehicule): Response
+    {
+        return $this->render('uservehicule/show.html.twig', [
+            'vehicule' => $vehicule,
+        ]);
+    }
+
+
+
+    #[Route('/vehicule/searchh', name: 'app_vehicule_searcc', methods: ['GET'])]
+    public function searchh(Request $request, VehiculeRepository $vehiculeRepository): Response
+    {
+        $search = $request->query->get('search');
+        $vehicules = $vehiculeRepository->searchByName($search);
+    
+        return $this->render('uservehicule/_vehicule_cards.html.twig', [
+            'vehicules' => $vehicules,
+        ]);
+    }
+
+    
+
+    
 
     #[Route('/vehicule/search', name: 'app_vehicule_search', methods: ['GET'])]
 public function search(Request $request, VehiculeRepository $vehiculeRepository): Response
