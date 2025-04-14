@@ -129,4 +129,5 @@ final class TripController extends AbstractController
             'trips' => $trips,
         ]);
     }
+
 }
