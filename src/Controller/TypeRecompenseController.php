@@ -14,14 +14,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class TypeRecompenseController extends AbstractController
 {
     #[Route('/', name: 'index')]
-    public function index(EntityManagerInterface $em): Response
-    {
-        $types = $em->getRepository(TypeRecompense::class)->findAll();
+    public function index(Request $request, EntityManagerInterface $em): Response
+{
+    $search = $request->query->get('search');
 
-        return $this->render('type_recompense/index.html.twig', [
-            'types' => $types,
-        ]);
+    $repository = $em->getRepository(TypeRecompense::class);
+
+    if ($search) {
+        $types = $repository->createQueryBuilder('t')
+            ->where('LOWER(t.nom) LIKE :search')
+            ->setParameter('search', '%' . strtolower($search) . '%')
+            ->getQuery()
+            ->getResult();
+    } else {
+        $types = $repository->findAll();
     }
+
+    return $this->render('type_recompense/index.html.twig', [
+        'types' => $types,
+        'search' => $search,
+    ]);
+}
 
     #[Route('/new', name: 'new')]
     public function new(Request $request, EntityManagerInterface $em): Response

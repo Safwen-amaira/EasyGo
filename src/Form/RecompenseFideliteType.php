@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class RecompenseFideliteType extends AbstractType
 {
@@ -16,7 +17,12 @@ class RecompenseFideliteType extends AbstractType
         $builder
             ->add('description', TextType::class)
             ->add('points_requis', IntegerType::class)
-            ->add('date_expiration');
+            ->add('date_expiration', DateTimeType::class, [
+                'widget' => 'single_text',
+                'html5' => true,
+                'label' => 'Date expiration',
+                'required' => true,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

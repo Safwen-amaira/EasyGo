@@ -4,28 +4,39 @@
 
 {% block body %}
 <div class="container py-5">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary fw-bold">🗂️ Types de Récompenses</h2>
-        <a href="{{ path('type_recompense_new') }}" class="btn btn-outline-primary rounded-pill">➕ Ajouter</a>
+        <a href="{{ path('type_recompense_new') }}" class="btn btn-outline-primary rounded-pill">
+            ➕ Ajouter
+        </a>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped shadow-sm">
-            <thead class="table-light">
-                <tr>
-                    <th>#</th>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>Statut</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for type in types %}
-                    <tr>
-                        <td>{{ type.id }}</td>
-                        <td>{{ type.nom }}</td>
-                        <td>{{ type.description|default('—') }}</td>
+    <form method="get" action="{{ path('type_recompense_index') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="🔍 Rechercher par nom..." value="{{ search ?? '' }}">
+            <button type="submit" class="btn btn-outline-secondary">Rechercher</button>
+        </div>
+    </form>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover align-middle">
+           <thead class="table-light">
+    <tr>
+        <th>#</th>
+        <th>Nom</th>
+        <th>Catégorie</th>
+        <th>Statut</th>
+        <th class="text-center">Actions</th>
+    </tr>
+</thead>
+<tbody>
+    {% for type in types %}
+        <tr>
+            <td>{{ type.id }}</td>
+            <td>{{ type.nom }}</td>
+            <td>{{ type.categorie }}</td>
+
                         <td>
                             {% if type.actif %}
                                 <span class="badge bg-success">Actif</span>
@@ -34,10 +45,16 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            <a href="{{ path('type_recompense_edit', { id: type.id }) }}" class="btn btn-sm btn-outline-primary">✏️ Modifier</a>
+                            <a href="{{ path('type_recompense_edit', { id: type.id }) }}" class="btn btn-sm btn-outline-primary">
+                                ✏️ Modifier
+                            </a>
                             <a href="{{ path('type_recompense_delete', { id: type.id }) }}" class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('Supprimer ce type ?');">🗑️ Supprimer</a>
-                            <a href="{{ path('type_recompense_toggle', { id: type.id }) }}" class="btn btn-sm btn-outline-warning">🔁 Toggle</a>
+                               onclick="return confirm('Supprimer ce type ?');">
+                                🗑️ Supprimer
+                            </a>
+                            <a href="{{ path('type_recompense_toggle', { id: type.id }) }}" class="btn btn-sm btn-outline-warning">
+                                🔁 Toggle
+                            </a>
                         </td>
                     </tr>
                 {% else %}
