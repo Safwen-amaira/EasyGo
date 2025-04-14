@@ -2,91 +2,18 @@
 
 {% block title %}Trajet {{ trip.departurePoint }} → {{ trip.destination }}{% endblock %}
 
-{% block stylesheets %}
-{{ parent() }}
-<style>
-    .trip-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-        overflow: hidden;
-    }
-    .trip-header {
-        background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
-        color: white;
-        padding: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .info-badge {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-weight: 500;
-    }
-    .route-container {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.5rem;
-    }
-    .action-btn {
-        border: none;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        border-radius: 50px;
-        transition: all 0.3s;
-    }
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .edit-btn {
-        background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
-        color: white;
-    }
-    .delete-btn {
-        background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
-        color: white;
-    }
-    .back-btn {
-        background: white;
-        color: #0d47a1;
-        border: 1px solid #0d47a1;
-    }
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-    .detail-card {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.25rem;
-        height: 100%;
-    }
-    .detail-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-</style>
-{% endblock %}
-
 {% block body %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
 
-    <div class="card trip-card">
+    <div class="card trip-card" >
     <div class="card-header trip-header d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">
+        <h2 class="h5 mb-0" style="color:rgb(54, 95, 244);">
             <i class="bi bi-car-front-fill me-2"></i>
             {{ trip.departurePoint }} → {{ trip.destination }}
         </h2>
-        <a href="{{ path('app_trip_index', {'id': trip.id}) }}" class="btn btn-secondary-custom">
+        <a href="{{ path('app_trip_index', {'id': trip.id}) }}" class="btn btn-secondary-custom" style="color:rgb(54, 95, 244);">
             <i class="bi bi-arrow-left me-2"></i> Retour
         </a>
     </div>
@@ -185,19 +112,20 @@
                         </div>
                     </div>
                      </div>
-                    <div class="action-buttons d-flex justify-content-center gap-3">
-    <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn edit-btn flex-grow-1 flex-md-grow-0">
-        <i class="bi bi-pencil me-2"></i> Modifier
+<div class="action-buttons d-flex justify-content-center gap-3">
+    <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn edit-btn flex-grow-1 flex-md-grow-0" style="color: rgb(23, 116, 238);">
+        <i class="bi bi-pencil me-2" style="color: rgb(23, 116, 238);"></i> Modifier
     </a>
     
     <form method="post" action="{{ path('app_trip_delete', {'id': trip.id}) }}" 
           onsubmit="return confirm('Confirmer la suppression ?');"
           class="flex-grow-1 flex-md-grow-0">
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trip.id) }}">
-        <button class="btn delete-btn w-100">
+        <button class="btn delete-btn w-100" style="color: rgb(206, 26, 26);">
             <i class="bi bi-trash me-2"></i> Supprimer
         </button>
     </form>
+</div>
 </div>
                 </div>
             </div>
