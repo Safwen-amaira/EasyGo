@@ -48,6 +48,19 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         color: white;
     }
+    .sold-out-btn {
+        background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+        cursor: not-allowed;
+        color: white;
+        border: none;
+    }
+    .sold-out-badge {
+        background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+    }
 </style>
 {% endblock %}
 
@@ -79,10 +92,17 @@
                             </div>
                         </div>
                         
-                        <div class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">
-                            <i class="bi bi-people-fill me-1"></i>
-                            {{ trip.availableSeats }} places disponibles
-                        </div>
+<div class="d-flex align-items-center">
+    {% if trip.availableSeats > 0 %}
+        <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">
+            {{ trip.availableSeats }} places disponibles
+        </span>
+    {% else %}
+        <span class="badge bg-danger text-white py-2 px-3 rounded-pill">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Complet
+        </span>
+    {% endif %}
+</div>
                     </div>
                     
                     <!-- Itinéraire -->
@@ -150,13 +170,64 @@
                     
                     <!-- Bouton de réservation -->
                     <div class="d-grid">
-                        <a href="{{ path('app_reservation_new', {'tripId': trip.id}) }}" class="btn btn-success btn-lg rounded-pill py-3 book-btn">
-                            <i class="bi bi-bookmark-check-fill me-2"></i> Réserver ce trajet
-                        </a>
+                        {% if trip.availableSeats > 0 %}
+                            <a href="{{ path('app_reservation_new', {'tripId': trip.id}) }}" class="btn btn-success btn-lg rounded-pill py-3 book-btn">
+                                <i class="bi bi-bookmark-check-fill me-2"></i> Réserver ce trajet
+                            </a>
+                        {% else %}
+                           <style>
+    .sold-out-btn {
+        background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%) !important;
+        color: white !important;
+        border: none;
+    }
+</style>
+
+<button class="btn sold-out-btn btn-lg rounded-pill py-3" disabled>
+    <i class="bi bi-exclamation-octagon-fill me-2"></i> Complet - Plus de places disponibles
+</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal d'alerte pour trajet complet -->
+<div class="modal fade" id="soldOutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i> Trajet complet</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Désolé, toutes les places pour ce trajet ont été réservées.</p>
+                <p>Veuillez consulter d'autres trajets disponibles.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <a href="{{ path('app_trip_index') }}" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Voir d'autres trajets
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if trip.availableSeats <= 0 %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Affiche automatiquement le modal si le trajet est complet
+    var soldOutModal = new bootstrap.Modal(document.getElementById('soldOutModal'));
+    soldOutModal.show();
+    
+    // Empêche la réservation si l'URL est accédée directement
+    if(window.location.pathname.includes('reservation/new')) {
+        window.location.href = "{{ path('app_trip_show', {'id': trip.id}) }}";
+    }
+});
+</script>
+{% endif %}
 {% endblock %}
