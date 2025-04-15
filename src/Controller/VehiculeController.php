@@ -58,7 +58,7 @@ final class VehiculeController extends AbstractController{
 
     
 
-    
+
 
     #[Route('/vehicule/search', name: 'app_vehicule_search', methods: ['GET'])]
 public function search(Request $request, VehiculeRepository $vehiculeRepository): Response
@@ -98,10 +98,11 @@ public function search(Request $request, VehiculeRepository $vehiculeRepository)
                     $this->addFlash('error', 'Erreur lors du téléchargement de l\'image.');
                 }
             }
-
+//Marque l'objet pour insertion
             $entityManager->persist($vehicule);
+            //Exécute toutes les insertions/mises à jour en attente
             $entityManager->flush();
-
+// Redirection vers la page d’index après enregistrement
             return $this->redirectToRoute('app_vehicule_index', [], Response::HTTP_SEE_OTHER);
         }
 

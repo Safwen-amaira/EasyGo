@@ -26,9 +26,9 @@ class Vehicule
     )]
     private ?string $name = null;
 
-    #[ORM\Column(type: 'date')]
-    #[Assert\NotBlank(message: "La date de mise à jour est requise.")]
-    private ?\DateTimeInterface $updated = null;
+    #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message: "Carburant de mise à jour est requise.")]
+    private ?string $Carburant = null;
 
     #[ORM\Column(type: 'date')]
     #[Assert\NotBlank(message: "La date de création est requise.")]
@@ -48,10 +48,10 @@ class Vehicule
     #[Assert\Positive(message: "Le prix doit être un nombre positif.")]
     private ?int $prix = null;
 
-    #[ORM\Column(type: 'integer', name: 'total_en_stock')]
-    #[Assert\NotBlank(message: "Le nombre total en stock est requis.")]
-    #[Assert\Positive(message: "Le nombre total en stock doit être un nombre positif.")]
-    private ?int $totalEnStock = null;
+    #[ORM\Column(type: 'integer', name: 'NombrePlaces')]
+    #[Assert\NotBlank(message: "Le Nombre Places en stock est requis.")]
+    #[Assert\Positive(message: "Le Nombre Places en stock doit être un nombre positif.")]
+    private ?int $NombrePlaces = null;
 
     #[ORM\Column(type: 'integer', name: 'categories_id')]
     #[Assert\NotBlank(message: "La catégorie du véhicule est requise.")]
@@ -74,14 +74,14 @@ class Vehicule
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getCarburant(): ?string
     {
-        return $this->updated;
+        return $this->Carburant;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setCarburant(string $Carburant): self
     {
-        $this->updated = $updated;
+        $this->Carburant = $Carburant;
         return $this;
     }
 
@@ -140,14 +140,14 @@ class Vehicule
         return $this;
     }
 
-    public function getTotalEnStock(): ?int
+    public function getNombrePlaces(): ?int
     {
-        return $this->totalEnStock;
+        return $this->NombrePlaces;
     }
 
-    public function setTotalEnStock(int $totalEnStock): self
+    public function setNombrePlaces(int $NombrePlaces): self
     {
-        $this->totalEnStock = $totalEnStock;
+        $this->NombrePlaces = $NombrePlaces;
         return $this;
     }
 

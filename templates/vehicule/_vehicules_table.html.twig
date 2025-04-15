@@ -3,7 +3,7 @@
         <tr>
             <td>{{ vehicule.id }}</td>
             <td>{{ vehicule.name }}</td>
-            <td>{{ vehicule.updated ? vehicule.updated|date('Y-m-d') : '' }}</td>
+            <td>{{ vehicule.carburant }}</td>
             <td>{{ vehicule.created ? vehicule.created|date('Y-m-d') : '' }}</td>
             <td>
                 {% if vehicule.image %}
@@ -15,7 +15,7 @@
             <td>{{ vehicule.content }}</td>
             <td>{{ vehicule.color }}</td>
             <td>{{ vehicule.prix }}€</td>
-            <td>{{ vehicule.totalEnStock }}</td>
+            <td>{{ vehicule.nombrePlaces}}</td>
             <td>{{ vehicule.categoriesId }}</td>
             <td>
                 <a href="{{ path('app_vehicule_show', {'id': vehicule.id}) }}" class="btn btn-info btn-sm">Voir</a>
