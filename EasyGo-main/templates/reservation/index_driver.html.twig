@@ -35,7 +35,7 @@
                             <tbody>
                             {% for reservation in reservations %}
 <tr onclick="window.location='{{ path('app_reservation_manage_driver', {'id': reservation.id}) }}'" style="cursor: pointer;">                                    <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
-                                    <td>{{ reservation.trip.id }}</td>
+                                    <td>TRP-{{ reservation.trip.id|slice(0, 8)|upper }}</td>
                                     <td>
                                         {{ reservation.trip.departurePoint }} 
                                         <i class="bi bi-arrow-right mx-1"></i> 
