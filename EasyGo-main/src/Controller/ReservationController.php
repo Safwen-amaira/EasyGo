@@ -82,13 +82,14 @@ final class ReservationController extends AbstractController
     
             $montantTotal = $trip->getContribution() * $nombrePlaces;
             $reservation->setMontantTotal($montantTotal);
-            $trip->setAvailableSeats($trip->getAvailableSeats() - $nombrePlaces);
+            // On ne décrémente pas encore les places disponibles, seulement à la confirmation
+            $reservation->setUser($this->getUser());
     
             try {
                 $this->entityManager->persist($reservation);
                 $this->entityManager->flush();
     
-                $this->addFlash('success', 'Réservation effectuée avec succès !');
+                $this->addFlash('success', 'Réservation effectuée avec succès ! En attente de confirmation du conducteur.');
                 return $this->redirectToRoute('app_reservation_show', ['id' => $reservation->getId()]);
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de la réservation');
@@ -117,16 +118,19 @@ final class ReservationController extends AbstractController
         $oldPlaces = $reservation->getNombrePlaces();
 
         $form = $this->createForm(ReservationType::class, $reservation, [
-            'available_seats' => $trip->getAvailableSeats() + $oldPlaces
+            'available_seats' => $trip->getAvailableSeats() + ($reservation->getEtatReservation() === 'confirmé' ? $oldPlaces : 0)
         ]);
         
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $newPlaces = $reservation->getNombrePlaces();
-            $difference = $oldPlaces - $newPlaces;
-
-            $trip->setAvailableSeats($trip->getAvailableSeats() + $difference);
+            
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $difference = $oldPlaces - $newPlaces;
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $difference);
+            }
+            
             $reservation->setMontantTotal($trip->getContribution() * $newPlaces);
 
             $this->entityManager->flush();
@@ -146,7 +150,11 @@ final class ReservationController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->request->get('_token'))) {
             $trip = $reservation->getTrip();
-            $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            
+            // On remet les places disponibles seulement si la réservation était confirmée
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            }
 
             $this->entityManager->remove($reservation);
             $this->entityManager->flush();
@@ -164,14 +172,21 @@ final class ReservationController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $action = $request->request->get('action');
+            $trip = $reservation->getTrip();
             
             if ($action === 'confirm') {
+                // On vérifie qu'il y a assez de places disponibles
+                if ($reservation->getNombrePlaces() > $trip->getAvailableSeats()) {
+                    $this->addFlash('error', 'Pas assez de places disponibles pour confirmer cette réservation');
+                    return $this->redirectToRoute('app_reservation_manage_driver', ['id' => $reservation->getId()]);
+                }
+                
                 $reservation->setEtatReservation('confirmé');
+                $trip->setAvailableSeats($trip->getAvailableSeats() - $reservation->getNombrePlaces());
                 $this->addFlash('success', 'Réservation confirmée avec succès');
             } elseif ($action === 'reject') {
                 $reservation->setEtatReservation('refusé');
-                $trip = $reservation->getTrip();
-                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+                // On ne modifie pas les places disponibles car elles n'ont pas été décrémentées à la création
                 $this->addFlash('warning', 'Réservation refusée');
             }
             

@@ -8,7 +8,7 @@
         <div class="col-lg-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h2 class="h4 mb-0">Gestion de la réservation </h2>
+                    <h2 class="h4 mb-0">Gestion de la réservation</h2>
                 </div>
                 
                 <div class="card-body">
@@ -24,7 +24,13 @@
                                 <li class="list-group-item"><strong>Départ:</strong> {{ reservation.trip.departurePoint }}</li>
                                 <li class="list-group-item"><strong>Destination:</strong> {{ reservation.trip.destination }}</li>
                                 <li class="list-group-item"><strong>Date:</strong> {{ reservation.trip.tripDate|date('d/m/Y H:i') }}</li>
-                                <li class="list-group-item"><strong>Places disponibles:</strong> {{ reservation.trip.availableSeats }}</li>
+                                <li class="list-group-item">
+                                    <strong>Places disponibles:</strong> 
+                                    {{ reservation.trip.availableSeats }}
+                                    {% if reservation.etatReservation == 'en_attente' %}
+                                        ({{ reservation.trip.availableSeats - reservation.nombrePlaces }} après confirmation)
+                                    {% endif %}
+                                </li>
                             </ul>
                         </div>
                         <div class="col-md-6">
@@ -38,7 +44,7 @@
                         </div>
                     </div>
 
-                    {% if reservation.etatReservation != 'confirmé' %}
+                    {% if reservation.etatReservation == 'en_attente' %}
                         <form method="post" class="mb-3">
                             <input type="hidden" name="_token" value="{{ csrf_token('manage_reservation') }}">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
