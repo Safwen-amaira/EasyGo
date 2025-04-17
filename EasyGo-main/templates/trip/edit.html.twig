@@ -89,7 +89,9 @@
                                     <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-calendar3"></i></span>
                                     {{ form_widget(form.trip_date, {'attr': {'class': 'form-control datepicker border-start-0'}}) }}
                                 </div>
+                                <div class="invalid-feedback">
                                 {{ form_errors(form.trip_date) }}
+                            </div>
                             </div>
                             <div class="col-md-6">
                                 {{ form_label(form.trip_type, 'Type de voyage', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
@@ -97,7 +99,9 @@
                                     <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-tag"></i></span>
                                     {{ form_widget(form.trip_type, {'attr': {'class': 'form-select border-start-0'}}) }}
                                 </div>
+                                <div class="invalid-feedback">
                                 {{ form_errors(form.trip_type) }}
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -117,8 +121,10 @@
                                     <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-geo-alt"></i></span>
                                     {{ form_widget(form.departure_point, {'attr': {'class': 'form-control border-start-0'}}) }}
                                 </div>
+                                <div class="invalid-feedback">
                                 {{ form_errors(form.departure_point) }}
                             </div>
+                           </div> 
 
                             <div class="col-md-6">
                                 {{ form_label(form.destination, 'Destination', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
@@ -126,7 +132,9 @@
                                     <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-geo-alt-fill"></i></span>
                                     {{ form_widget(form.destination, {'attr': {'class': 'form-control border-start-0'}}) }}
                                 </div>
+                                <div class="invalid-feedback">
                                 {{ form_errors(form.destination) }}
+                            </div>
                             </div>
 
                             <div class="col-md-12">
@@ -155,8 +163,10 @@
                                     <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-arrow-up-right"></i></span>
                                     {{ form_widget(form.departure_time, {'attr': {'class': 'form-control timepicker border-start-0'}}) }}
                                 </div>
+                                <div class="invalid-feedback">
                                 {{ form_errors(form.departure_time) }}
                             </div>
+                           </div> 
 
                             <div class="col-md-6">
                                 {{ form_label(form.return_time, 'Heure de retour', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
@@ -164,8 +174,10 @@
                                     <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-arrow-down-left"></i></span>
                                     {{ form_widget(form.return_time, {'attr': {'class': 'form-control timepicker border-start-0'}}) }}
                                 </div>
+                                <div class="invalid-feedback">
                                 {{ form_errors(form.return_time) }}
                             </div>
+                           </div> 
                         </div>
                     </div>
 
@@ -184,8 +196,10 @@
                                     <span class="input-group-text bg-primary bg-opacity-10 text-primary border-end-0"><i class="bi bi-people"></i></span>
                                     {{ form_widget(form.available_seats, {'attr': {'class': 'form-control border-start-0'}}) }}
                                 </div>
+                                <div class="invalid-feedback">
                                 {{ form_errors(form.available_seats) }}
                             </div>
+                        </div>  
 
                             <div class="col-md-6">
                                 {{ form_label(form.contribution, 'Cotisation', {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
@@ -217,6 +231,17 @@
         </div>
     </div>
 </div>
+<style>
+    .text-danger { color: #dc3545; }
+    .is-invalid { border-color: #dc3545; }
+    .invalid-feedback { 
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+</style>
 {% endblock %}
 
 {% block javascripts %}

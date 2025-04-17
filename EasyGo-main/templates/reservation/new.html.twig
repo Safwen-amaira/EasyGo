@@ -1,4 +1,3 @@
-{# templates/reservation/new.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Nouvelle réservation{% endblock %}
@@ -22,7 +21,7 @@
                         </div>
                     </div>
                     
-                    {{ form_start(form) }}
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                         <div class="mb-3">
                             <label class="form-label">
                                 <i class="bi bi-ticket-perforated" style="color: #0dcaf0;"></i> 
@@ -34,15 +33,14 @@
                                 </span>
                                 {{ form_widget(form.nombre_places, {
                                     'attr': {
-                                        'min': 1,
-                                        'max': trip.availableSeats,
-                                        'class': 'form-control'
+                                        'class': 'form-control'~ (form.nombre_places.vars.valid ? '' : ' is-invalid'),
                                     }
                                 }) }}
                             </div>
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle"></i> Maximum {{ trip.availableSeats }} places disponibles
-                            </small>
+                             <div class="invalid-feedback">
+
+                            {{ form_errors(form.nombre_places) }}
+                        </div>
                         </div>
                         
                         <div class="mb-3">
@@ -56,11 +54,11 @@
                                 </span>
                                 {{ form_widget(form.lieu_escale, {
                                     'attr': {
-                                        'class': 'form-control',
-                                    
+                                        'class': 'form-control'
                                     }
                                 }) }}
                             </div>
+                            {{ form_errors(form.lieu_escale) }}
                         </div>
                         
                         <div class="mb-4">
@@ -74,12 +72,15 @@
                                 </span>
                                 {{ form_widget(form.type_handicap, {
                                     'attr': {
-                                        'class': 'form-select',
-                                    },
-                                    'placeholder': 'Sélectionnez un type de handicap si nécessaire'
+                                        'class': 'form-select'~ (form.nombre_places.vars.valid ? '' : ' is-invalid'),
+                                    }
                                 }) }}
                             </div>
+                             <div class="invalid-feedback">
+                            {{ form_errors(form.type_handicap) }}
                         </div>
+                        </div>
+
                         
                         <div class="d-grid mt-4">
                             <button type="submit" class="btn btn-success btn-lg">
@@ -92,4 +93,15 @@
         </div>
     </div>
 </div>
+<style>
+    .text-danger { color: #dc3545; }
+    .is-invalid { border-color: #dc3545; }
+    .invalid-feedback { 
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+</style>
 {% endblock %}

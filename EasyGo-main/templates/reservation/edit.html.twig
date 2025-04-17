@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <div class="alert alert-info d-flex align-items-center">
                         <div>
-                            <span class="fw-bold"><i class="bi bi-people-fill" style="color: #20c997;"></i> Places disponibles :</span> {{ reservation.trip.availableSeats + reservation.nombrePlaces }} | 
+                            <span class="fw-bold"><i class="bi bi-people-fill" style="color: #20c997;"></i> Places disponibles :</span> {{ reservation.trip.availableSeats }} | 
                             <span class="fw-bold"><i class="bi bi-coin" style="color: #ffc107;"></i> Contribution par place :</span> {{ reservation.trip.contribution }} DNT
                         </div>
                     </div>
@@ -33,16 +33,16 @@
                                 </span>
                                 {{ form_widget(form.nombre_places, {
                                     'attr': {
-                                        'min': 1,
-                                        'max': reservation.trip.availableSeats + reservation.nombrePlaces,
-                                        'class': 'form-control'
+                                        'class': 'form-control'~ (form.nombre_places.vars.valid ? '' : ' is-invalid'),
                                     }
                                 }) }}
                             </div>
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle"></i> Maximum {{ reservation.trip.availableSeats + reservation.nombrePlaces }} places disponibles
-                            </small>
+                          <div class="invalid-feedback">
+
+                            {{ form_errors(form.nombre_places) }}
                         </div>
+                        </div>
+
                         
                         <div class="mb-3">
                             <label class="form-label">
@@ -56,16 +56,16 @@
                                 {{ form_widget(form.lieu_escale, {
                                     'attr': {
                                         'class': 'form-control',
-                                        'placeholder': 'Ex: Avenue des Champs-Élysées'
                                     }
                                 }) }}
                             </div>
+                            {{ form_errors(form.lieu_escale) }}
                         </div>
                         
                         <div class="mb-4">
                             <label class="form-label">
                                 <i class="bi bi-universal-access" style="color: #20c997;"></i> 
-                                {{ form_label(form.type_handicap) }}
+                                Type de handicap 
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text">
@@ -73,10 +73,12 @@
                                 </span>
                                 {{ form_widget(form.type_handicap, {
                                     'attr': {
-                                        'class': 'form-select',
-                                    },
-                                    'placeholder': 'Sélectionnez un type de handicap si nécessaire'
+                                        'class': 'form-select' ~ (form.type_handicap.vars.valid ? '' : ' is-invalid'),
+                                    }
                                 }) }}
+                            </div>
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.type_handicap) }}
                             </div>
                         </div>
                         
@@ -94,4 +96,16 @@
         </div>
     </div>
 </div>
+
+<style>
+    .text-danger { color: #dc3545; }
+    .is-invalid { border-color: #dc3545; }
+    .invalid-feedback { 
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+</style>
 {% endblock %}
