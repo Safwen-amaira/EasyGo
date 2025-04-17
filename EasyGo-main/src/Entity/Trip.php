@@ -17,11 +17,6 @@ class Trip
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: "La date du voyage est obligatoire")]
-    #[Assert\Range(
-        min: "tomorrow",
-        max: "+1 week",
-        notInRangeMessage: "La date doit être entre demain et la semaine prochaine"
-    )]
     private ?\DateTimeInterface $trip_date = null;
 
     #[ORM\Column(length: 255)]
@@ -43,14 +38,14 @@ class Trip
 
     #[ORM\Column]
     #[Assert\NotBlank(message: "Le nombre de places est obligatoire")]
-    #[Assert\PositiveOrZero(message: "Le nombre doit être positif ou zéro")]
+    #[Assert\Positive(message: "Le nombre de places doit être supérieur à 0")]
     private ?int $available_seats = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(length: 20)]
     private ?string $trip_type = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    #[Assert\PositiveOrZero(message: "La cotisation doit être positive ")]
+    #[Assert\PositiveOrZero(message: "La cotisation doit être positive ou nulle")]
     private ?string $contribution = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

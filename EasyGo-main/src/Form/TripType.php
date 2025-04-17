@@ -5,46 +5,39 @@ namespace App\Form;
 use App\Entity\Trip;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank; 
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType; 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class TripType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('trip_date', DateTimeType::class, [
+            ->add('trip_date', DateType::class, [
                 'widget' => 'single_text',
-                'html5' => false,
-                'format' => 'dd/MM/yyyy',
-                'attr' => [
-                    'class' => 'form-control datepicker',
-                    'placeholder' => 'jj/mm/aaaa'
-                ]
+                'constraints' => [
+                    new Callback([$this, 'validateDate']),
+                ],
             ])
             ->add('departure_point')
             ->add('destination')
             ->add('departure_time', TimeType::class, [
                 'widget' => 'single_text',
-                'input' => 'datetime',
-                'attr' => [
-                    'class' => 'form-control timepicker',
-                    'placeholder' => 'HH:MM'
-                ]
+                'constraints' => [
+                    new Callback([$this, 'validateDepartureTime']),
+                ],
             ])
             ->add('return_time', TimeType::class, [
                 'widget' => 'single_text',
-                'input' => 'datetime',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-control timepicker',
-                    'placeholder' => 'HH:MM'
-                ]
+                'constraints' => [
+                    new Callback([$this, 'validateReturnTime']),
+                ],
             ])
             ->add('available_seats')
             ->add('trip_type', ChoiceType::class, [
@@ -53,24 +46,66 @@ class TripType extends AbstractType
                     'Retour simple' => 'retour',
                     'Aller-Retour' => 'aller_retour'
                 ],
-                'placeholder' => 'Choisissez un type'
-            ])
-            ->add('contribution', NumberType::class, [
-                'required' => false,
-                'html5' => true,
-                'scale' => 2,
+                'placeholder' => 'Choisissez un type',
+                'label' => 'Type de trajet <span class="text-danger">*</span>',
+                'label_html' => true,
                 'attr' => [
-                    'step' => '0.01',
-                    'min' => '0'
-                ]
-            ])
-            ->add('relay_points', TextareaType::class, [
+                    'class' => 'form-select border-start-0'
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Le type de trajet est obligatoire']),
+                ],
+            ])           
+             ->add('contribution', null, [
                 'required' => false,
-                'attr' => [
-                    'rows' => 3,
-                    'placeholder' => 'Séparez les points par des virgules'
-                ]
+            ])
+            ->add('relay_points', null, [
+                'required' => false,
             ]);
+    }
+
+    public function validateDate($value, ExecutionContextInterface $context)
+    {
+        if (!$value) {
+            return;
+        }
+
+        $today = new \DateTime();
+        $oneWeekLater = (new \DateTime())->modify('+1 week');
+
+        if ($value < $today || $value > $oneWeekLater) {
+            $context->buildViolation('La date doit être entre aujourd\'hui et dans une semaine')
+                ->atPath('trip_date')
+                ->addViolation();
+        }
+    }
+
+    public function validateDepartureTime($value, ExecutionContextInterface $context)
+    {
+        if (!$value) {
+            return;
+        }
+
+        $hour = (int)$value->format('H');
+        if ($hour < 8 || $hour > 18) {
+            $context->buildViolation('L\'heure de départ doit être entre 8h et 18h')
+                ->atPath('departure_time')
+                ->addViolation();
+        }
+    }
+
+    public function validateReturnTime($value, ExecutionContextInterface $context)
+    {
+        if (!$value) {
+            return;
+        }
+
+        $hour = (int)$value->format('H');
+        if ($hour < 8 || $hour > 18) {
+            $context->buildViolation('L\'heure de retour doit être entre 8h et 18h')
+                ->atPath('return_time')
+                ->addViolation();
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
