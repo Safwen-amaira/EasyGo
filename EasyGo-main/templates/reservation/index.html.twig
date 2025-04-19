@@ -47,21 +47,30 @@
                                     </td>
                                     <td class="fw-bold">{{ reservation.montantTotal }} DNT</td>
                                     <td>
-                                        {% if reservation.etatReservation == 'refusé' %}
+                                        {% if reservation.etatReservation|lower == 'refusé' or reservation.etatReservation|lower == 'refusee' %}
                                             <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">
                                                 {{ reservation.etatReservation }}
                                             </span>
+                                        {% elseif reservation.etatReservation|lower == 'confirmé' or reservation.etatReservation|lower == 'confirmee' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill">
+                                                {{ reservation.etatReservation }}
+                                            </span>
                                         {% else %}
-                                            <span class="badge bg-{{ reservation.etatReservation == 'confirmé' ? 'success' : 'warning' }} bg-opacity-10 text-{{ reservation.etatReservation == 'confirmé' ? 'success' : 'warning' }} rounded-pill">
+                                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
                                                 {{ reservation.etatReservation }}
                                             </span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2" onclick="event.stopPropagation()">
-                                            <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
+                                            {# Bouton d'édition seulement pour les réservations en attente #}
+                                            {% if reservation.etatReservation|lower starts with 'en attente' %}
+                                                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            {% endif %}
+                                            
+                                            {# Bouton de suppression toujours visible #}
                                             <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
                                                 <button class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">

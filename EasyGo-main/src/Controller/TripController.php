@@ -15,6 +15,35 @@ use Knp\Component\Pager\PaginatorInterface;
 #[Route('/trip')]
 final class TripController extends AbstractController
 {
+
+    #[Route('/home', name: 'app_trip_home')]
+public function home(TripRepository $tripRepository): Response
+{
+    $trips = $tripRepository->findAll();
+
+    return $this->render('trip/home.html.twig', [
+        'trips' => $trips,
+    ]);
+}
+#[Route('/home_client', name: 'app_trip_home_client')]
+public function homeclient(TripRepository $tripRepository): Response
+{
+    $trips = $tripRepository->findAll();
+
+    return $this->render('trip/home_client.html.twig', [
+        'trips' => $trips,
+    ]);
+}
+#[Route('/home_admin', name: 'app_trip_home_admin')]
+public function homeadmin(TripRepository $tripRepository): Response
+{
+    $trips = $tripRepository->findAll();
+
+    return $this->render('trip/home_admin.html.twig', [
+        'trips' => $trips,
+    ]);
+}
+
     #[Route('/', name: 'app_trip_index', methods: ['GET'])]
     public function index(TripRepository $tripRepository): Response
     {

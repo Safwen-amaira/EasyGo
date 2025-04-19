@@ -74,7 +74,7 @@ class TripType extends AbstractType
         $oneWeekLater = (new \DateTime())->modify('+1 week');
 
         if ($value < $today || $value > $oneWeekLater) {
-            $context->buildViolation('La date doit être entre aujourd\'hui et dans une semaine')
+            $context->buildViolation('La date doit être entre demain et dans une semaine')
                 ->atPath('trip_date')
                 ->addViolation();
         }
