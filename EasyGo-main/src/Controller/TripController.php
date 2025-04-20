@@ -26,9 +26,20 @@ public function home(TripRepository $tripRepository): Response
     ]);
 }
 #[Route('/home_client', name: 'app_trip_home_client')]
-public function homeclient(TripRepository $tripRepository): Response
+public function homeclient(Request $request, TripRepository $tripRepository): Response
 {
-    $trips = $tripRepository->findAll();
+    $searchTerm = $request->query->get('search');
+    
+    if ($searchTerm) {
+        $trips = $tripRepository->createQueryBuilder('t')
+            ->where('LOWER(t.departure_point) LIKE LOWER(:search) OR LOWER(t.destination) LIKE LOWER(:search)')
+            ->setParameter('search', '%'.$searchTerm.'%')
+            ->orderBy('t.trip_date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    } else {
+        $trips = $tripRepository->findBy([], ['trip_date' => 'ASC']);
+    }
 
     return $this->render('trip/home_client.html.twig', [
         'trips' => $trips,
