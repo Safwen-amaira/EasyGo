@@ -21,6 +21,47 @@
                     </a>
                 </div>
             </div>
+            {# Barre de recherche #}
+<div class="card mb-4 shadow-sm">
+    <div class="card-body p-3">
+        <form method="get" action="{{ path('app_trip_home') }}" class="row g-3 align-items-center">
+            <!-- Champ de recherche -->
+            <div class="col-md-6">
+                <div class="input-group" style="height: 38px;">
+                    <span class="input-group-text bg-light border-0 d-flex align-items-center">
+                        <i class="bi bi-search" style="color: rgb(54, 95, 244);"></i>
+                    </span>
+                    <input type="text" 
+                           class="form-control border-0 bg-light" 
+                           name="search" 
+                           value="{{ app.request.query.get('search') }}" 
+                           placeholder="Rechercher ">
+                </div>
+            </div>
+            
+            <!-- Boutons de tri -->
+            <div class="col-md-4">
+                <div class="d-flex" style="height: 38px; gap: 8px;">
+                    <a href="{{ path('app_trip_home', app.request.query.all|merge({'order': 'ASC'})) }}" 
+                       class="btn btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center {{ app.request.query.get('order', 'ASC') == 'ASC' ? 'active' : '' }}">
+                        <i class="bi bi-sort-down me-1"></i>Anciens
+                    </a>
+                    <a href="{{ path('app_trip_home', app.request.query.all|merge({'order': 'DESC'})) }}" 
+                       class="btn btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center {{ app.request.query.get('order', 'ASC') == 'DESC' ? 'active' : '' }}">
+                        <i class="bi bi-sort-up me-1"></i>Récents
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bouton Rechercher -->
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-search me-1"></i>Rechercher
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
             {% if trips|length > 0 %}
                 {% for trip in trips %}
@@ -87,7 +128,7 @@
                             
                             <!-- Actions -->
                             <div class="d-flex justify-content-between align-items-center">
-                                <a href="{{ path('app_trip_show', {'id': trip.id}) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ path('app_trip_client_view', {'id': trip.id}) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye me-1"></i> Voir détails
                                 </a>
                                 

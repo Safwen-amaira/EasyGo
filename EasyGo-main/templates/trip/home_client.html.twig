@@ -15,24 +15,42 @@
             </div>
 
 {# Barre de recherche #}
+{# Barre de recherche #}
 <div class="card mb-4 shadow-sm">
     <div class="card-body p-3">
-        <form method="get" action="{{ path('app_trip_home_client') }}" class="row g-2">
-            <div class="col-md-9">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-0">
+        <form method="get" action="{{ path('app_trip_home_client') }}" class="row g-3 align-items-center">
+            <!-- Champ de recherche -->
+            <div class="col-md-6">
+                <div class="input-group" style="height: 38px;">
+                    <span class="input-group-text bg-light border-0 d-flex align-items-center">
                         <i class="bi bi-search" style="color: rgb(54, 95, 244);"></i>
                     </span>
                     <input type="text" 
                            class="form-control border-0 bg-light" 
                            name="search" 
                            value="{{ app.request.query.get('search') }}" 
-                           placeholder="Rechercher par lieu de départ ou destination">
+                           placeholder="Rechercher ">
                 </div>
             </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-search me-1"></i> Rechercher
+            
+            <!-- Boutons de tri -->
+            <div class="col-md-4">
+                <div class="d-flex" style="height: 38px; gap: 8px;">
+                    <a href="{{ path('app_trip_home_client', app.request.query.all|merge({'order': 'ASC'})) }}" 
+                       class="btn btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center {{ app.request.query.get('order', 'ASC') == 'ASC' ? 'active' : '' }}">
+                        <i class="bi bi-sort-down me-1"></i>Anciens
+                    </a>
+                    <a href="{{ path('app_trip_home_client', app.request.query.all|merge({'order': 'DESC'})) }}" 
+                       class="btn btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center {{ app.request.query.get('order', 'ASC') == 'DESC' ? 'active' : '' }}">
+                        <i class="bi bi-sort-up me-1"></i>Récents
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bouton Rechercher -->
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-search me-1"></i>Rechercher
                 </button>
             </div>
         </form>
