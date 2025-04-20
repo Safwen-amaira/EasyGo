@@ -6,6 +6,7 @@ use App\Repository\VehiculeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints\Date;
 
 
 #[ORM\Entity(repositoryClass: VehiculeRepository::class)]
@@ -21,26 +22,38 @@ class Vehicule
     #[Assert\Length(
         min: 4,
         minMessage: "Le nom du véhicule doit comporter au moins {{ limit }} caractères.",
-        max: 255,
+        max: 8,
         maxMessage: "Le nom du véhicule ne peut pas dépasser {{ limit }} caractères."
     )]
     private ?string $name = null;
 
     #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank(message: "Carburant de mise à jour est requise.")]
+    #[Assert\NotBlank(message: "Le type de carburant est requis..")]
     private ?string $Carburant = null;
 
     #[ORM\Column(type: 'date')]
     #[Assert\NotBlank(message: "La date de création est requise.")]
+    #[Assert\LessThan(
+        value: "today",
+        message: "La date de création ne peut pas être aujourd'hui."
+    )]
     private ?\DateTimeInterface $created = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        min: 4,
+        minMessage: "Le nom du véhicule doit comporter au moins {{ limit }} caractères.",
+    )]
     private ?string $content = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        max: 8,
+        maxMessage: "La couleur ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $color = null;
 
     #[ORM\Column(type: 'integer')]

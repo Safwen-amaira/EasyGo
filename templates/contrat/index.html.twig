@@ -11,21 +11,22 @@
             <table class="table table-striped" id="contrat-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nom et Prénom</th>
+                        
+                        <th>Nom du Garage</th>
                         <th>fournisseur_service</th>
                         <th>Téléphone</th>
                         <th>service_inclus</th>
                         <th>date debut</th>
                         <th>Date fin</th>
                         <th>type_contrat</th>
+                        <th>IDVehicule</th>
                         
                     </tr>
                 </thead>
                 <tbody id="vehicule-table-body">
                     {% for contrat in contrats %}
                         <tr>
-                            <td>{{ contrat.id }}</td>
+                            
                             <td>{{ contrat.nomprenom }}</td>
                             <td>{{ contrat.adresse }}</td>
                             <td>{{ contrat.telephone }}</td>
@@ -33,6 +34,7 @@
                             <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}</td>
                             <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
                             <td>{{ contrat.description }}</td>
+                            <td>{{ contrat.vehicule.id }}</td>
                             <td>
                                 <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}" class="btn btn-info btn-sm">Voir</a>
                                 <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
@@ -52,4 +54,5 @@
             <a href="{{ path('app_contrat_new') }}" class="btn btn-success">Créer un nouveau contrat</a>
         </div>
     </div>
+    
 {% endblock %}

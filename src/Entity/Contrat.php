@@ -15,9 +15,13 @@ class Contrat
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+
+
     #[ORM\ManyToOne(targetEntity: Vehicule::class)]
     #[ORM\JoinColumn(name: 'idVehicule', referencedColumnName: 'id')]
     private ?Vehicule $vehicule = null;
+
+
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le nom du contrat est requis.")]
@@ -43,18 +47,17 @@ class Contrat
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $typeContrat = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: 'date')]
+    #[Assert\NotBlank(message: "La date de création est requise.")]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateFin = null;
-    #[Assert\NotBlank(message: "Le type de contrat est requis.")]
-    #[Assert\Choice(
-        choices: ["annuel", "kilométrique"],
-        message: "Le type de contrat doit être soit 'kilométrique'."
-    )]
+    
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
+
+    
 
     public function getId(): ?int
     {
