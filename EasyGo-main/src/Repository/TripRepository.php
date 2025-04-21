@@ -40,6 +40,15 @@ class TripRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-
+    public function getPopularDestinations(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.destination, COUNT(t.id) as tripCount')
+            ->groupBy('t.destination')
+            ->orderBy('tripCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 
 }

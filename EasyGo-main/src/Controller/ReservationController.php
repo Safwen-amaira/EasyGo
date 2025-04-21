@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Reservation;
 use App\Entity\Trip;
+use App\Form\TripType;
+use App\Repository\TripRepository;
 use App\Form\ReservationType;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,13 +13,50 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
+    #[Route('/statistics', name: 'app_reservation_statistics', methods: ['GET'])]  
+public function statistics(ReservationRepository $reservationRepository, TripRepository $tripRepository): Response
+{
+    // Statistiques des réservations
+    $reservationStats = $reservationRepository->createQueryBuilder('r')
+        ->select([
+            "COUNT(r.id) as total_reservations",
+            "SUM(CASE WHEN r.etatReservation = 'confirmée' THEN 1 ELSE 0 END) as confirmed",
+            "SUM(CASE WHEN r.etatReservation = 'en attente' THEN 1 ELSE 0 END) as pending",
+            "SUM(CASE WHEN r.etatReservation = 'refusée' THEN 1 ELSE 0 END) as refused",
+            "SUM(r.montantTotal) as total_revenue"
+        ])
+        ->getQuery()
+        ->getSingleResult();
+
+    // Statistiques des trajets
+    $tripStats = $tripRepository->createQueryBuilder('t')
+        ->select([
+            "COUNT(t.id) as total_trips",
+            "SUM(t.availableSeats) as total_seats",
+            "AVG(t.contribution) as avg_contribution"
+        ])
+        ->getQuery()
+        ->getSingleResult();
+
+    // Réservations par mois (pour le graphique)
+    $monthlyReservations = $reservationRepository->getMonthlyReservations();
+
+    return $this->render('reservation/statistics.html.twig', [
+        'reservationStats' => $reservationStats,
+        'tripStats' => $tripStats,
+        'monthlyData' => $monthlyReservations
+    ]);
+}
 
     #[Route('/', name: 'app_reservation_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository): Response

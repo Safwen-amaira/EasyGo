@@ -3,3 +3,6 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+reservation_stats:
+    path: /reservations/statistiques
+    controller: App\Controller\ReservationController::statistics

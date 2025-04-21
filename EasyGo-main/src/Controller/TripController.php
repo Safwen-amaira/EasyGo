@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Trip;
 use App\Form\TripType;
 use App\Repository\TripRepository;
+use App\Form\ReservationType;
+use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,53 @@ use Knp\Component\Pager\PaginatorInterface;
 #[Route('/trip')]
 final class TripController extends AbstractController
 {
+    #[Route('/statistics', name: 'app_trip_statistics')]
+public function statistics(ReservationRepository $reservationRepo, TripRepository $tripRepo): Response
+{
+    // Statistiques des réservations
+    $reservationStats = [
+        'total' => $reservationRepo->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->getQuery()
+            ->getSingleScalarResult(),
+        'confirmed' => $reservationRepo->count(['etatReservation' => 'confirmé']),
+        'pending' => $reservationRepo->count(['etatReservation' => 'en_attente']),
+        'rejected' => $reservationRepo->count(['etatReservation' => 'refusé']),
+        'monthly' => $reservationRepo->getMonthlyReservations(),
+    ];
+
+    // Statistiques des trajets
+    $tripStats = [
+        'total' => $tripRepo->count([]),
+        'active' => $tripRepo->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.trip_date >= :today')
+            ->setParameter('today', new \DateTime())
+            ->getQuery()
+            ->getSingleScalarResult(),
+        'completed' => $tripRepo->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.trip_date < :today')
+            ->setParameter('today', new \DateTime())
+            ->getQuery()
+            ->getSingleScalarResult(),
+        'popular_destinations' => $tripRepo->getPopularDestinations(5),
+    ];
+
+    // Revenus totaux
+    $totalRevenue = $reservationRepo->createQueryBuilder('r')
+        ->select('SUM(r.montantTotal)')
+        ->where('r.etatReservation = :confirmed')
+        ->setParameter('confirmed', 'confirmé')
+        ->getQuery()
+        ->getSingleScalarResult() ?? 0;
+
+    return $this->render('trip/statistics.html.twig', [
+        'reservation_stats' => $reservationStats,
+        'trip_stats' => $tripStats,
+        'total_revenue' => $totalRevenue,
+    ]);
+}
 
     #[Route('/home', name: 'app_trip_home')]
     public function home(Request $request, TripRepository $tripRepository): Response
