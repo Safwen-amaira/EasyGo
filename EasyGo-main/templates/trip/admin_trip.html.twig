@@ -28,7 +28,7 @@
                         <table class="table table-hover mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="text-primary">ID</th>
+                                    <th class="text-primary">Référence</th>
                                     <th class="text-primary">Date du voyage</th>
                                     <th class="text-primary">Départ</th>
                                     <th class="text-primary">Destination</th>
@@ -43,7 +43,7 @@
                             <tbody>
                             {% for trip in pagination %}
                                 <tr onclick="window.location='{{ path('app_trip_publication_admin', {'id': trip.id}) }}'" style="cursor: pointer;">
-                                    <td>{{ trip.id }}</td>
+                                    <td>TRP-{{ trip.id }}</td>
                                     <td>{{ trip.tripDate ? trip.tripDate|date('d/m/Y') : '' }}</td>
                                     <td>{{ trip.departurePoint }}</td>
                                     <td>{{ trip.destination }}</td>
@@ -51,10 +51,10 @@
                                     <td>{{ trip.returnTime ? trip.returnTime|date('H:i') : '' }}</td>
                                     <td>
                                         <span class="badge bg-{{ trip.availableSeats > 0 ? 'primary' : 'danger' }} bg-opacity-10 text-{{ trip.availableSeats > 0 ? 'primary' : 'danger' }} rounded-pill">
-                                            {{ trip.availableSeats }} places
+                                            {{ trip.availableSeats > 0 ? trip.availableSeats ~ ' places' : 'Complet' }}
                                         </span>
                                     </td>
-                                    <td>{{ trip.tripType ? trip.tripType : '-' }}</td>
+                                    <td>{{ trip.tripType ? trip.tripType|replace({'_': ' '}) : '-' }}</td>
                                     <td class="fw-bold">{{ trip.contribution ? trip.contribution ~ ' DNT' : '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-2" onclick="event.stopPropagation()">

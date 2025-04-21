@@ -22,7 +22,8 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="bg-light">
-                                <tr>                                  
+                                <tr>  
+                                    <th class="text-primary">Trajet</th>
                                     <th class="text-primary">Date réservation</th>
                                     <th class="text-primary">Départ → Destination</th>
                                     <th class="text-primary">Places réservées</th>
@@ -34,6 +35,7 @@
                             <tbody>
                             {% for reservation in pagination %}
                                 <tr onclick="window.location='{{ path('app_reservation_show', {'id': reservation.id}) }}'" style="cursor: pointer;">
+                                    <td>TRP-{{ reservation.trip.id }}</td>
                                     <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
                                     <td>
                                         {{ reservation.trip.departurePoint }} 
