@@ -32,7 +32,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for reservation in reservations %}
+                            {% for reservation in pagination %}
                                 <tr onclick="window.location='{{ path('app_reservation_show', {'id': reservation.id}) }}'" style="cursor: pointer;">
                                     <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
                                     <td>
@@ -92,11 +92,24 @@
                     </div>
                 </div>
                 
-                {% if reservations|length > 5 %}
                 <div class="card-footer bg-light py-3">
-                    <small class="text-muted">Affichage de {{ reservations|length }} réservations</small>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                Affichage de <b>{{ pagination.getPaginationData.firstItemNumber }}</b> à <b>{{ pagination.getPaginationData.lastItemNumber }}</b> sur <b>{{ pagination.getTotalItemCount }}</b> réservations
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end">
+                                {{ knp_pagination_render(pagination, null, {}, {
+                                    'align': 'center',
+                                    'size': 'small',
+                                    'rounded': true,
+                                }) }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -160,6 +173,36 @@
     .badge.bg-danger {
         background-color: rgba(220, 53, 69, 0.1) !important;
         color: #dc3545 !important;
+    }
+    
+    /* Styles pour la pagination */
+    .pagination {
+        margin: 0;
+    }
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        border-radius: 50rem !important;
+    }
+    .page-link {
+        color: #0d47a1;
+        border: 1px solid #dee2e6;
+        margin: 0 3px;
+        border-radius: 50rem !important;
+        min-width: 36px;
+        text-align: center;
+    }
+    .page-item.active .page-link {
+        background-color: #0d47a1;
+        border-color: #0d47a1;
+    }
+    .page-link:hover {
+        color: #1e88e5;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
     }
 </style>
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des Trajets{% endblock %}
+{% block title %}Liste des Trajets (Admin){% endblock %}
 
 {% block body %}
 <div class="container py-5">
@@ -10,11 +10,14 @@
                 <div class="card-header bg-primary text-white py-3" style="background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);">
                     <div class="d-flex justify-content-between align-items-center">
                         <h1 class="h4 mb-0 font-weight-light">
-                            <i class="bi bi-car-front-fill mr-2"></i> Liste des trajets
+                            <i class="bi bi-car-front-fill mr-2"></i> Liste des trajets 
                         </h1>
                         <div>
                             <a href="{{ path('app_reservation_admin') }}" class="btn btn-sm btn-light rounded-pill me-2" style="color: #0d47a1;">
                                 <i class="bi bi-journal-check me-1"></i> Voir réservations
+                            </a>
+                            <a href="{{ path('app_trip_new') }}" class="btn btn-sm btn-light rounded-pill" style="color: #0d47a1;">
+                                <i class="bi bi-plus-circle me-1"></i> Nouveau trajet
                             </a>
                         </div>
                     </div>
@@ -25,7 +28,7 @@
                         <table class="table table-hover mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="text-primary">#</th>
+                                    <th class="text-primary">ID</th>
                                     <th class="text-primary">Date du voyage</th>
                                     <th class="text-primary">Départ</th>
                                     <th class="text-primary">Destination</th>
@@ -38,7 +41,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for trip in trips %}
+                            {% for trip in pagination %}
                                 <tr onclick="window.location='{{ path('app_trip_publication_admin', {'id': trip.id}) }}'" style="cursor: pointer;">
                                     <td>{{ trip.id }}</td>
                                     <td>{{ trip.tripDate ? trip.tripDate|date('d/m/Y') : '' }}</td>
@@ -47,7 +50,7 @@
                                     <td>{{ trip.departureTime ? trip.departureTime|date('H:i') : '' }}</td>
                                     <td>{{ trip.returnTime ? trip.returnTime|date('H:i') : '' }}</td>
                                     <td>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                                        <span class="badge bg-{{ trip.availableSeats > 0 ? 'primary' : 'danger' }} bg-opacity-10 text-{{ trip.availableSeats > 0 ? 'primary' : 'danger' }} rounded-pill">
                                             {{ trip.availableSeats }} places
                                         </span>
                                     </td>
@@ -55,6 +58,9 @@
                                     <td class="fw-bold">{{ trip.contribution ? trip.contribution ~ ' DNT' : '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-2" onclick="event.stopPropagation()">
+                                            <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
                                             <form method="post" action="{{ path('app_trip_delete', {'id': trip.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce voyage ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trip.id) }}">
                                                 <button class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">
@@ -76,11 +82,24 @@
                     </div>
                 </div>
                 
-                {% if trips|length > 5 %}
                 <div class="card-footer bg-light py-3">
-                    <small class="text-muted">Affichage de {{ trips|length }} voyages</small>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                Affichage de <b>{{ pagination.getPaginationData.firstItemNumber }}</b> à <b>{{ pagination.getPaginationData.lastItemNumber }}</b> sur <b>{{ pagination.getTotalItemCount }}</b> voyages
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end">
+                                {{ knp_pagination_render(pagination, null, {}, {
+                                    'align': 'center',
+                                    'size': 'small',
+                                    'rounded': true,
+                                }) }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -136,6 +155,40 @@
     }
     form {
         display: inline-block;
+    }
+    
+    /* Styles pour la pagination */
+    .pagination {
+        margin: 0;
+    }
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        border-radius: 50rem !important;
+    }
+    .page-link {
+        color: #0d47a1;
+        border: 1px solid #dee2e6;
+        margin: 0 3px;
+        border-radius: 50rem !important;
+        min-width: 36px;
+        text-align: center;
+        font-size: 0.85rem;
+        padding: 0.375rem 0.75rem;
+    }
+    .page-item.active .page-link {
+        background-color: #0d47a1;
+        border-color: #0d47a1;
+        color: white;
+    }
+    .page-link:hover {
+        color: #1e88e5;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
     }
 </style>
 {% endblock %}

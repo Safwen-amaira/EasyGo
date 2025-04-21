@@ -132,21 +132,40 @@ public function homeadmin(Request $request, TripRepository $tripRepository): Res
     ]);
 }
 
-    #[Route('/', name: 'app_trip_index', methods: ['GET'])]
-    public function index(TripRepository $tripRepository): Response
-    {
-        return $this->render('trip/index.html.twig', [
-            'trips' => $tripRepository->findAll(),
-        ]);
-    }
+#[Route('/', name: 'app_trip_index', methods: ['GET'])]
+public function index(TripRepository $tripRepository, PaginatorInterface $paginator, Request $request): Response
+{
+    $query = $tripRepository->createQueryBuilder('t')
+        ->orderBy('t.trip_date', 'DESC')
+        ->getQuery();
 
-    #[Route('/admin_trip', name: 'app_trip_admin_trip', methods: ['GET'])]
-    public function indexadmintrip(TripRepository $tripRepository): Response
-    {
-        return $this->render('trip/admin_trip.html.twig', [
-            'trips' => $tripRepository->findAll(),
-        ]);
-    }
+    $pagination = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1), // Numéro de page par défaut
+        10 // Nombre d'éléments par page
+    );
+
+    return $this->render('trip/index.html.twig', [
+        'pagination' => $pagination,
+    ]);
+}
+#[Route('/admin_trip', name: 'app_trip_admin_trip', methods: ['GET'])]
+public function indexadmintrip(TripRepository $tripRepository, PaginatorInterface $paginator, Request $request): Response
+{
+    $query = $tripRepository->createQueryBuilder('t')
+        ->orderBy('t.trip_date', 'DESC')
+        ->getQuery();
+
+    $pagination = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1), // Numéro de page par défaut
+        10 // Nombre d'éléments par page
+    );
+
+    return $this->render('trip/admin_trip.html.twig', [
+        'pagination' => $pagination,
+    ]);
+}
 
     #[Route('/publication_admin/{id}', name: 'app_trip_publication_admin', methods: ['GET'])]
     public function showadmin(Trip $trip): Response

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
@@ -23,54 +24,39 @@ final class ReservationController extends AbstractController
         private EntityManagerInterface $entityManager
     ) {
     }
-    #[Route('/statistics', name: 'app_reservation_statistics', methods: ['GET'])]  
-public function statistics(ReservationRepository $reservationRepository, TripRepository $tripRepository): Response
-{
-    // Statistiques des réservations
-    $reservationStats = $reservationRepository->createQueryBuilder('r')
-        ->select([
-            "COUNT(r.id) as total_reservations",
-            "SUM(CASE WHEN r.etatReservation = 'confirmée' THEN 1 ELSE 0 END) as confirmed",
-            "SUM(CASE WHEN r.etatReservation = 'en attente' THEN 1 ELSE 0 END) as pending",
-            "SUM(CASE WHEN r.etatReservation = 'refusée' THEN 1 ELSE 0 END) as refused",
-            "SUM(r.montantTotal) as total_revenue"
-        ])
-        ->getQuery()
-        ->getSingleResult();
-
-    // Statistiques des trajets
-    $tripStats = $tripRepository->createQueryBuilder('t')
-        ->select([
-            "COUNT(t.id) as total_trips",
-            "SUM(t.availableSeats) as total_seats",
-            "AVG(t.contribution) as avg_contribution"
-        ])
-        ->getQuery()
-        ->getSingleResult();
-
-    // Réservations par mois (pour le graphique)
-    $monthlyReservations = $reservationRepository->getMonthlyReservations();
-
-    return $this->render('reservation/statistics.html.twig', [
-        'reservationStats' => $reservationStats,
-        'tripStats' => $tripStats,
-        'monthlyData' => $monthlyReservations
-    ]);
-}
-
+    
     #[Route('/', name: 'app_reservation_index', methods: ['GET'])]
-    public function index(ReservationRepository $reservationRepository): Response
+    public function index(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $query = $reservationRepository->createQueryBuilder('r')
+            ->orderBy('r.dateReservation', 'DESC')
+            ->getQuery();
+    
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1), // Numéro de page par défaut
+            10 // Nombre d'éléments par page
+        );
+    
         return $this->render('reservation/index.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'pagination' => $pagination,
         ]);
     }
-
     #[Route('/admin', name: 'app_reservation_admin', methods: ['GET'])]
-    public function indexadmin(ReservationRepository $reservationRepository): Response
+    public function indexadmin(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $query = $reservationRepository->createQueryBuilder('r')
+            ->orderBy('r.dateReservation', 'DESC')
+            ->getQuery();
+    
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1), // Numéro de page par défaut
+            10 // Nombre d'éléments par page
+        );
+    
         return $this->render('reservation/admin_reservation.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'pagination' => $pagination,
         ]);
     }
 
@@ -81,15 +67,23 @@ public function statistics(ReservationRepository $reservationRepository, TripRep
             'reservation' => $reservation,
         ]);
     }
-
     #[Route('/driver', name: 'app_reservation_index_driver', methods: ['GET'])]
-    public function indexDriver(ReservationRepository $reservationRepository): Response
+    public function indexDriver(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $query = $reservationRepository->createQueryBuilder('r')
+            ->orderBy('r.dateReservation', 'DESC')
+            ->getQuery();
+    
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1), // Numéro de page par défaut
+            10 // Nombre d'éléments par page
+        );
+    
         return $this->render('reservation/index_driver.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'pagination' => $pagination,
         ]);
     }
-
     #[Route('/new/{tripId}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, int $tripId): Response
     {

@@ -10,15 +10,18 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-4"  style="color:rgb(5, 28, 114);">
-                <h1 class="h3 mb-0">
+                <h1 class="h3 mb-3">
                     <i class="bi bi-car-front-fill me-2"></i> Trajets disponibles
                 </h1>
                 <div>
                     <a href="{{ path('app_trip_admin_trip') }}" class="btn btn-sm btn-outline-primary me-2">
                         <i class="bi bi-list-ul me-1"></i> Voir trajets
                     </a>
-                    <a href="{{ path('app_reservation_admin') }}" class="btn btn-sm btn-primary">
+                    <a href="{{ path('app_reservation_admin') }}" class="btn btn-sm btn-primary me-2">
                         <i class="bi bi-plus-circle me-1"></i> Voir reservations
+                    </a>
+                    <a href="{{ path('app_trip_statistics') }}" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="bi bi-graph-up me-1"></i> Voir statistiques
                     </a>
                 </div>
             </div>
@@ -43,7 +46,7 @@
             <!-- Boutons de tri -->
             <div class="col-md-4">
                 <div class="d-flex" style="height: 38px; gap: 8px;">
-                    <a href="{{ path('app_trip_home_admin', app.request.query.all|merge({'order': 'ASC'})) }}" 
+                    <a href="{{ path('app_trip_home_admin', app.request.query.all|merge({'order': 'ASC'}))  }}" 
                        class="btn btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center {{ app.request.query.get('order', 'ASC') == 'ASC' ? 'active' : '' }}">
                         <i class="bi bi-sort-down me-1"></i>Anciens
                     </a>
@@ -129,7 +132,7 @@
                             
                             <!-- Actions -->
                             <div class="d-flex justify-content-between align-items-center">
-                                <a href="{{ path('app_trip_client_view', {'id': trip.id}) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ path('app_trip_publication_admin', {'id': trip.id}) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye me-1"></i> Voir détails
                                 </a>
                                 
