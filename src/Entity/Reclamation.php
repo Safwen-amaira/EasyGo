@@ -30,9 +30,19 @@ class Reclamation
 
     #[ORM\ManyToOne(inversedBy: 'reclamations')]
     private ?User $user = null;
+ 
+    
+   
+    /**
+     * @var Collection<int, Reponse>
+     */
+    #[ORM\OneToMany(mappedBy: 'reclamation', targetEntity: Reponse::class, cascade: ['persist', 'remove'])]
+    private Collection $reponses;
 
-    #[ORM\Column(type:"string", nullable:true)]
-    private $reponse;
+    public function __construct()
+    {
+        $this->reponses = new ArrayCollection();
+    }
 
     
     public function getId(): ?int
@@ -87,16 +97,7 @@ class Reclamation
 
         return $this;
     }
-    public function getReponse(): ?string
-    {
-        return $this->reponse;
-    }
-
-    public function setReponse(?string $reponse): self
-    {
-        $this->reponse = $reponse;
-        return $this;
-    }
+ 
     public function getUser(): ?User
     {
         return $this->user;
@@ -105,6 +106,36 @@ class Reclamation
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reponse>
+     */
+    public function getReponses(): Collection
+    {
+        return $this->reponses;
+    }
+
+    public function addReponse(Reponse $reponse): static
+    {
+        if (!$this->reponses->contains($reponse)) {
+            $this->reponses->add($reponse);
+            $reponse->setReclamation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponse(Reponse $reponse): static
+    {
+        if ($this->reponses->removeElement($reponse)) {
+            // set the owning side to null (unless already changed)
+            if ($reponse->getReclamation() === $this) {
+                $reponse->setReclamation(null);
+            }
+        }
 
         return $this;
     }
