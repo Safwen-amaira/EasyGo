@@ -33,48 +33,51 @@
 
     <div class="row g-4">
       {% for reclamation in reclamations %}
-        <div class="col-lg-4 col-md-6">
-          <div class="card reclamation-card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Réclamation #{{ reclamation.id }}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">{{ reclamation.categorie }}</h6>
-              <p class="card-text">
-                <strong>Statut:</strong> {{ reclamation.statut }}<br>
-                <strong>Description:</strong> {{ reclamation.description }}<br>
-                <strong>Date de création:</strong> {{ reclamation.dateCreation ? reclamation.dateCreation|date('Y-m-d H:i:s') : 'N/A' }}
-              </p>
-              
-              <div class="feedback-section">
-                <strong>Réponse(s):</strong>
-                {% if reclamation.reponses|length > 0 %}
-                  {% for reponse in reclamation.reponses %}
-                    <div class="feedback-item">
-                      <p>{{ reponse.contenu }}</p>
-                      <small class="text-muted">
-                        {{ reponse.dateCreation ? reponse.dateCreation|date('d/m/Y H:i') : 'Date inconnue' }}
-                      </small>
-                    </div>
-                  {% endfor %}
-                {% else %}
-                  <p>Aucune réponse fournie</p>
-                {% endif %}
-              </div>
+  <div class="col-lg-4 col-md-6">
+    <div class="card reclamation-card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Réclamation #{{ reclamation.id }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ reclamation.categorie }}</h6>
+        <p><strong>Statut:</strong> {{ reclamation.statut }}</p>
+        <p><strong>Date de création:</strong> {{ reclamation.dateCreation ? reclamation.dateCreation|date('Y-m-d H:i:s') : 'N/A' }}</p>
 
-              <div class="d-flex justify-content-between mt-3">
-                <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}" class="btn btn-outline-primary">Show</a>
-                <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-outline-secondary">Edit</a>
-                {{ include('reclamation/_delete_form.html.twig') }}
-              </div>
-            </div>
+        <div class="details" style="display: none;">
+          <p><strong>Description:</strong> {{ reclamation.description }}</p>
+
+          <div class="feedback-section">
+            <strong>Réponse(s):</strong>
+            {% if reclamation.reponses|length > 0 %}
+              {% for reponse in reclamation.reponses %}
+                <div class="feedback-item">
+                  <p>{{ reponse.contenu }}</p>
+                  <small class="text-muted">
+                    {{ reponse.dateCreation ? reponse.dateCreation|date('d/m/Y H:i') : 'Date inconnue' }}
+                  </small>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p>Aucune réponse fournie</p>
+            {% endif %}
           </div>
         </div>
-      {% else %}
-        <div class="col-12">
-          <div class="alert no-records-alert text-center" role="alert">
-            No records found
-          </div>
+
+        <div class="d-flex justify-content-between mt-3">
+          <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}" class="btn btn-outline-primary">Show</a>
+          <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-outline-secondary">Edit</a>
+          {{ include('reclamation/_delete_form.html.twig') }}
         </div>
-      {% endfor %}
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="col-12">
+    <div class="alert no-records-alert text-center" role="alert">
+      No records found
+    </div>
+  </div>
+{% endfor %}
+
+
     </div>
 
     <div class="mt-4 text-center">

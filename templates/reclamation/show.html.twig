@@ -29,6 +29,19 @@
             </tr>
         </tbody>
     </table>
+    <h2>Réponses :</h2>
+    {% if reclamation.reponses|length > 0 %}
+        <ul>
+            {% for reponse in reclamation.reponses %}
+                <li>
+                    <p>{{ reponse.contenu }}</p>
+                    <small class="text-muted">{{ reponse.dateCreation ? reponse.dateCreation|date('d/m/Y H:i') : 'Date inconnue' }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucune réponse pour cette réclamation.</p>
+    {% endif %}
 
     <a href="{{ path('app_reclamation_index') }}">back to list</a>
 

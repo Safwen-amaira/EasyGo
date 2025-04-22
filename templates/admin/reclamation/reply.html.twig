@@ -32,7 +32,7 @@
                 <div class="card-body">
                     <p class="mb-1">{{ reponse.contenu|nl2br }}</p>
                     <small class="text-muted">Répondu le {{ reponse.dateCreation|date('d/m/Y ') }}</small>
-                     <form method="post" action="{{ path('admin_reponse_delete', {'id': reponse.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette réponse ?');">
+                     <form method="post" action="{{ path('admin_reclamation_reply', {'id': reponse.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette réponse ?');">
             <input type="hidden" name="_token" value="{{ csrf_token('delete_reponse_' ~ reponse.id) }}">
             <button class="btn btn-sm btn-outline-danger mt-2">Supprimer</button>
         </form>
