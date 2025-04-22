@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des véhicules{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="mb-4">Statistiques des véhicules</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <h4>Total des véhicules: {{ totalVehicules }}</h4>
+            </div>
+            <div class="col-md-4">
+                <h4>Prix moyen des véhicules: {{ prixMoyen | number_format(2, '.', ' ') }} €</h4>
+            </div>
+            <div class="col-md-4">
+                <h4>Véhicules par catégorie:</h4>
+                <ul>
+                    {% for categorie, count in vehiculesParCategorie %}
+                        <li>{{ categorie }}: {{ count }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <h4>Véhicules par couleur:</h4>
+                <ul>
+                    {% for couleur, count in vehiculesParCouleur %}
+                        <li>{{ couleur }}: {{ count }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <a href="{{ path('app_vehicule_index') }}" class="btn btn-primary">Retour à la liste des véhicules</a>
+    </div>
+{% endblock %}

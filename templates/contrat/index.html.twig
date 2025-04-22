@@ -5,23 +5,37 @@
 {% block body %}
     <div class="container mt-4">
         <h1>Liste des Contrats</h1>
+    {# Zone de notification des contrats expirants bientôt #}
+    <div id="notification-container" class="alert alert-warning d-none" role="alert">
+        <strong>Attention :</strong> Certains contrats expirent bientôt !
+        <ul id="notification-list" class="mb-0 mt-2"></ul>
+    </div>
+
         <input type="text" id="search" class="form-control mb-3" placeholder="Rechercher un véhicule...">
 
         <div class="card p-4">
             <table class="table table-striped" id="contrat-table">
                 <thead>
-                    <tr>
-                        
-                        <th>Nom du Garage</th>
+                <tr>
+                        <th>Nom</th>
                         <th>fournisseur_service</th>
                         <th>Téléphone</th>
-                        <th>service_inclus</th>
-                        <th>date debut</th>
-                        <th>Date fin</th>
+                         <th>
+                            
+                            <button id="sort-type" class="btn btn-link btn-sm">⬇</button> <!-- bouton pour trier par type de contrat -->
+                     <br>
+                       service_inclus
+                        </th>
+                        <th>Date  début </th>
+                        <th>
+                             <button id="sort-date" class="btn btn-link btn-sm">⬇</button> <!-- bouton pour trier -->
+                           <br> Date fin
+                        </th>
                         <th>type_contrat</th>
                         <th>IDVehicule</th>
                         
                     </tr>
+                    
                 </thead>
                 <tbody id="vehicule-table-body">
                     {% for contrat in contrats %}
@@ -35,6 +49,9 @@
                             <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
                             <td>{{ contrat.description }}</td>
                             <td>{{ contrat.vehicule.id }}</td>
+
+
+
                             <td>
                                 <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}" class="btn btn-info btn-sm">Voir</a>
                                 <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
@@ -54,5 +71,90 @@
             <a href="{{ path('app_contrat_new') }}" class="btn btn-success">Créer un nouveau contrat</a>
         </div>
     </div>
-    
+     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+    <script>
+       
+
+        // Recherche AJAX
+        document.getElementById('search').addEventListener('input', function() {
+            const searchValue = this.value;
+
+            fetch('{{ path('app_contrat_search') }}?search=' + encodeURIComponent(searchValue), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('vehicule-table-body').innerHTML = html;
+            });
+        });
+
+        // Fonction de tri
+        let sortAsc = true; // Variable pour alterner entre tri ascendant et descendant
+
+        document.getElementById('sort-date').addEventListener('click', function() {
+            const table = document.getElementById('contrat-table');
+            const rows = Array.from(table.rows).slice(1); // Exclure la ligne d'en-tête
+            const sortedRows = rows.sort(function(rowA, rowB) {
+                const dateA = new Date(rowA.cells[5].innerText);
+                const dateB = new Date(rowB.cells[5].innerText);
+
+                if (sortAsc) {
+                    return dateA - dateB; // Tri ascendant
+                } else {
+                    return dateB - dateA; // Tri descendant
+                }
+            });
+
+            // Re-ajouter les lignes triées dans le tableau
+            sortedRows.forEach(row => table.appendChild(row));
+
+            // Alterner l'ordre du tri
+            sortAsc = !sortAsc;
+            document.getElementById('sort-date').innerText = sortAsc ? "⬇" : "⬆"; // Modifier l'icône du bouton
+        });
+
+        // Fonction de tri pour la colonne 'Type de contrat'
+let sortAscType = true;
+
+document.getElementById('sort-type').addEventListener('click', function() {
+    const table = document.getElementById('contrat-table');
+    const rows = Array.from(table.rows).slice(1); // Exclure la ligne d'en-tête
+    const sortedRows = rows.sort(function(rowA, rowB) {
+        const typeA = rowA.cells[4].innerText.toLowerCase(); // Type de contrat en colonne 4
+        const typeB = rowB.cells[4].innerText.toLowerCase();
+
+        if (sortAscType) {
+            return typeA.localeCompare(typeB); // Tri ascendant par ordre alphabétique
+        } else {
+            return typeB.localeCompare(typeA); // Tri descendant par ordre alphabétique
+        }
+    });
+
+    sortedRows.forEach(row => table.appendChild(row)); // Ajouter les lignes triées
+
+    sortAscType = !sortAscType; // Alterner l'ordre du tri
+    document.getElementById('sort-type').innerText = sortAscType ? "⬇" : "⬆"; // Modifier l'icône du bouton
+});
+
+        // Notifications contrats expirant bientôt
+        fetch('{{ path('app_contrat_notifications') }}')
+            .then(response => response.json())
+            .then(contracts => {
+                if (contracts.length > 0) {
+                    const container = document.getElementById('notification-container');
+                    const list = document.getElementById('notification-list');
+                    container.classList.remove('d-none');
+
+                    contracts.forEach(contract => {
+                        const li = document.createElement('li');
+                        li.textContent = `Contrat de ${contract.nomprenom} expire le ${contract.dateFin}`;
+                        list.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Erreur lors du chargement des notifications :', error));
+    </script>
 {% endblock %}

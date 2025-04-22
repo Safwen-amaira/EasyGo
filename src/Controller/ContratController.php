@@ -9,10 +9,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[Route('/contrat')]
-final class ContratController extends AbstractController{
+final class ContratController extends AbstractController
+{
     #[Route(name: 'app_contrat_index', methods: ['GET'])]
     public function index(ContratRepository $contratRepository): Response
     {
@@ -21,12 +24,12 @@ final class ContratController extends AbstractController{
         ]);
     }
 
-    #[Route('/contrat/search', name: 'app_contrat_search', methods: ['GET'])]
-    public function search(Request $request, ContratRepository $ContratRepository): Response
+    #[Route('/search', name: 'app_contrat_search', methods: ['GET'])]
+    public function search(Request $request, ContratRepository $contratRepository): Response
     {
         $search = $request->query->get('search');
-        $contrats = $ContratRepository->searchByName($search);
-    
+        $contrats = $contratRepository->searchByName($search);
+
         return $this->render('contrat/_contrats_table.html.twig', [
             'contrats' => $contrats,
         ]);
@@ -81,11 +84,27 @@ final class ContratController extends AbstractController{
     #[Route('/{id}', name: 'app_contrat_delete', methods: ['POST'])]
     public function delete(Request $request, Contrat $contrat, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$contrat->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $contrat->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($contrat);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
     }
+    #[Route('/contrat/notifications', name: 'app_contrat_notifications')]
+    public function notifications(ContratRepository $contratRepository): JsonResponse
+    {
+        $contrats = $contratRepository->findContractsExpiringSoon();
+    
+        $data = array_map(function ($contrat) {
+            return [
+                'id' => $contrat->getId(),
+                'nomprenom' => $contrat->getNomprenom(),
+                'dateFin' => $contrat->getDateFin()->format('Y-m-d'),
+            ];
+        }, $contrats);
+    
+        return new JsonResponse($data);
+    }
+    
 }

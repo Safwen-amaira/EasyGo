@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\Contrat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Doctrine\ORM\QueryBuilder;
 /**
  * @extends ServiceEntityRepository<Contrat>
  */
@@ -25,9 +25,20 @@ class ContratRepository extends ServiceEntityRepository
                ->setParameter('nomprenom', '%' . $name . '%');
         }
     
-        return $qb->orderBy('v.id', 'DESC')
+        return $qb->orderBy('v.dateFin', 'DESC')
                   ->getQuery()
                   ->getResult();
+    }
+    public function findContractsExpiringSoon()
+    {
+        $dateLimit = new \DateTime('+7 days'); // Limite de 7 jours à partir d'aujourd'hui
+        return $this->createQueryBuilder('c')
+            ->where('c.dateFin <= :dateLimit')
+            ->andWhere('c.dateFin >= :currentDate')
+            ->setParameter('dateLimit', $dateLimit)
+            ->setParameter('currentDate', new \DateTime())
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

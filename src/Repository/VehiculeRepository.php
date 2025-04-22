@@ -26,7 +26,7 @@ class VehiculeRepository extends ServiceEntityRepository
            ->setParameter('name', '%' . $name . '%');
     }
 
-    return $qb->orderBy('v.id', 'DESC')
+    return $qb->orderBy('v.created', 'DESC')
               ->getQuery()
               ->getResult();
 }

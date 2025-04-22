@@ -1,14 +1,15 @@
 <tbody>
     {% for contrat in contrats %}
         <tr>
-            <td>{{ contrat.id }}</td>
-            <td>{{ contrat.nomprenom }}</td>
-            <td>{{ contrat.adresse ?? '—' }}</td>
-            <td>{{ contrat.telephone ?? '—' }}</td>
-            <td>{{ contrat.typeContrat ?? '—' }}</td>
-            <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '—' }}</td>
-            <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '—' }}</td>
-            <td>{{ contrat.description ?? '—' }}</td>
+           
+                            <td>{{ contrat.nomprenom }}</td>
+                            <td>{{ contrat.adresse }}</td>
+                            <td>{{ contrat.telephone }}</td>
+                            <td>{{ contrat.typeContrat }}</td>
+                            <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}</td>
+                            <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
+                            <td>{{ contrat.description }}</td>
+                            <td>{{ contrat.vehicule.id }}</td>
             <td>
                 {% if contrat.vehicule %}
                     {{ contrat.vehicule.name }}

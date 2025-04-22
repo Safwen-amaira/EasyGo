@@ -18,7 +18,7 @@ class ContratType extends AbstractType
     {
         $builder
             ->add('nomprenom', TextType::class, [
-                'label' => 'Nom du Garage', // Personnalisation du label
+                'label' => 'Nom', // Personnalisation du label
                 'attr' => [
                     'class' => 'form-control',
                     'novalidate' => 'novalidate', // Désactive la validation HTML5
