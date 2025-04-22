@@ -104,95 +104,57 @@ public function new(Request $request, EntityManagerInterface $em): Response
         return $this->redirectToRoute('recompense_index');
     }
 
-    #[Route('/spin', name: 'spin_reward', methods: ['POST'])]
-    public function spin(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $userId = $data['userId'] ?? null;
-
-        if (!$userId) {
-            return new JsonResponse(['error' => 'Missing user ID'], 400);
-        }
-
-        $user = $em->getRepository(UtilisateurFidelite::class)->find($userId);
-
-        if (!$user) {
-            return new JsonResponse(['error' => 'User not found'], 404);
-        }
-
-        $rewards = $em->getRepository(RecompenseFidelite::class)->findBy([
-            'utilisateurfidelite' => null
-        ]);
-
-        if (empty($rewards)) {
-            return new JsonResponse(['error' => 'No unassigned rewards available'], 404);
-        }
-
-        $reward = $rewards[array_rand($rewards)];
-        $reward->setUtilisateurFidelite($user);
-        $reward->setStatut('attribuee');
-        $em->flush();
-
-        return new JsonResponse([
-            'message' => 'Reward assigned!',
-            'reward' => $reward->getDescription(),
-        ]);
-    }
-
-    #[Route('/assign', name: 'assign_reward', methods: ['POST'])]
-    public function assign(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        dump($data); // ← ajoute ça
-
-        $rewardDescription = $data['reward'] ?? null;
-        $userId = $data['userId'] ?? null;
-
-        if (!$rewardDescription || !$userId) {
-            return new JsonResponse(['error' => 'Missing data'], 400);
-        }
-
-        $user = $em->getRepository(UtilisateurFidelite::class)->find($userId);
-        $reward = $em->getRepository(RecompenseFidelite::class)->findOneBy([
-            'description' => $rewardDescription,
-            'utilisateurfidelite' => null,
-        ]);
-
-        if (!$user || !$reward) {
-            return new JsonResponse(['error' => 'User or reward not found or already assigned'], 404);
-        }
-
-        $reward->setUtilisateurFidelite($user);
-        $reward->setStatut('attribuee');
-        $em->flush();
-
-        return new JsonResponse(['message' => 'Reward assigned!']);
-    }
-
-    #[Route('/list-json', name: 'reward_list_json')]
-    public function listRewards(EntityManagerInterface $em): JsonResponse
-    {
-        $rewards = $em->getRepository(RecompenseFidelite::class)->findAll();
-
-        $rewardDescriptions = array_map(fn($r) => $r->getDescription(), $rewards);
-
-        return new JsonResponse(['rewards' => $rewardDescriptions]);
-    }
-
-    #[Route('/recompense/spin-page', name: 'recompense_spin_page')]
-    public function spinPage(EntityManagerInterface $em): Response
-    {$rewards = $em->getRepository(RecompenseFidelite::class)->findBy([
-        'utilisateurfidelite' => null
-    ]);
     
-        
 
-        $rewardDescriptions = array_map(fn($r) => $r->getDescription(), $rewards);
+    #[Route('/spin', name: 'recompense_spin', methods: ['POST'])]
+public function spinReward(Request $request, EntityManagerInterface $em): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    $rewardLabel = $data['reward'] ?? null;
 
-        return $this->render('recompense/spin.html.twig', [
-            'rewardsJson' => json_encode($rewardDescriptions),
-        ]);
+    if (!$rewardLabel) {
+        return new JsonResponse(['error' => 'Récompense manquante'], 400);
     }
+
+    // Constant user: ID = 2
+    $user = $em->getRepository(Utilisateurfidelite::class)->find(2);
+    if (!$user) {
+        return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+    }
+
+    $reward = new RecompenseFidelite();
+    $reward->setDescription($rewardLabel);
+    $reward->setUtilisateurfidelite($user);
+    $reward->setDateExpiration((new \DateTime())->modify('+30 days'));
+    $reward->setPointsRequis(0); // You can randomize or fetch if needed
+
+    $em->persist($reward);
+    $em->flush();
+
+    return new JsonResponse(['success' => true, 'recompense' => $rewardLabel]);
+}
+
+#[Route('/spin/rewards', name: 'spin_rewards', methods: ['GET'])]
+public function getRewards(EntityManagerInterface $em): JsonResponse
+{
+    $rewards = $em->getRepository(RecompenseFidelite::class)->findAll();
+
+    $labels = array_map(fn($reward) => $reward->getDescription(), $rewards);
+
+    if (empty($labels)) {
+        return new JsonResponse(['error' => 'Aucune récompense disponible'], 404);
+    }
+
+    return new JsonResponse($labels);
+}
+
+
+#[Route('/spin-page', name: 'recompense_spin_page')]
+public function spinPage(): Response
+{
+    return $this->render('recompense/spin.html.twig');
+}
+
 
     #[Route('/mon-profil', name: 'mon_profil')]
 public function monProfil(UtilisateurfideliteRepository $utilisateurFideliteRepository): Response
@@ -217,34 +179,62 @@ public function monProfil(UtilisateurfideliteRepository $utilisateurFideliteRepo
 
 
 
-    #[Route('/statistiques', name: 'recompense_statistiques')]
-    public function statistiques(EntityManagerInterface $em): Response
-    {
-        $total = $em->getRepository(RecompenseFidelite::class)->count([]);
-    
-        $avgPoints = $em->createQuery(
-            'SELECT AVG(r.points_requis) FROM App\Entity\RecompenseFidelite r'
-        )->getSingleScalarResult();
-    
-        $topTypes = $em->createQuery(
-            'SELECT t.nom, COUNT(r.id) as total
-             FROM App\Entity\RecompenseFidelite r
-             JOIN r.typeRecompense t
-             GROUP BY t.nom
-             ORDER BY total DESC'
-        )->setMaxResults(3)->getResult();
-    
-        $topUsers = $em->createQuery(
-            'SELECT u FROM App\Entity\Utilisateurfidelite u ORDER BY u.points_accumules DESC'
-        )->setMaxResults(5)->getResult();
-    
-        return $this->render('recompense/statistiques.html.twig', [
-            'total' => $total,
-            'avgPoints' => round($avgPoints),
-            'topTypes' => $topTypes,
-            'topUsers' => $topUsers,
-        ]);
-    }
-    
+private function getRecompenseStats(EntityManagerInterface $em): array
+{
+    $total = $em->getRepository(RecompenseFidelite::class)->count([]);
 
+    $avgPoints = $em->createQuery(
+        'SELECT AVG(r.points_requis) FROM App\Entity\RecompenseFidelite r'
+    )->getSingleScalarResult();
+
+    return ['total' => $total, 'avgPoints' => round($avgPoints)];
+}
+private function getTopRewardTypes(EntityManagerInterface $em): array
+{
+    return $em->createQuery(
+        'SELECT t.nom, COUNT(r.id) as total
+         FROM App\Entity\RecompenseFidelite r
+         JOIN r.typeRecompense t
+         GROUP BY t.nom
+         ORDER BY total DESC'
+    )->setMaxResults(3)->getResult();
+}
+private function getTopUsersForChart(EntityManagerInterface $em): array
+{
+    $topUsers = $em->createQuery(
+        'SELECT u FROM App\Entity\Utilisateurfidelite u ORDER BY u.points_accumules DESC'
+    )->setMaxResults(5)->getResult();
+
+    $labels = [];
+    $points = [];
+
+    foreach ($topUsers as $user) {
+        $labels[] = $user->getNomUtilisateur();
+        $points[] = $user->getPointsAccumules();
+    }
+
+    return [
+        'topUsers' => $topUsers,
+        'labels' => json_encode($labels),
+        'points' => json_encode($points),
+    ];
+}
+
+
+#[Route('/statistiques', name: 'recompense_statistiques')]
+public function statistiques(EntityManagerInterface $em): Response
+{
+    $stats = $this->getRecompenseStats($em);
+    $topTypes = $this->getTopRewardTypes($em);
+    $userChartData = $this->getTopUsersForChart($em);
+
+    return $this->render('recompense/statistiques.html.twig', [
+        'total' => $stats['total'],
+        'avgPoints' => $stats['avgPoints'],
+        'topTypes' => $topTypes,
+        'topUsers' => $userChartData['topUsers'],
+        'labels' => $userChartData['labels'],
+        'points' => $userChartData['points'],
+    ]);
+}
 }

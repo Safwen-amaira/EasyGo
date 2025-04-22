@@ -30,7 +30,7 @@ class TypeRecompenseType extends AbstractType
             ->add('categorie', ChoiceType::class, [
                 'label' => 'Catégorie',
                 'choices' => [
-                    'Electronics' => 'electronics',
+                    'Points' => 'Points',
                     'Food' => 'food',
                     'Clothing' => 'clothing',
                     'Travel' => 'travel',

@@ -12,6 +12,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
         "knpuniversity/oauth2-client-bundle": "^2.18",
+        "phpoffice/phpexcel": "^1.8",
         "symfony/console": "6.4.*",
         "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2",
@@ -21,6 +22,7 @@
         "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
+        "symfony/ux-chartjs": "^2.24",
         "symfony/validator": "6.4.*",
         "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "6.4.*"

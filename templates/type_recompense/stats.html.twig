@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des types de récompense{% endblock %}
+
+{% block body %}
+    <h1>Statistiques des types de récompense</h1>
+
+    <div style="max-width: 700px; margin: 2rem auto;">
+        {{ render_chart(chart) }}
+    </div>
+
+    <button onclick="downloadChart()">📥 Télécharger le graphique</button>
+
+    <script>
+        function downloadChart() {
+            const canvas = document.querySelector('canvas');
+            if (!canvas) {
+                alert("Graphique introuvable !");
+                return;
+            }
+            const link = document.createElement('a');
+            link.download = 'chart.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+    {% block javascripts %}
+    <script src="{{ asset('build/app.js') }}"></script>
+{% endblock %}
+
+
+
+{% endblock %}

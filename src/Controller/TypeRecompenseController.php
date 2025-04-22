@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\RecompenseFidelite;
 
 use App\Entity\TypeRecompense;
 use App\Form\TypeRecompenseType;
@@ -9,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
+
 
 #[Route('/type-recompense', name: 'type_recompense_')]
 class TypeRecompenseController extends AbstractController
@@ -92,7 +96,39 @@ class TypeRecompenseController extends AbstractController
  
     }
 
+    
+    
+    #[Route('/stats', name: 'type_recompense_stats')]
+public function stats(EntityManagerInterface $em, ChartBuilderInterface $chartBuilder): Response
+{
+    $types = $em->getRepository(TypeRecompense::class)->findAll();
 
+    $labels = [];
+    $data = [];
 
+    foreach ($types as $type) {
+        $labels[] = $type->getNom();
+        $data[] = count($type->getRecompenseFidelites()); // attention: relation OneToMany
+    }
+
+    $chart = $chartBuilder->createChart(Chart::TYPE_BAR);
+    $chart->setData([
+        'labels' => $labels,
+        'datasets' => [[
+            'label' => 'Nombre de récompenses',
+            'backgroundColor' => 'rgba(54, 162, 235, 0.5)',
+            'borderColor' => 'rgba(54, 162, 235, 1)',
+            'data' => $data,
+        ]],
+    ]);
+    $chart->setOptions([
+        'responsive' => true,
+        'plugins' => ['legend' => ['position' => 'top']],
+    ]);
+
+    return $this->render('type_recompense/stats.html.twig', [
+        'chart' => $chart,
+    ]);
+}
 
 }

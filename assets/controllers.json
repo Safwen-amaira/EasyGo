@@ -1,0 +1,10 @@
+{
+    "controllers": {
+      "chart": {
+        "enabled": true,
+        "fetch": "eager"
+      }
+    },
+    "entrypoints": []
+  }
+  

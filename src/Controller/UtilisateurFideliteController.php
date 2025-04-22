@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\RecompenseFidelite;
 
 use App\Entity\Utilisateurfidelite;
 use App\Form\UtilisateurFideliteType;
@@ -66,6 +67,7 @@ class UtilisateurFideliteController extends AbstractController
         return $this->redirectToRoute('utilisateur_fidelite_index');
     }
     
-
+   
+    
 
 }
