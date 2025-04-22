@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
+
 #[Route('/recompense')]
 class RecompenseFideliteController extends AbstractController
 {
@@ -107,46 +109,70 @@ public function new(Request $request, EntityManagerInterface $em): Response
     
 
     #[Route('/spin', name: 'recompense_spin', methods: ['POST'])]
-public function spinReward(Request $request, EntityManagerInterface $em): JsonResponse
-{
-    $data = json_decode($request->getContent(), true);
-    $rewardLabel = $data['reward'] ?? null;
-
-    if (!$rewardLabel) {
-        return new JsonResponse(['error' => 'Récompense manquante'], 400);
+    public function spinReward(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $rewardLabel = $data['reward'] ?? null;
+    
+        if (!$rewardLabel) {
+            return new JsonResponse(['error' => 'Récompense manquante'], 400);
+        }
+    
+        $user = $em->getRepository(Utilisateurfidelite::class)->find(2);
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+        }
+    
+        // Prevent duplicate
+        $existing = $em->getRepository(RecompenseFidelite::class)->findOneBy([
+            'utilisateurfidelite' => $user,
+            'description' => $rewardLabel
+        ]);
+    
+        if ($existing) {
+            return new JsonResponse(['error' => 'Récompense déjà obtenue.'], 409);
+        }
+    
+        // Fetch the base reward
+        $base = $em->getRepository(RecompenseFidelite::class)->findOneBy([
+            'description' => $rewardLabel,
+            'utilisateurfidelite' => null
+        ]);
+    
+        if (!$base) {
+            return new JsonResponse(['error' => 'Récompense de base introuvable.'], 404);
+        }
+    
+        // Clone for user
+        $earned = new RecompenseFidelite();
+        $earned->setDescription($base->getDescription());
+        $earned->setUtilisateurfidelite($user);
+        $earned->setDateExpiration((new \DateTime())->modify('+30 days'));
+        $earned->setPointsRequis($base->getPointsRequis());
+        $earned->setTypeRecompense($base->getTypeRecompense());
+    
+        // Add to user's points
+        $user->setPointsAccumules($user->getPointsAccumules() + $base->getPointsRequis());
+    
+        $em->persist($earned);
+        $em->flush();
+    
+        return new JsonResponse(['success' => true, 'recompense' => $earned->getDescription()]);
     }
-
-    // Constant user: ID = 2
-    $user = $em->getRepository(Utilisateurfidelite::class)->find(2);
-    if (!$user) {
-        return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
-    }
-
-    $reward = new RecompenseFidelite();
-    $reward->setDescription($rewardLabel);
-    $reward->setUtilisateurfidelite($user);
-    $reward->setDateExpiration((new \DateTime())->modify('+30 days'));
-    $reward->setPointsRequis(0); // You can randomize or fetch if needed
-
-    $em->persist($reward);
-    $em->flush();
-
-    return new JsonResponse(['success' => true, 'recompense' => $rewardLabel]);
-}
-
+    
 #[Route('/spin/rewards', name: 'spin_rewards', methods: ['GET'])]
 public function getRewards(EntityManagerInterface $em): JsonResponse
 {
-    $rewards = $em->getRepository(RecompenseFidelite::class)->findAll();
+    // Fetch unique base rewards only (i.e., not user-earned)
+    $baseRewards = $em->createQuery(
+        'SELECT DISTINCT r.description FROM App\Entity\RecompenseFidelite r WHERE r.utilisateurfidelite IS NULL'
+    )->getResult();
 
-    $labels = array_map(fn($reward) => $reward->getDescription(), $rewards);
-
-    if (empty($labels)) {
-        return new JsonResponse(['error' => 'Aucune récompense disponible'], 404);
-    }
+    $labels = array_map(fn($r) => $r['description'], $baseRewards);
 
     return new JsonResponse($labels);
 }
+
 
 
 #[Route('/spin-page', name: 'recompense_spin_page')]

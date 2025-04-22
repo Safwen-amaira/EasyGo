@@ -2,12 +2,17 @@
 
 <canvas id="spinWheel" width="400" height="400"></canvas>
 <br>
-<button onclick="spin()">🎯 Lancer la roue</button>
+<button id="spinButton" onclick="spin()">🎯 Lancer la roue</button>
+<p id="spinLimitMessage" style="color: red; font-weight: bold;"></p>
+<audio id="spinSound" src="/sounds/spin-sound.mp3" preload="auto"></audio>
+<audio id="rewardSound" src="/sounds/reward-sound.mp3" preload="auto"></audio>
 
 <script>
 let segments = [];
 const userId = 2;
 let spinning = false;
+let selectedIndex = -1;
+let currentAngle = 0;
 
 // Fetch rewards
 fetch('/recompense/spin/rewards')
@@ -17,10 +22,7 @@ fetch('/recompense/spin/rewards')
         drawWheel();
     });
 
-let currentAngle = 0;
-let selectedIndex = -1;
-
-function drawWheel(angle = 0) {
+function drawWheel(angle = 0, highlightIndex = -1) {
     const canvas = document.getElementById('spinWheel');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, 400, 400);
@@ -29,12 +31,21 @@ function drawWheel(angle = 0) {
     const arcSize = (2 * Math.PI) / total;
 
     for (let i = 0; i < total; i++) {
-        const start = angle + arcSize * i;
-        const end = angle + arcSize * (i + 1);
+       const start = angle + arcSize * i - Math.PI / 2;
+const end = angle + arcSize * (i + 1) - Math.PI / 2;
+
+
+
         ctx.beginPath();
         ctx.moveTo(200, 200);
         ctx.arc(200, 200, 200, start, end);
-        ctx.fillStyle = `hsl(${(i * 360 / total)}, 70%, 70%)`;
+
+        if (i === highlightIndex) {
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.6)'; // Highlighted segment
+        } else {
+            ctx.fillStyle = `hsl(${(i * 360 / total)}, 70%, 70%)`;
+        }
+
         ctx.fill();
         ctx.stroke();
 
@@ -59,11 +70,17 @@ function drawWheel(angle = 0) {
 function spin() {
     if (spinning || segments.length === 0) return alert("⚠️ Aucune récompense disponible !");
     spinning = true;
+    selectedIndex = -1;
 
     const arcSize = (2 * Math.PI) / segments.length;
     const fullTurns = 5;
     const randomAngle = Math.random() * 2 * Math.PI;
     const finalAngle = fullTurns * 2 * Math.PI + randomAngle;
+
+    const spinSound = document.getElementById('spinSound');
+    const rewardSound = document.getElementById('rewardSound');
+    spinSound.currentTime = 0;
+    spinSound.play();
 
     const duration = 4000;
     const start = performance.now();
@@ -79,22 +96,35 @@ function spin() {
         if (progress < 1) {
             requestAnimationFrame(animate);
         } else {
-            // Normalize angle between 0 and 2*PI
-            const normalized = (2 * Math.PI - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
-const actualIndex = Math.floor(normalized / arcSize) % segments.length;
+            spinSound.pause();
 
-            const selectedReward = segments[actualIndex];
+            const normalized = currentAngle % (2 * Math.PI);
+const adjusted = (normalized - Math.PI / 2 + 2 * Math.PI) % (2 * Math.PI); // << fixed
+selectedIndex = Math.floor(adjusted / arcSize) % segments.length;
+
+
+            const selectedReward = segments[selectedIndex];
+            drawWheel(currentAngle, selectedIndex); // Highlight
+
+            rewardSound.play();
 
             fetch('/recompense/spin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: userId, reward: selectedReward })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("🎉 Récompense attribuée : " + data.recompense);
-                spinning = false;
-            });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: userId, reward: selectedReward })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.error) {
+        alert("⚠️ " + data.error);
+    } else {
+        alert("🎉 Récompense attribuée : " + data.recompense);
+        window.location.href = "/recompense/mon-profil";
+    }
+    spinning = false;
+});
+
+
         }
     }
 
