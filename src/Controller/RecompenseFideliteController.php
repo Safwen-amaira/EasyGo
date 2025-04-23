@@ -22,24 +22,39 @@ use Symfony\Component\Routing\Annotation\Route;
 class RecompenseFideliteController extends AbstractController
 {
     #[Route('/', name: 'recompense_index')]
-    public function index(Request $request, EntityManagerInterface $em): Response
-    {
-        $searchTerm = $request->query->get('search');
-        $repository = $em->getRepository(RecompenseFidelite::class);
+public function index(Request $request, EntityManagerInterface $em): Response
+{
+    $searchTerm = $request->query->get('search');
+    $repository = $em->getRepository(RecompenseFidelite::class);
 
-        $recompenses = $searchTerm
-            ? $repository->createQueryBuilder('r')
-                ->where('r.description LIKE :search')
-                ->setParameter('search', '%' . $searchTerm . '%')
-                ->getQuery()
-                ->getResult()
-            : $repository->findAll();
+    $recompenses = $searchTerm
+        ? $repository->createQueryBuilder('r')
+            ->where('r.description LIKE :search')
+            ->setParameter('search', '%' . $searchTerm . '%')
+            ->getQuery()
+            ->getResult()
+        : $repository->findAll();
 
-        return $this->render('recompense/index.html.twig', [
-            'recompenses' => $recompenses,
-            'search' => $searchTerm,
-        ]);
+    if ($request->isXmlHttpRequest()) {
+        $data = [];
+        foreach ($recompenses as $recompense) {
+            $data[] = [
+                'id' => $recompense->getId(),
+                'description' => $recompense->getDescription(),
+                'points' => $recompense->getPointsRequis(),
+                'expiration' => $recompense->getDateExpiration()?->format('Y-m-d'),
+                'type' => $recompense->getTypeRecompense()?->getNom()
+            ];
+        }
+        return new JsonResponse($data);
     }
+
+    return $this->render('recompense/index.html.twig', [
+        'recompenses' => $recompenses,
+        'search' => $searchTerm,
+    ]);
+}
+
 
     #[Route('/new', name: 'recompense_new')]
 public function new(Request $request, EntityManagerInterface $em): Response
