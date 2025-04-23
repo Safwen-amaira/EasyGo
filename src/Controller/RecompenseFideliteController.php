@@ -22,38 +22,51 @@ use Symfony\Component\Routing\Annotation\Route;
 class RecompenseFideliteController extends AbstractController
 {
     #[Route('/', name: 'recompense_index')]
-public function index(Request $request, EntityManagerInterface $em): Response
-{
-    $searchTerm = $request->query->get('search');
-    $repository = $em->getRepository(RecompenseFidelite::class);
-
-    $recompenses = $searchTerm
-        ? $repository->createQueryBuilder('r')
-            ->where('r.description LIKE :search')
-            ->setParameter('search', '%' . $searchTerm . '%')
-            ->getQuery()
-            ->getResult()
-        : $repository->findAll();
-
-    if ($request->isXmlHttpRequest()) {
-        $data = [];
-        foreach ($recompenses as $recompense) {
-            $data[] = [
-                'id' => $recompense->getId(),
-                'description' => $recompense->getDescription(),
-                'points' => $recompense->getPointsRequis(),
-                'expiration' => $recompense->getDateExpiration()?->format('Y-m-d'),
-                'type' => $recompense->getTypeRecompense()?->getNom()
-            ];
+    public function index(Request $request, EntityManagerInterface $em): Response
+    {
+        $searchTerm = $request->query->get('search');
+        $sort = $request->query->get('sort', 'id');
+        $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+    
+        $qb = $em->createQueryBuilder()
+            ->select('r')
+            ->from(RecompenseFidelite::class, 'r')
+            ->leftJoin('r.typeRecompense', 't')
+            ->leftJoin('r.utilisateurfidelite', 'u');
+    
+        if ($searchTerm) {
+            $qb->where('r.description LIKE :search')
+               ->setParameter('search', '%' . $searchTerm . '%');
         }
-        return new JsonResponse($data);
+    
+        $allowedSortFields = ['id', 'description', 'points_requis', 'date_expiration'];
+        if (in_array($sort, $allowedSortFields)) {
+            $qb->orderBy("r.$sort", $direction);
+        }
+    
+        $recompenses = $qb->getQuery()->getResult();
+    
+        if ($request->isXmlHttpRequest()) {
+            $data = [];
+            foreach ($recompenses as $r) {
+                $data[] = [
+                    'id' => $r->getId(),
+                    'description' => $r->getDescription(),
+                    'points' => $r->getPointsRequis(),
+                    'expiration' => $r->getDateExpiration()?->format('Y-m-d'),
+                    'type' => $r->getTypeRecompense()?->getNom(),
+                    'user' => $r->getUtilisateurfidelite()?->getNomUtilisateur(),
+                ];
+            }
+            return new JsonResponse($data);
+        }
+    
+        return $this->render('recompense/index.html.twig', [
+            'recompenses' => $recompenses,
+            'search' => $searchTerm,
+        ]);
     }
-
-    return $this->render('recompense/index.html.twig', [
-        'recompenses' => $recompenses,
-        'search' => $searchTerm,
-    ]);
-}
+    
 
 
     #[Route('/new', name: 'recompense_new')]
