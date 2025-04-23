@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 
 
 #[Route('/type-recompense', name: 'type_recompense_')]
@@ -19,26 +21,46 @@ class TypeRecompenseController extends AbstractController
 {
     #[Route('/', name: 'index')]
     public function index(Request $request, EntityManagerInterface $em): Response
-{
-    $search = $request->query->get('search');
-
-    $repository = $em->getRepository(TypeRecompense::class);
-
-    if ($search) {
-        $types = $repository->createQueryBuilder('t')
-            ->where('LOWER(t.nom) LIKE :search')
-            ->setParameter('search', '%' . strtolower($search) . '%')
-            ->getQuery()
-            ->getResult();
-    } else {
-        $types = $repository->findAll();
+    {
+        $searchTerm = $request->query->get('search');
+        $sort = $request->query->get('sort', 'id');
+        $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+    
+        $qb = $em->createQueryBuilder()
+            ->select('t')
+            ->from(TypeRecompense::class, 't');
+    
+        if ($searchTerm) {
+            $qb->where('LOWER(t.nom) LIKE :search')
+               ->setParameter('search', '%' . strtolower($searchTerm) . '%');
+        }
+    
+        $allowedSortFields = ['id', 'nom', 'categorie'];
+        if (in_array($sort, $allowedSortFields)) {
+            $qb->orderBy("t.$sort", $direction);
+        }
+    
+        $types = $qb->getQuery()->getResult();
+    
+        if ($request->isXmlHttpRequest()) {
+            $data = [];
+            foreach ($types as $type) {
+                $data[] = [
+                    'id' => $type->getId(),
+                    'nom' => $type->getNom(),
+                    'categorie' => $type->getCategorie(),
+                    'actif' => $type->isActif(),
+                ];
+            }
+            return new JsonResponse($data);
+        }
+    
+        return $this->render('type_recompense/index.html.twig', [
+            'types' => $types,
+            'search' => $searchTerm,
+        ]);
     }
-
-    return $this->render('type_recompense/index.html.twig', [
-        'types' => $types,
-        'search' => $search,
-    ]);
-}
+    
 
     #[Route('/new', name: 'new')]
     public function new(Request $request, EntityManagerInterface $em): Response

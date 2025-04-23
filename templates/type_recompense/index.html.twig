@@ -14,7 +14,7 @@
 
     <form method="get" action="{{ path('type_recompense_index') }}" class="mb-4">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="🔍 Rechercher par nom..." value="{{ search ?? '' }}">
+            <input type="text" name="search" id="search" class="form-control" placeholder="🔍 Rechercher par nom..." value="{{ search ?? '' }}">
             <button type="submit" class="btn btn-outline-secondary">Rechercher</button>
         </div>
     </form>
@@ -30,13 +30,12 @@
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="type-recompense-body">
                 {% for type in types %}
                     <tr>
                         <td>{{ type.id }}</td>
                         <td>{{ type.nom }}</td>
                         <td>{{ type.categorie }}</td>
-
                         <td>
                             {% if type.actif %}
                                 <span class="badge bg-success">Actif</span>
@@ -66,4 +65,42 @@
         </table>
     </div>
 </div>
+
+<script>
+document.getElementById('search').addEventListener('input', function () {
+    const searchTerm = this.value;
+
+    fetch(`?search=${encodeURIComponent(searchTerm)}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const tbody = document.getElementById('type-recompense-body');
+        tbody.innerHTML = '';
+
+        if (data.length > 0) {
+            data.forEach(type => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${type.id}</td>
+                        <td>${type.nom}</td>
+                        <td>${type.categorie}</td>
+                        <td>
+                            <span class="badge ${type.actif ? 'bg-success' : 'bg-secondary'}">
+                                ${type.actif ? 'Actif' : 'Inactif'}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="/type-recompense/${type.id}/edit" class="btn btn-sm btn-outline-primary">✏️ Modifier</a>
+                            <a href="/type-recompense/${type.id}/delete" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer ce type ?');">🗑️ Supprimer</a>
+                            <a href="/type-recompense/toggle/${type.id}" class="btn btn-sm btn-outline-warning">🔁 Toggle</a>
+                        </td>
+                    </tr>`;
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Aucun type trouvé.</td></tr>`;
+        }
+    });
+});
+</script>
 {% endblock %}
