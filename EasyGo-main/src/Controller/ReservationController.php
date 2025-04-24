@@ -16,6 +16,11 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use Knp\Component\Pager\PaginatorInterface;
+use App\Service\InfobipService;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Psr\Log\LoggerInterface; 
+
+
 
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
@@ -199,16 +204,25 @@ final class ReservationController extends AbstractController
 
         return $this->redirectToRoute('app_reservation_index');
     }
-
+    
     #[Route('/{id}/manage-driver', name: 'app_reservation_manage_driver', methods: ['GET', 'POST'])]
-    public function manageDriver(Request $request, Reservation $reservation): Response
-    {
+    public function manageDriver(
+        Request $request, 
+        Reservation $reservation,
+        InfobipService $infobipService,
+        ParameterBagInterface $params,
+        LoggerInterface $logger
+    ): Response {
+        $logger->info('Entering manageDriver', ['reservation' => $reservation->getId()]);
+        
         if ($request->isMethod('POST')) {
             $action = $request->request->get('action');
+            $logger->info('Action received', ['action' => $action]);
             $trip = $reservation->getTrip();
             
             if ($action === 'confirm') {
-                // On vérifie qu'il y a assez de places disponibles
+                $logger->debug('Confirming reservation');
+                
                 if ($reservation->getNombrePlaces() > $trip->getAvailableSeats()) {
                     $this->addFlash('error', 'Pas assez de places disponibles pour confirmer cette réservation');
                     return $this->redirectToRoute('app_reservation_manage_driver', ['id' => $reservation->getId()]);
@@ -217,9 +231,53 @@ final class ReservationController extends AbstractController
                 $reservation->setEtatReservation('confirmé');
                 $trip->setAvailableSeats($trip->getAvailableSeats() - $reservation->getNombrePlaces());
                 $this->addFlash('success', 'Réservation confirmée avec succès');
+                
+                // Envoi du SMS modifié
+                $user = $reservation->getUser();
+                $phoneNumber = $user?->getPhoneNumber() ?? $params->get('test_phone_number');
+                
+                if (!empty($phoneNumber)) {
+                    $message = sprintf(
+                        "Votre réservation pour le trajet %s -> %s le %s a été confirmée. Places: %d, Montant: %.2f DNT.",
+                        $trip->getDeparturePoint(),
+                        $trip->getDestination(),
+                        $trip->getTripDate()->format('d/m/Y H:i'),
+                        $reservation->getNombrePlaces(),
+                        $reservation->getMontantTotal()
+                    );
+                    
+                    $logger->debug('Attempting to send SMS', [
+                        'phone' => $phoneNumber,
+                        'message' => $message
+                    ]);
+                    
+                    try {
+                        $smsSent = $infobipService->sendSms($phoneNumber, $message);
+                        
+                        if ($smsSent) {
+                            $logger->info('SMS successfully sent');
+                            $this->addFlash('success', 'SMS de confirmation envoyé au passager');
+                        } else {
+                            $logger->error('SMS sending failed (no exception)');
+                            $this->addFlash('warning', 'Réservation confirmée mais échec d\'envoi du SMS');
+                        }
+                    } catch (\Exception $e) {
+                        $logger->error('SMS sending error', [
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
+                        ]);
+                        $this->addFlash('warning', 'Réservation confirmée mais erreur lors de l\'envoi du SMS');
+                    }
+                } else {
+                    $logger->warning('No phone number available for SMS', [
+                        'user_id' => $user?->getId(),
+                        'has_phone' => !empty($phoneNumber)
+                    ]);
+                    $this->addFlash('warning', 'Réservation confirmée mais SMS non envoyé (numéro non disponible)');
+                }
             } elseif ($action === 'reject') {
+                $logger->debug('Rejecting reservation');
                 $reservation->setEtatReservation('refusé');
-                // On ne modifie pas les places disponibles car elles n'ont pas été décrémentées à la création
                 $this->addFlash('warning', 'Réservation refusée');
             }
             
@@ -232,3 +290,5 @@ final class ReservationController extends AbstractController
         ]);
     }
 }
+    
+

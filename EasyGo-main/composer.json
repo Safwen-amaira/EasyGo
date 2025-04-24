@@ -12,15 +12,20 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+        "infobip/infobip-api-php-client": "^4.0",
         "knplabs/knp-paginator-bundle": "^6.8",
         "knpuniversity/oauth2-client-bundle": "^2.18",
+        "psr/log": "^3.0",
         "symfony/amphp-http-client-meta": "^1.0",
         "symfony/console": "6.4.*",
         "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2",
         "symfony/form": "6.4.*",
         "symfony/framework-bundle": "6.4.*",
+        "symfony/http-client": "6.4.*",
+        "symfony/mailer": "6.4.*",
         "symfony/maker-bundle": "^1.62",
+        "symfony/monolog-bundle": "^3.10",
         "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
@@ -28,7 +33,9 @@
         "symfony/ux-twig-component": "^2.24",
         "symfony/validator": "6.4.*",
         "symfony/webpack-encore-bundle": "^2.2",
-        "symfony/yaml": "6.4.*"
+        "symfony/yaml": "6.4.*",
+        "twig/extra-bundle": "^3.20",
+        "twilio/sdk": "^8.5"
     },
     "config": {
         "allow-plugins": {
