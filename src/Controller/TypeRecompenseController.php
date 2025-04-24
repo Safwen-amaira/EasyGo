@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Knp\Component\Pager\PaginatorInterface;
 
 
 
@@ -20,59 +21,68 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class TypeRecompenseController extends AbstractController
 {
     #[Route('/', name: 'index')]
-public function index(Request $request, EntityManagerInterface $em): Response
-{
-    $searchTerm = $request->query->get('search');
-    $sort = $request->query->get('sort', 'id');
-    $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
-    $statut = $request->query->get('statut'); // "actif" / "inactif"
-    $categorie = $request->query->get('categorie');
-
-    $qb = $em->createQueryBuilder()
-        ->select('t')
-        ->from(TypeRecompense::class, 't');
-
-    if ($searchTerm) {
-        $qb->andWhere('LOWER(t.nom) LIKE :search')
-           ->setParameter('search', '%' . strtolower($searchTerm) . '%');
-    }
-
-    if ($statut !== null && $statut !== '') {
-        $qb->andWhere('t.actif = :statut')
-           ->setParameter('statut', $statut === 'actif');
-    }
-
-    if ($categorie) {
-        $qb->andWhere('LOWER(t.categorie) LIKE :cat')
-           ->setParameter('cat', '%' . strtolower($categorie) . '%');
-    }
-
-    $allowedSortFields = ['id', 'nom', 'categorie'];
-    if (in_array($sort, $allowedSortFields)) {
-        $qb->orderBy("t.$sort", $direction);
-    }
-
-    $types = $qb->getQuery()->getResult();
-
-    if ($request->isXmlHttpRequest()) {
-        $data = [];
-        foreach ($types as $type) {
-            $data[] = [
-                'id' => $type->getId(),
-                'nom' => $type->getNom(),
-                'categorie' => $type->getCategorie(),
-                'actif' => $type->isActif(),
-            ];
+    public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
+    {
+        $searchTerm = $request->query->get('search');
+        $sort = $request->query->get('sort', 'id');
+        $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+        $statut = $request->query->get('statut');
+        $categorie = $request->query->get('categorie');
+    
+        $qb = $em->createQueryBuilder()
+            ->select('t')
+            ->from(TypeRecompense::class, 't');
+    
+        if ($searchTerm) {
+            $qb->andWhere('LOWER(t.nom) LIKE :search')
+                ->setParameter('search', '%' . strtolower($searchTerm) . '%');
         }
-        return new JsonResponse($data);
+    
+        if ($statut !== null && $statut !== '') {
+            $qb->andWhere('t.actif = :statut')
+                ->setParameter('statut', $statut === 'actif');
+        }
+    
+        if ($categorie) {
+            $qb->andWhere('LOWER(t.categorie) LIKE :cat')
+                ->setParameter('cat', '%' . strtolower($categorie) . '%');
+        }
+    
+        $allowedSortFields = ['id', 'nom', 'categorie'];
+        if (in_array($sort, $allowedSortFields)) {
+            $qb->orderBy("t.$sort", $direction);
+        }
+    
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->query->getInt('page', 1),
+            10
+        );
+    
+        // AJAX response
+        if ($request->isXmlHttpRequest()) {
+            $data = [];
+            foreach ($pagination as $type) {
+                $data[] = [
+                    'id' => $type->getId(),
+                    'nom' => $type->getNom(),
+                    'categorie' => $type->getCategorie(),
+                    'actif' => $type->isActif(),
+                ];
+            }
+            return new JsonResponse($data);
+        }
+    
+        return $this->render('type_recompense/index.html.twig', [
+            'types' => $pagination,
+            'search' => $searchTerm,
+            'sort' => $sort,
+            'direction' => $direction,
+            'statut' => $statut,
+            'categorie' => $categorie,
+        ]);
     }
-
-    return $this->render('type_recompense/index.html.twig', [
-        'types' => $types,
-        'search' => $searchTerm,
-    ]);
-}
-
+    
     #[Route('/new', name: 'new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {

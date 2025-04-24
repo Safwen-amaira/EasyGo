@@ -34,9 +34,9 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th><a href="#" class="sort" data-sort="id">#</a></th>
-                    <th><a href="#" class="sort" data-sort="nom">Nom</a></th>
-                    <th><a href="#" class="sort" data-sort="categorie">Catégorie</a></th>
+                    <th><a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'sort': 'id', 'direction': sort == 'id' and direction == 'ASC' ? 'DESC' : 'ASC'}) ) }}">#</a></th>
+                    <th><a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'sort': 'nom', 'direction': sort == 'nom' and direction == 'ASC' ? 'DESC' : 'ASC'}) ) }}">Nom</a></th>
+                    <th><a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'sort': 'categorie', 'direction': sort == 'categorie' and direction == 'ASC' ? 'DESC' : 'ASC'}) ) }}">Catégorie</a></th>
                     <th>Statut</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -68,11 +68,19 @@
             </tbody>
         </table>
     </div>
+
+    {% if not app.request.isXmlHttpRequest %}
+<div class="mt-3 d-flex justify-content-center">
+    {{ knp_pagination_render(types) }}
+</div>
+{% endif %}
+
+
 </div>
 
 <script>
-let currentDirection = 'ASC';
-let currentSort = '';
+let currentDirection = '{{ direction|default('ASC') }}';
+let currentSort = '{{ sort|default('') }}';
 
 function fetchTypes() {
     const search = document.getElementById('search').value;
