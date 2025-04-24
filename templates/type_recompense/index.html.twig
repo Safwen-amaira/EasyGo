@@ -12,10 +12,21 @@
         </a>
     </div>
 
-    <form method="get" action="{{ path('type_recompense_index') }}" class="mb-4">
-        <div class="input-group">
+    <form method="get" class="row g-2 align-items-center mb-3" id="filter-form">
+        <div class="col-sm-4">
             <input type="text" name="search" id="search" class="form-control" placeholder="🔍 Rechercher par nom..." value="{{ search ?? '' }}">
-            <button type="submit" class="btn btn-outline-secondary">Rechercher</button>
+        </div>
+
+        <div class="col-sm-3">
+            <select name="statut" id="statut" class="form-select">
+                <option value="">Tous les statuts</option>
+                <option value="actif">Actif</option>
+                <option value="inactif">Inactif</option>
+            </select>
+        </div>
+
+        <div class="col-sm-3">
+            <input type="text" name="categorie" id="categorie" class="form-control" placeholder="Filtrer par catégorie">
         </div>
     </form>
 
@@ -63,11 +74,17 @@
 let currentDirection = 'ASC';
 let currentSort = '';
 
-function fetchTypes(searchTerm = '', sort = '', direction = 'ASC') {
+function fetchTypes() {
+    const search = document.getElementById('search').value;
+    const statut = document.getElementById('statut').value;
+    const categorie = document.getElementById('categorie').value;
+
     const params = new URLSearchParams({
-        search: searchTerm,
-        sort: sort,
-        direction: direction
+        search: search,
+        sort: currentSort,
+        direction: currentDirection,
+        statut: statut,
+        categorie: categorie
     });
 
     fetch(`?${params.toString()}`, {
@@ -103,9 +120,9 @@ function fetchTypes(searchTerm = '', sort = '', direction = 'ASC') {
     });
 }
 
-document.getElementById('search').addEventListener('input', function () {
-    fetchTypes(this.value, currentSort, currentDirection);
-});
+document.getElementById('search').addEventListener('input', fetchTypes);
+document.getElementById('statut').addEventListener('change', fetchTypes);
+document.getElementById('categorie').addEventListener('input', fetchTypes);
 
 document.querySelectorAll('.sort').forEach(link => {
     link.addEventListener('click', function (e) {
@@ -113,7 +130,7 @@ document.querySelectorAll('.sort').forEach(link => {
         const sort = this.dataset.sort;
         currentDirection = (currentSort === sort && currentDirection === 'ASC') ? 'DESC' : 'ASC';
         currentSort = sort;
-        fetchTypes(document.getElementById('search').value, currentSort, currentDirection);
+        fetchTypes();
     });
 });
 </script>
