@@ -10,6 +10,17 @@
         <a href="{{ path('type_recompense_new') }}" class="btn btn-outline-primary rounded-pill">
             ➕ Ajouter
         </a>
+        <a href="{{ path('type_recompense_export', {
+    search: search,
+    statut: statut,
+    categorie: categorie,
+    sort: sort,
+    direction: direction
+}) }}"
+   class="btn btn-success mb-3">
+   📥 Exporter en Excel
+</a>
+
     </div>
 
     <form method="get" class="row g-2 align-items-center mb-3" id="filter-form">

@@ -15,7 +15,9 @@ use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Knp\Component\Pager\PaginatorInterface;
 
-
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Route('/type-recompense', name: 'type_recompense_')]
 class TypeRecompenseController extends AbstractController
@@ -172,6 +174,78 @@ public function stats(EntityManagerInterface $em, ChartBuilderInterface $chartBu
     return $this->render('type_recompense/stats.html.twig', [
         'chart' => $chart,
     ]);
+}
+
+
+
+#[Route('/export', name: 'export')]
+public function exportExcel(Request $request, EntityManagerInterface $em): Response
+{
+    $searchTerm = $request->query->get('search');
+    $statut = $request->query->get('statut');
+    $categorie = $request->query->get('categorie');
+    $sort = $request->query->get('sort', 'id');
+    $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+
+    $qb = $em->createQueryBuilder()
+        ->select('t')
+        ->from(TypeRecompense::class, 't');
+
+    if ($searchTerm) {
+        $qb->andWhere('LOWER(t.nom) LIKE :search')
+            ->setParameter('search', '%' . strtolower($searchTerm) . '%');
+    }
+
+    if ($statut !== null && $statut !== '') {
+        $qb->andWhere('t.actif = :statut')
+            ->setParameter('statut', $statut === 'actif');
+    }
+
+    if ($categorie) {
+        $qb->andWhere('LOWER(t.categorie) LIKE :cat')
+            ->setParameter('cat', '%' . strtolower($categorie) . '%');
+    }
+
+    $allowedSortFields = ['id', 'nom', 'categorie'];
+    if (in_array($sort, $allowedSortFields)) {
+        $qb->orderBy("t.$sort", $direction);
+    }
+
+    $types = $qb->getQuery()->getResult();
+
+    // Excel creation
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Header row
+    $sheet->fromArray(['ID', 'Nom', 'Catégorie', 'Statut'], NULL, 'A1');
+
+    // Data rows
+    $row = 2;
+    foreach ($types as $type) {
+        $sheet->fromArray([
+            $type->getId(),
+            $type->getNom(),
+            $type->getCategorie(),
+            $type->isActif() ? 'Actif' : 'Inactif'
+        ], NULL, 'A' . $row);
+        $row++;
+    }
+
+    $writer = new Xlsx($spreadsheet);
+
+    // Stream the response
+    $response = new StreamedResponse(function () use ($writer) {
+        $writer->save('php://output');
+    });
+
+    $filename = 'types_recompenses_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+    $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename . '"');
+    $response->headers->set('Cache-Control', 'max-age=0');
+
+    return $response;
 }
 
 }
