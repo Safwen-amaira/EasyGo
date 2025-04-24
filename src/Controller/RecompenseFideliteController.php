@@ -27,25 +27,37 @@ class RecompenseFideliteController extends AbstractController
         $searchTerm = $request->query->get('search');
         $sort = $request->query->get('sort', 'id');
         $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
-    
+        $typeFilter = $request->query->get('type');
+        $userFilter = $request->query->get('user');
+
         $qb = $em->createQueryBuilder()
             ->select('r')
             ->from(RecompenseFidelite::class, 'r')
             ->leftJoin('r.typeRecompense', 't')
             ->leftJoin('r.utilisateurfidelite', 'u');
-    
+
         if ($searchTerm) {
-            $qb->where('r.description LIKE :search')
+            $qb->andWhere('r.description LIKE :search')
                ->setParameter('search', '%' . $searchTerm . '%');
         }
-    
+
+        if ($typeFilter) {
+            $qb->andWhere('t.nom LIKE :type')
+               ->setParameter('type', '%' . $typeFilter . '%');
+        }
+
+        if ($userFilter) {
+            $qb->andWhere('u.nomUtilisateur LIKE :user')
+               ->setParameter('user', '%' . $userFilter . '%');
+        }
+
         $allowedSortFields = ['id', 'description', 'points_requis', 'date_expiration'];
         if (in_array($sort, $allowedSortFields)) {
             $qb->orderBy("r.$sort", $direction);
         }
-    
+
         $recompenses = $qb->getQuery()->getResult();
-    
+
         if ($request->isXmlHttpRequest()) {
             $data = [];
             foreach ($recompenses as $r) {
@@ -60,15 +72,13 @@ class RecompenseFideliteController extends AbstractController
             }
             return new JsonResponse($data);
         }
-    
+
         return $this->render('recompense/index.html.twig', [
             'recompenses' => $recompenses,
             'search' => $searchTerm,
         ]);
     }
     
-
-
     #[Route('/new', name: 'recompense_new')]
 public function new(Request $request, EntityManagerInterface $em): Response
 {
