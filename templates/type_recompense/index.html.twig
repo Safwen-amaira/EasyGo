@@ -23,9 +23,9 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>#</th>
-                    <th>Nom</th>
-                    <th>Catégorie</th>
+                    <th><a href="#" class="sort" data-sort="id">#</a></th>
+                    <th><a href="#" class="sort" data-sort="nom">Nom</a></th>
+                    <th><a href="#" class="sort" data-sort="categorie">Catégorie</a></th>
                     <th>Statut</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -44,16 +44,9 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            <a href="{{ path('type_recompense_edit', { id: type.id }) }}" class="btn btn-sm btn-outline-primary">
-                                ✏️ Modifier
-                            </a>
-                            <a href="{{ path('type_recompense_delete', { id: type.id }) }}" class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('Supprimer ce type ?');">
-                                🗑️ Supprimer
-                            </a>
-                            <a href="{{ path('type_recompense_toggle', { id: type.id }) }}" class="btn btn-sm btn-outline-warning">
-                                🔁 Toggle
-                            </a>
+                            <a href="{{ path('type_recompense_edit', { id: type.id }) }}" class="btn btn-sm btn-outline-primary">✏️ Modifier</a>
+                            <a href="{{ path('type_recompense_delete', { id: type.id }) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer ce type ?');">🗑️ Supprimer</a>
+                            <a href="{{ path('type_recompense_toggle', { id: type.id }) }}" class="btn btn-sm btn-outline-warning">🔁 Toggle</a>
                         </td>
                     </tr>
                 {% else %}
@@ -67,10 +60,17 @@
 </div>
 
 <script>
-document.getElementById('search').addEventListener('input', function () {
-    const searchTerm = this.value;
+let currentDirection = 'ASC';
+let currentSort = '';
 
-    fetch(`?search=${encodeURIComponent(searchTerm)}`, {
+function fetchTypes(searchTerm = '', sort = '', direction = 'ASC') {
+    const params = new URLSearchParams({
+        search: searchTerm,
+        sort: sort,
+        direction: direction
+    });
+
+    fetch(`?${params.toString()}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
@@ -100,6 +100,20 @@ document.getElementById('search').addEventListener('input', function () {
         } else {
             tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Aucun type trouvé.</td></tr>`;
         }
+    });
+}
+
+document.getElementById('search').addEventListener('input', function () {
+    fetchTypes(this.value, currentSort, currentDirection);
+});
+
+document.querySelectorAll('.sort').forEach(link => {
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const sort = this.dataset.sort;
+        currentDirection = (currentSort === sort && currentDirection === 'ASC') ? 'DESC' : 'ASC';
+        currentSort = sort;
+        fetchTypes(document.getElementById('search').value, currentSort, currentDirection);
     });
 });
 </script>
