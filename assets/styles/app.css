@@ -1,5 +1,17 @@
 body {
     background-color: #f9f9f9;
     font-family: sans-serif;
+    .pagination {
+      margin-top: 1rem;
+  }
+  .pagination .page-item.active .page-link {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+      color: white;
+  }
+  .pagination .page-link {
+      color: #0d6efd;
+  }
+  
   }
   

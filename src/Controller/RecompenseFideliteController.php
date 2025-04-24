@@ -15,69 +15,76 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Knp\Component\Pager\PaginatorInterface;
 
 
 
 #[Route('/recompense')]
 class RecompenseFideliteController extends AbstractController
 {
-    #[Route('/', name: 'recompense_index')]
-    public function index(Request $request, EntityManagerInterface $em): Response
-    {
-        $searchTerm = $request->query->get('search');
-        $sort = $request->query->get('sort', 'id');
-        $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
-        $typeFilter = $request->query->get('type');
-        $userFilter = $request->query->get('user');
 
-        $qb = $em->createQueryBuilder()
-            ->select('r')
-            ->from(RecompenseFidelite::class, 'r')
-            ->leftJoin('r.typeRecompense', 't')
-            ->leftJoin('r.utilisateurfidelite', 'u');
+#[Route('/', name: 'recompense_index')]
+public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
+{
+    $searchTerm = $request->query->get('search');
+    $sort = $request->query->get('sort', 'id');
+    $direction = strtoupper($request->query->get('direction', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+    $typeFilter = $request->query->get('type');
+    $userFilter = $request->query->get('user');
 
-        if ($searchTerm) {
-            $qb->andWhere('r.description LIKE :search')
-               ->setParameter('search', '%' . $searchTerm . '%');
-        }
+    $qb = $em->createQueryBuilder()
+        ->select('r')
+        ->from(RecompenseFidelite::class, 'r')
+        ->leftJoin('r.typeRecompense', 't')
+        ->leftJoin('r.utilisateurfidelite', 'u');
 
-        if ($typeFilter) {
-            $qb->andWhere('t.nom LIKE :type')
-               ->setParameter('type', '%' . $typeFilter . '%');
-        }
-
-        if ($userFilter) {
-            $qb->andWhere('u.nomUtilisateur LIKE :user')
-               ->setParameter('user', '%' . $userFilter . '%');
-        }
-
-        $allowedSortFields = ['id', 'description', 'points_requis', 'date_expiration'];
-        if (in_array($sort, $allowedSortFields)) {
-            $qb->orderBy("r.$sort", $direction);
-        }
-
-        $recompenses = $qb->getQuery()->getResult();
-
-        if ($request->isXmlHttpRequest()) {
-            $data = [];
-            foreach ($recompenses as $r) {
-                $data[] = [
-                    'id' => $r->getId(),
-                    'description' => $r->getDescription(),
-                    'points' => $r->getPointsRequis(),
-                    'expiration' => $r->getDateExpiration()?->format('Y-m-d'),
-                    'type' => $r->getTypeRecompense()?->getNom(),
-                    'user' => $r->getUtilisateurfidelite()?->getNomUtilisateur(),
-                ];
-            }
-            return new JsonResponse($data);
-        }
-
-        return $this->render('recompense/index.html.twig', [
-            'recompenses' => $recompenses,
-            'search' => $searchTerm,
-        ]);
+    if ($searchTerm) {
+        $qb->andWhere('r.description LIKE :search')
+            ->setParameter('search', '%' . $searchTerm . '%');
     }
+
+    if ($typeFilter) {
+        $qb->andWhere('t.nom LIKE :type')
+            ->setParameter('type', '%' . $typeFilter . '%');
+    }
+
+    if ($userFilter) {
+        $qb->andWhere('u.nomUtilisateur LIKE :user')
+            ->setParameter('user', '%' . $userFilter . '%');
+    }
+
+    $allowedSortFields = ['id', 'description', 'points_requis', 'date_expiration'];
+    if (in_array($sort, $allowedSortFields)) {
+        $qb->orderBy("r.$sort", $direction);
+    }
+
+    $pagination = $paginator->paginate(
+        $qb->getQuery(),
+        $request->query->getInt('page', 1),
+        10
+    );
+
+    if ($request->isXmlHttpRequest()) {
+        $data = [];
+        foreach ($pagination as $r) {
+            $data[] = [
+                'id' => $r->getId(),
+                'description' => $r->getDescription(),
+                'points' => $r->getPointsRequis(),
+                'expiration' => $r->getDateExpiration()?->format('Y-m-d'),
+                'type' => $r->getTypeRecompense()?->getNom(),
+                'user' => $r->getUtilisateurfidelite()?->getNomUtilisateur(),
+            ];
+        }
+        return new JsonResponse($data);
+    }
+
+    return $this->render('recompense/index.html.twig', [
+        'recompenses' => $pagination,
+        'search' => $searchTerm,
+    ]);
+}
+
     
     #[Route('/new', name: 'recompense_new')]
 public function new(Request $request, EntityManagerInterface $em): Response

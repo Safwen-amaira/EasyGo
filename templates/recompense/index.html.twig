@@ -9,9 +9,7 @@
         <h2 class="text-primary fw-bold">🎁 Récompenses Fidélité</h2>
         <a href="{{ path('recompense_new') }}" class="btn btn-outline-primary rounded-pill">➕ Ajouter</a>
     </div>
-    <a href="{{ path('recompense_statistiques') }}" class="btn btn-outline-info mb-4">
-        📈 Voir les statistiques
-    </a>
+    <a href="{{ path('recompense_statistiques') }}" class="btn btn-outline-info mb-4">📈 Voir les statistiques</a>
 
     <form method="get" class="row g-2 align-items-center mb-4" id="filter-form">
         <div class="col-sm-4">
@@ -44,29 +42,36 @@
                         <tr>
                             <td>{{ recompense.id }}</td>
                             <td>{{ recompense.description|default('—') }}</td>
-                            <td><span class="badge bg-warning text-dark">{{ recompense.points_requis }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ recompense.pointsRequis }}</span></td>
                             <td>
                                 <span class="badge bg-info text-white">
                                     {{ recompense.typeRecompense ? recompense.typeRecompense.nom : '—' }}
                                 </span>
                             </td>
-                            <td>{{ recompense.date_expiration ? recompense.date_expiration|date('d/m/Y') : '—' }}</td>
-                            <td>
-                                {{ recompense.utilisateurfidelite ? recompense.utilisateurfidelite.nomUtilisateur : '—' }}
-                            </td>
+                            <td>{{ recompense.dateExpiration ? recompense.dateExpiration|date('d/m/Y') : '—' }}</td>
+                            <td>{{ recompense.utilisateurfidelite ? recompense.utilisateurfidelite.nomUtilisateur : '—' }}</td>
                             <td class="text-center">
                                 <a href="{{ path('recompense_edit', {id: recompense.id}) }}" class="btn btn-sm btn-outline-primary">✏️</a>
                                 <a href="{{ path('recompense_delete', {id: recompense.id}) }}" class="btn btn-sm btn-outline-danger">🗑️</a>
                             </td>
                         </tr>
                     {% else %}
-                        <tr>
-                            <td colspan="7" class="text-center text-muted">Aucune récompense trouvée.</td>
-                        </tr>
+                        <tr><td colspan="7" class="text-center text-muted">Aucune récompense trouvée.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+       {# ✅ Beautiful Bootstrap pagination #}
+{% if not app.request.isXmlHttpRequest %}
+    <div class="d-flex justify-content-center mt-4">
+        {{ knp_pagination_render(recompenses) }}
+    </div>
+
+
+</div>
+
+        {% endif %}
     </div>
 </div>
 
@@ -74,17 +79,18 @@
 let currentDirection = 'ASC';
 let currentSort = '';
 
-function fetchRewards() {
-    const searchTerm = document.getElementById('search').value;
+function fetchRewards(page = 1) {
+    const search = document.getElementById('search').value;
     const type = document.getElementById('type-filter').value;
     const user = document.getElementById('user-filter').value;
 
     const params = new URLSearchParams({
-        search: searchTerm,
+        search: search,
         sort: currentSort,
         direction: currentDirection,
         type: type,
-        user: user
+        user: user,
+        page: page
     });
 
     fetch(`?${params.toString()}`, {
@@ -117,9 +123,9 @@ function fetchRewards() {
     });
 }
 
-document.getElementById('search').addEventListener('input', fetchRewards);
-document.getElementById('type-filter').addEventListener('input', fetchRewards);
-document.getElementById('user-filter').addEventListener('input', fetchRewards);
+['search', 'type-filter', 'user-filter'].forEach(id =>
+    document.getElementById(id).addEventListener('input', () => fetchRewards())
+);
 
 document.querySelectorAll('.sort').forEach(link => {
     link.addEventListener('click', function (e) {
