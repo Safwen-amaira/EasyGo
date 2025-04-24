@@ -34,36 +34,40 @@ class TestSmsCommand extends Command
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $reservation = $this->entityManager->getRepository(Reservation::class)->find(51);
-        
-        if (!$reservation) {
-            $output->writeln('ERROR: Reservation not found');
-            return Command::FAILURE;
-        }
+{
+    $reservation = $this->entityManager->getRepository(Reservation::class)->find(51);
     
-        $trip = $reservation->getTrip();
-        $phoneNumber = $this->params->get('test_phone_number');
-    
-        $message = sprintf(
-            "Votre réservation pour le trajet %s -> %s le %s a été confirmée. Places: %d, Montant: %.2f DNT.",
-            $trip->getDeparturePoint(),
-            $trip->getDestination(),
-            $trip->getTripDate()->format('d/m/Y H:i'),
-            $reservation->getNombrePlaces(),
-            $reservation->getMontantTotal()
-        );
-    
-        $output->writeln("Sending to: " . $phoneNumber);
-        $output->writeln("Message: " . $message);
-    
-        try {
-            $result = $this->infobipService->sendSms($phoneNumber, $message);
-            $output->writeln($result ? 'SUCCESS: SMS sent' : 'ERROR: Failed to send SMS');
-            return $result ? Command::SUCCESS : Command::FAILURE;
-        } catch (\Exception $e) {
-            $output->writeln('ERROR: ' . $e->getMessage());
-            return Command::FAILURE;
-        }
+    if (!$reservation) {
+        $output->writeln('ERROR: Reservation not found');
+        return Command::FAILURE;
     }
+
+    $trip = $reservation->getTrip();
+    $phoneNumber = $this->params->get('test_phone_number');
+
+    $message = sprintf(
+        "[EasyGo] Confirmation réservation\n" .
+        "Trajet: %s → %s\n" .
+        "Date: %s\n" .
+        "%d place(s) - %.2f DNT\n" .
+        "Merci pour votre confiance!",
+        $trip->getDeparturePoint(),
+        $trip->getDestination(),
+        $trip->getTripDate()->format('d/m/Y H:i'),
+        $reservation->getNombrePlaces(),
+        $reservation->getMontantTotal()
+    );
+
+    $output->writeln("Sending to: " . $phoneNumber);
+    $output->writeln("Message: " . $message);
+
+    try {
+        $result = $this->infobipService->sendSms($phoneNumber, $message);
+        $output->writeln($result ? 'SUCCESS: SMS sent' : 'ERROR: Failed to send SMS');
+        return $result ? Command::SUCCESS : Command::FAILURE;
+    } catch (\Exception $e) {
+        $output->writeln('ERROR: ' . $e->getMessage());
+        return Command::FAILURE;
+    }
+}
 }

@@ -238,14 +238,17 @@ final class ReservationController extends AbstractController
                 
                 if (!empty($phoneNumber)) {
                     $message = sprintf(
-                        "Votre réservation pour le trajet %s -> %s le %s a été confirmée. Places: %d, Montant: %.2f DNT.",
+                        "[EasyGo] Confirmation réservation\n" .
+                        "Trajet: %s → %s\n" .
+                        "Date: %s\n" .
+                        "%d place(s) - %.2f DNT\n" .
+                        "Merci pour votre confiance!",
                         $trip->getDeparturePoint(),
                         $trip->getDestination(),
                         $trip->getTripDate()->format('d/m/Y H:i'),
                         $reservation->getNombrePlaces(),
                         $reservation->getMontantTotal()
                     );
-                    
                     $logger->debug('Attempting to send SMS', [
                         'phone' => $phoneNumber,
                         'message' => $message
