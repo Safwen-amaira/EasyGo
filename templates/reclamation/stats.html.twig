@@ -1,0 +1,14 @@
+{# templates/reclamation/stats.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des réclamations{% endblock %}
+
+{% block body %}
+  <h1>Statistiques des réclamations</h1>
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <img src="{{ chartUrl }}"
+         alt="Graphique des réclamations par statut"
+         style="max-width:100%; height:auto; border:1px solid #ccc; padding:0.5rem;">
+  </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Reclamation{% endblock %}
+
+{% block body %}
+  <div class="container my-5">
+    <h1 class="text-center mb-4" data-aos="fade-up">Créer une nouvelle réclamation</h1>
+
+    <div data-aos="fade-up" data-aos-delay="200">
+      {{ include('reclamation/_form.html.twig', {'button_label': 'Create'}) }}
+    </div>
+
+    <div class="mt-3 text-center" data-aos="fade-up" data-aos-delay="300">
+      <a href="{{ path('app_reclamation_index') }}" class="btn btn-outline-secondary">retour a la  liste</a>
+    </div>
+  </div>
+{% endblock %}

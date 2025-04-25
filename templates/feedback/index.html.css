@@ -1,0 +1,54 @@
+/* feedback/index.html.css */
+
+.feedback-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.feedback-item {
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.feedback-item:last-child {
+  border-bottom: none;
+}
+
+.star-rating i {
+  color: #f1c40f;
+  font-size: 1.5rem;
+}
+
+.star-rating i.bi-star {
+  color: #ccc;
+}
+
+.feedback-item p {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.d-flex {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.d-flex .btn-sm {
+  font-size: 0.875rem;
+}
+
+.small {
+  font-size: 0.8rem;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+.feedback-section h6 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}

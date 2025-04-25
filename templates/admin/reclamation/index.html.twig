@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Réclamations{% endblock %}
+
+{% block body %}
+  <div class="container my-5">
+    <h1 class="text-center mb-4">Réclamations</h1>
+
+    <div class="row">
+      {% for reclamation in reclamations %}
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Réclamation #{{ reclamation.id }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">{{ reclamation.categorie }}</h6>
+              <p><strong>Statut:</strong> {{ reclamation.statut }}</p>
+              <p><strong>Description:</strong> {{ reclamation.description }}</p>
+              <p><strong>Date de création:</strong> {{ reclamation.dateCreation ? reclamation.dateCreation|date('Y-m-d H:i:s') : 'N/A' }}</p>
+
+              <div class="d-flex justify-content-between">
+                <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Acceptée'}) }}" class="btn btn-success">Accepter</a>
+                <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Refusée'}) }}" class="btn btn-danger">Refuser</a>
+                <a href="{{ path('admin_reclamation_reply', {'id': reclamation.id, 'statut': reclamation.statut}) }}" class="btn btn-primary">Répondre</a>
+              </div>
+
+              <!-- Formulaire pour répondre à la réclamation, s'il est affiché -->
+              {% if form is defined %}
+                <form action="{{ path('admin_reclamation_reply', {'id': reclamation.id, 'statut': reclamation.statut}) }}" method="post">
+                  {{ form_start(form) }}
+                    {{ form_row(form.reponse) }}
+                    <button type="submit" class="btn btn-primary mt-2">Soumettre la réponse</button>
+                  {{ form_end(form) }}
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      <a href="{{ path('app_reclamation_stats') }}" class="btn btn-info">
+        <i class="bi bi-bar-chart-line"></i> Voir les statistiques
+      </a>
+    </div>
+  </div>
+{% endblock %}
