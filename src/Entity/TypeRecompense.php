@@ -17,11 +17,11 @@ class TypeRecompense
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nom = null;
-
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $categorie = null;
+
+    #[ORM\Column(type: 'string', nullable: false)]
+    private ?string $nom = null;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $actif = null;
@@ -29,15 +29,14 @@ class TypeRecompense
     #[ORM\OneToMany(targetEntity: RecompenseFidelite::class, mappedBy: 'typeRecompense')]
     private Collection $recompenseFidelites;
 
-    // Constant for Categories
-    const CATEGORIES = ['Points',  'Discounts', 'Exclusive', 'Loyalty'];
+    const CATEGORIES = ['Points', 'Discounts', 'Exclusive', 'Loyalty'];
 
     public function __construct()
     {
         $this->recompenseFidelites = new ArrayCollection();
     }
-    
-    public function getId(): ?int   
+
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -66,14 +65,9 @@ class TypeRecompense
 
     public function setCategorie(?string $categorie): self
     {
-        // Normalize category input (make the first letter uppercase and others lowercase)
-        $categorie = ucfirst(strtolower($categorie));
-
-        // Validate category against predefined valid categories
         if (!in_array($categorie, self::CATEGORIES)) {
             throw new \InvalidArgumentException('Invalid category');
         }
-
         $this->categorie = $categorie;
         return $this;
     }

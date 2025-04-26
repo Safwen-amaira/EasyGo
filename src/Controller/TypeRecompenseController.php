@@ -142,41 +142,31 @@ class TypeRecompenseController extends AbstractController
     }
 
     
+    #[Route('/api/stats', name: 'api_stats')]
+    public function apiStats(EntityManagerInterface $em): JsonResponse
+    {
+        $types = $em->getRepository(TypeRecompense::class)->findAll();
     
-    #[Route('/stats', name: 'type_recompense_stats')]
-public function stats(EntityManagerInterface $em, ChartBuilderInterface $chartBuilder): Response
-{
-    $types = $em->getRepository(TypeRecompense::class)->findAll();
-
-    $labels = [];
-    $data = [];
-
-    foreach ($types as $type) {
-        $labels[] = $type->getNom();
-        $data[] = count($type->getRecompenseFidelites()); // attention: relation OneToMany
-    }
-
-    $chart = $chartBuilder->createChart(Chart::TYPE_BAR);
-    $chart->setData([
-        'labels' => $labels,
-        'datasets' => [[
-            'label' => 'Nombre de récompenses',
-            'backgroundColor' => 'rgba(54, 162, 235, 0.5)',
-            'borderColor' => 'rgba(54, 162, 235, 1)',
+        $labels = [];
+        $data = [];
+    
+        foreach ($types as $type) {
+            $labels[] = $type->getNom();
+            $data[] = count($type->getRecompenseFidelites());
+        }
+    
+        return $this->json([
+            'labels' => $labels,
             'data' => $data,
-        ]],
-    ]);
-    $chart->setOptions([
-        'responsive' => true,
-        'plugins' => ['legend' => ['position' => 'top']],
-    ]);
-
-    return $this->render('type_recompense/stats.html.twig', [
-        'chart' => $chart,
-    ]);
-}
-
-
+        ]);
+    }
+    
+    #[Route('/stats', name: 'type_recompense_api_stats')]
+    public function stats(): Response
+    {
+        return $this->render('type_recompense/stats.html.twig');
+    }
+    
 
 #[Route('/export', name: 'export')]
 public function exportExcel(Request $request, EntityManagerInterface $em): Response

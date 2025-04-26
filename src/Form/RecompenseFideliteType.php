@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Form;
 
 use App\Entity\RecompenseFidelite;
@@ -25,6 +26,12 @@ class RecompenseFideliteType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'La description est obligatoire.']),
+                    new Assert\Length([
+                        'min' => 3,
+                        'max' => 255,
+                        'minMessage' => 'La description doit contenir au moins {{ limit }} caractères.',
+                        'maxMessage' => 'La description ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
                     new Assert\Regex([
                         'pattern' => '/^(?![0-9]+$)[a-zA-Z0-9\s]+$/',
                         'message' => 'La description doit contenir uniquement des lettres et des chiffres, et ne peut pas être composée uniquement de chiffres.',
@@ -36,9 +43,18 @@ class RecompenseFideliteType extends AbstractType
                 'required' => true,
                 'attr' => ['min' => 0],
                 'constraints' => [
+                    new Assert\NotNull(['message' => 'Le nombre de points est obligatoire.']),
+                    new Assert\Type([
+                        'type' => 'integer',
+                        'message' => 'Le nombre de points doit être un entier valide.',
+                    ]),
                     new Assert\GreaterThanOrEqual([
                         'value' => 0,
                         'message' => 'Le nombre de points requis ne peut pas être négatif.',
+                    ]),
+                    new Assert\LessThanOrEqual([
+                        'value' => 100000,
+                        'message' => 'Le nombre de points doit être inférieur ou égal à {{ compared_value }}.',
                     ]),
                 ],
             ])
@@ -48,9 +64,10 @@ class RecompenseFideliteType extends AbstractType
                 'label' => 'Date d\'expiration',
                 'required' => true,
                 'constraints' => [
+                    new Assert\NotBlank(['message' => 'La date d\'expiration est obligatoire.']),
                     new Assert\GreaterThan([
-                        'value' => "today",
-                        'message' => 'La date d\'expiration doit être dans le futur.',
+                        'value' => 'today',
+                        'message' => 'La date d\'expiration doit être postérieure à aujourd\'hui.',
                     ]),
                 ],
             ])
@@ -61,19 +78,17 @@ class RecompenseFideliteType extends AbstractType
                 'placeholder' => 'Sélectionnez un type',
                 'required' => true,
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Le type de récompense est obligatoire.']),
+                    new Assert\NotNull(['message' => 'Le type de récompense est obligatoire.']),
                 ],
             ]);
 
-        // Add the event listener to validate the 'typeRecompense' field
+        // ✅ Vérification personnalisée après soumission
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
             $recompenseFidelite = $form->getData();
             $typeRecompense = $recompenseFidelite->getTypeRecompense();
 
-            // Check if the selected TypeRecompense is active
             if ($typeRecompense && !$typeRecompense->isActif()) {
-                // If the type is inactive, add a custom error using FormError
                 $form->get('typeRecompense')->addError(
                     new FormError('Le type de récompense sélectionné est inactif.')
                 );

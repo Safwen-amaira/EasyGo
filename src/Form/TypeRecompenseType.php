@@ -5,11 +5,10 @@ namespace App\Form;
 use App\Entity\TypeRecompense;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-
 use Symfony\Component\Validator\Constraints as Assert;
 
 class TypeRecompenseType extends AbstractType
@@ -29,12 +28,10 @@ class TypeRecompenseType extends AbstractType
             ])
             ->add('categorie', ChoiceType::class, [
                 'label' => 'Catégorie',
-                'choices' => [
-                    'Points' => 'Points',
-                    'Food' => 'food',
-                    'Clothing' => 'clothing',
-                    'Travel' => 'travel',
-                ],
+                'choices' => array_combine(
+                    TypeRecompense::CATEGORIES, 
+                    TypeRecompense::CATEGORIES
+                ),
                 'required' => true,
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'La catégorie est obligatoire.']),
