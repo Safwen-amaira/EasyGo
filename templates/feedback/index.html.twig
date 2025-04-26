@@ -8,33 +8,42 @@
 {% endblock %}
 
 {% block body %}
-  <div class="container mt-4">
-    <h1 class="mb-4 text-center">Liste des Feedbacks</h1>
+<div class="container py-5">
+  <h1 class="text-center mb-5">📝 Feedbacks</h1>
 
-    <div class="feedback-section">
-      <h6>Feedbacks :</h6>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
       {% if feedbacks is not empty %}
         {% for feedback in feedbacks %}
-          <div class="feedback-item">
-            <div class="star-rating mb-2">
-              {% for i in 1..5 %}
-                <i class="bi {{ i <= feedback.note ? 'bi-star-fill' : 'bi-star' }}"></i>
-              {% endfor %}
-            </div>
-            <p class="small">{{ feedback.commentaire|default('No comment') }}</p>
-            <div class="d-flex gap-2">
-              <a href="{{ path('app_feedback_edit', {'id': feedback.id}) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
-              {{ include('feedback/_delete.html.twig', {'feedback': feedback}) }}
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="star-rating">
+                  {% for i in 1..5 %}
+                    <i class="bi {{ i <= feedback.note ? 'bi-star-fill text-warning' : 'bi-star text-secondary' }}"></i>
+                  {% endfor %}
+                </div>
+                <div class="d-flex gap-2">
+                  <a href="{{ path('app_feedback_edit', {'id': feedback.id}) }}" class="btn btn-sm btn-outline-primary">
+  <i class="bi bi-pencil-square"></i>
+</a>
+                  {{ include('feedback/_delete.html.twig', {'feedback': feedback}) }}
+                </div>
+              </div>
+              <p class="card-text small text-muted">{{ feedback.commentaire|default('Aucun commentaire.') }}</p>
             </div>
           </div>
         {% endfor %}
       {% else %}
-        <p class="small text-muted">No feedback yet.</p>
+        <div class="alert alert-info text-center">Aucun feedback pour le moment.</div>
       {% endif %}
-    </div>
 
-    <div class="mt-4 text-center">
-      <a href="{{ path('app_feedback_new') }}" class="btn btn-primary">Ajouter un feedback</a>
+      <div class="text-center mt-5">
+        <a href="{{ path('app_feedback_new') }}" class="btn btn-success btn-lg">
+          <i class="fas fa-plus me-2"></i> Ajouter un feedback
+        </a>
+      </div>
     </div>
   </div>
+</div>
 {% endblock %}
