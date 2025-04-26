@@ -235,20 +235,29 @@ final class ReservationController extends AbstractController
                 // Envoi du SMS modifié
                 $user = $reservation->getUser();
                 $phoneNumber = $user?->getPhoneNumber() ?? $params->get('test_phone_number');
-                
                 if (!empty($phoneNumber)) {
+                    // Ajoutez ce logging
+                    $logger->info('Phone number to use', [
+                        'phone' => $phoneNumber,
+                        'source' => $user ? 'user profile' : 'test number'
+                    ]);
+                    
                     $message = sprintf(
-                        "[EasyGo] Confirmation réservation\n" .
-                        "Trajet: %s → %s\n" .
+                        "EasyGo - Confirmation de réservation\n\n" .
+                        "Votre réservation N°%d est confirmée :\n" .
+                        "Départ: %s\n" .
+                        "Arrivée: %s\n" .
                         "Date: %s\n" .
-                        "%d place(s) - %.2f DNT\n" .
-                        "Merci pour votre confiance!",
+                        "Détails: %d place(s) - %.2f DNT\n\n" .
+                        "Merci de voyager avec EasyGo!",
+                        $reservation->getId(),
                         $trip->getDeparturePoint(),
                         $trip->getDestination(),
                         $trip->getTripDate()->format('d/m/Y H:i'),
                         $reservation->getNombrePlaces(),
                         $reservation->getMontantTotal()
                     );
+
                     $logger->debug('Attempting to send SMS', [
                         'phone' => $phoneNumber,
                         'message' => $message
@@ -294,4 +303,3 @@ final class ReservationController extends AbstractController
     }
 }
     
-

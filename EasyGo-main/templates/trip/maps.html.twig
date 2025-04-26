@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Carte des vols</title>
+
+    <!-- Leaflet CSS & JS sans integrity -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        #map {
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Carte des vols</h2>
+
+<div id="map"></div>
+
+<script>
+    // Récupérer les données des vols envoyées par Symfony
+    const vols = {{ vols|json_encode|raw }};
+    console.log(vols);  // Vérification dans la console pour s'assurer que les données sont bien récupérées
+
+    // Créer la carte
+    const map = L.map('map').setView([36.8, 10.18], 5);
+
+    // Ajouter le fond de carte OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Fonction pour récupérer les coordonnées d'une ville avec l'API Nominatim
+    async function getLatLng(ville) {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${ville}&limit=1`);
+        const data = await response.json();
+        if (data.length > 0) {
+            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        }
+        return null;
+    }
+
+    // Dessiner les trajets de vol
+    vols.forEach(async (vol) => {
+        const departCoord = await getLatLng(vol.depart);
+        const destCoord = await getLatLng(vol.destination);
+
+        if (departCoord && destCoord) {
+            // Tracer une ligne entre le départ et la destination
+            L.polyline([departCoord, destCoord], {color: 'red'}).addTo(map);
+
+            // Ajouter des marqueurs pour le départ et la destination
+            L.marker(departCoord).addTo(map).bindPopup("Départ : " + vol.depart);
+            L.marker(destCoord).addTo(map).bindPopup("Destination : " + vol.destination);
+        }
+    });
+</script>
+
+</body>
+</html>

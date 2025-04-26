@@ -28,13 +28,12 @@ class InfobipService
 
     public function sendSms(string $to, string $message): bool
     {
+        $logFile = __DIR__.'/../../var/log/infobip.log';
+        
         try {
-            $this->logger->debug('Attempting to send SMS', [
-                'to' => $to,
-                'sender' => $this->sender,
-                'message' => $message
-            ]);
-
+            // Log avant l'envoi
+            file_put_contents($logFile, date('[Y-m-d H:i:s]')." Attempt to send SMS to: $to\n", FILE_APPEND);
+            
             $response = $this->httpClient->request('POST', $this->baseUrl.'/sms/2/text/advanced', [
                 'headers' => [
                     'Authorization' => 'App '.$this->apiKey,
@@ -45,46 +44,27 @@ class InfobipService
                     'messages' => [
                         [
                             'from' => $this->sender,
-                            'destinations' => [
-                                ['to' => $to]
-                            ],
+                            'destinations' => [['to' => $to]],
                             'text' => $message
                         ]
                     ]
                 ],
-                'timeout' => 10 // Timeout en secondes
+                'timeout' => 10
             ]);
-
+    
             $statusCode = $response->getStatusCode();
             $content = $response->getContent(false);
-
-            $this->logger->debug('Infobip API response', [
-                'status' => $statusCode,
-                'response' => $content
-            ]);
-
-            $isSuccess = $statusCode >= 200 && $statusCode < 300;
             
-            if (!$isSuccess) {
-                $this->storeFailedSms($to, $message, "HTTP Status $statusCode");
-                $this->logger->error('Infobip API error', [
-                    'status' => $statusCode,
-                    'response' => $content
-                ]);
-            }
-
-            return $isSuccess;
-
+            // Log la réponse
+            file_put_contents($logFile, date('[Y-m-d H:i:s]')." Response: $statusCode - $content\n", FILE_APPEND);
+            
+            return $statusCode >= 200 && $statusCode < 300;
+            
         } catch (\Exception $e) {
-            $this->storeFailedSms($to, $message, $e->getMessage());
-            $this->logger->error('SMS sending failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            file_put_contents($logFile, date('[Y-m-d H:i:s]')." Error: ".$e->getMessage()."\n", FILE_APPEND);
             return false;
         }
     }
-
     private function storeFailedSms(string $to, string $message, string $error): void
     {
         // Créer le répertoire var/log s'il n'existe pas

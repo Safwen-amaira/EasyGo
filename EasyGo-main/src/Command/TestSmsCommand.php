@@ -46,11 +46,14 @@ class TestSmsCommand extends Command
     $phoneNumber = $this->params->get('test_phone_number');
 
     $message = sprintf(
-        "[EasyGo] Confirmation réservation\n" .
-        "Trajet: %s → %s\n" .
-        "Date: %s\n" .
-        "%d place(s) - %.2f DNT\n" .
-        "Merci pour votre confiance!",
+        "EasyGo - Confirmation de réservation\n\n" .
+        "Votre réservation N°%d est confirmée :\n" .
+        " Départ: %s\n" .
+        " Arrivée: %s\n" .
+        " Date: %s\n" .
+        " Détails: %d place(s) - %.2f DNT\n\n" .
+        "Merci de voyager avec EasyGo!",
+        $reservation->getId(),
         $trip->getDeparturePoint(),
         $trip->getDestination(),
         $trip->getTripDate()->format('d/m/Y H:i'),

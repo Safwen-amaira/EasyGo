@@ -22,16 +22,41 @@
                         </div>
                     </div>
                 </div>
+               <!-- Ajout du formulaire de recherche -->
+<div class="card-body bg-light">
+    <form id="searchForm" class="row g-3">
+        <div class="col-md-4">
+            <label for="departurePoint" class="form-label">Point de départ</label>
+            <input type="text" class="form-control" id="departurePoint" name="departurePoint" 
+                   value="{{ searchCriteria.departurePoint }}" placeholder="Ville de départ">
+        </div>
+        <div class="col-md-4">
+            <label for="destination" class="form-label">Destination</label>
+            <input type="text" class="form-control" id="destination" name="destination" 
+                   value="{{ searchCriteria.destination }}" placeholder="Ville d'arrivée">
+        </div>
+        <div class="col-md-3">
+            <label for="tripDate" class="form-label">Date du voyage</label>
+            <input type="date" class="form-control" id="tripDate" name="tripDate" 
+                   value="{{ searchCriteria.tripDate }}">
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search me-1"></i>Rechercher
+            </button>
+        </div>
+    </form>
+</div>
                 
                 <div class="card-body px-0 py-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="text-primary">Référence</th>
-                                    <th class="text-primary">Date du voyage</th>
-                                    <th class="text-primary">Départ</th>
-                                    <th class="text-primary">Destination</th>
+                                    <th class="text-primary sortable" data-sort="t.id">Référence</th>
+                                    <th class="text-primary sortable" data-sort="t.trip_date">Date du voyage</th>
+                                    <th class="text-primary sortable" data-sort="t.departurePoint">Départ</th>
+                                    <th class="text-primary sortable" data-sort="t.destination">Destination</th>
                                     <th class="text-primary">Heure départ</th>
                                     <th class="text-primary">Heure retour</th>
                                     <th class="text-primary">Places disponibles</th>
@@ -40,49 +65,8 @@
                                     <th class="text-primary">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                            {% for trip in pagination %}
-                                <tr onclick="window.location='{{ path('app_trip_show', {'id': trip.id}) }}'" style="cursor: pointer;">
-                                    <td>TRP-{{ trip.id|slice(0, 8)|upper }}</td>
-                                    <td>{{ trip.tripDate ? trip.tripDate|date('d/m/Y') : '' }}</td>
-                                    <td>{{ trip.departurePoint }}</td>
-                                    <td>{{ trip.destination }}</td>
-                                    <td>{{ trip.departureTime ? trip.departureTime|date('H:i') : '' }}</td>
-                                    <td>{{ trip.returnTime ? trip.returnTime|date('H:i') : '' }}</td>
-                                    <td>
-                                        {% if trip.availableSeats > 0 %}
-                                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
-                                                {{ trip.availableSeats }} places
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">
-                                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Complet
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ trip.tripType ? trip.tripType : '-' }}</td>
-                                    <td class="fw-bold">{{ trip.contribution ? trip.contribution ~ ' DNT' : '-' }}</td>
-                                    <td>
-                                        <div class="d-flex gap-2" onclick="event.stopPropagation()">
-                                            <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <form method="post" action="{{ path('app_trip_delete', {'id': trip.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce voyage ?');">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trip.id) }}">
-                                                <button class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="10" class="text-center py-4 text-muted">
-                                        <i class="bi bi-info-circle me-2"></i>Aucun voyage trouvé
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                            <tbody id="tripsTable">
+                                {% include 'trip/_trips_table.html.twig' %}
                             </tbody>
                         </table>
                     </div>
@@ -111,90 +95,76 @@
     </div>
 </div>
 {% endblock %}
-
-{% block stylesheets %}
+{% block javascripts %}
 {{ parent() }}
-<style>
-    .table-hover tbody tr:hover {
-        background-color: rgba(30, 136, 229, 0.1);
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .table th {
-        border-top: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-        padding: 1rem 1.5rem;
-    }
-    .table td {
-        padding: 1rem 1.5rem;
-        vertical-align: middle;
-        transition: all 0.2s ease;
-    }
-    .badge {
-        padding: 0.35rem 0.65rem;
-        font-weight: 500;
-    }
-    .btn-outline-secondary {
-        border-color: #6c757d;
-        color: #6c757d;
-    }
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: white;
-    }
-    .btn-outline-danger {
-        border-color: #dc3545;
-        color: #dc3545;
-    }
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: white;
-    }
-    .text-muted {
-        color: #6c757d !important;
-    }
-    .card {
-        border: 1px solid rgba(30, 136, 229, 0.1);
-    }
-    form {
-        display: inline-block;
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Gestion de la soumission du formulaire de recherche
+    $('#searchForm').on('submit', function(e) {
+        e.preventDefault();
+        loadTrips();
+    });
+
+    // Gestion du tri des colonnes
+    $('.sortable').on('click', function() {
+        const sortField = $(this).data('sort');
+        const currentSort = $('#searchForm input[name="sort"]').val() || 't.trip_date';
+        const currentDirection = $('#searchForm input[name="direction"]').val() || 'DESC';
+        
+        let newDirection = 'ASC';
+        if (sortField === currentSort) {
+            newDirection = currentDirection === 'ASC' ? 'DESC' : 'ASC';
+        }
+        
+        // Mettre à jour les champs cachés
+        $('#searchForm').find('input[name="sort"]').remove();
+        $('#searchForm').find('input[name="direction"]').remove();
+        $('#searchForm').append(`<input type="hidden" name="sort" value="${sortField}">`);
+        $('#searchForm').append(`<input type="hidden" name="direction" value="${newDirection}">`);
+        
+        loadTrips();
+    });
+
+    // Fonction pour charger les voyages via AJAX
+    function loadTrips() {
+        const formData = $('#searchForm').serialize();
+        
+        $.ajax({
+            url: '{{ path('app_trip_index') }}',
+            type: 'GET',
+            data: formData,
+            beforeSend: function() {
+                $('#tripsTable').html('<tr><td colspan="10" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div></td></tr>');
+            },
+            success: function(data) {
+                $('#tripsTable').html(data);
+                // Mettre à jour l'URL sans recharger la page
+                history.pushState(null, null, '?' + formData);
+                
+                // Mettre à jour la pagination
+                updatePaginationLinks();
+            },
+            error: function() {
+                $('#tripsTable').html('<tr><td colspan="10" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Erreur lors du chargement des données</td></tr>');
+            }
+        });
     }
 
-    /* Styles pour la pagination */
-    .pagination {
-        margin: 0;
+    // Gestion de la pagination
+    function updatePaginationLinks() {
+        $(document).off('click', '.pagination a');
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            const page = $(this).data('page') || $(this).attr('href').split('page=')[1];
+            $('#searchForm').find('input[name="page"]').remove();
+            $('#searchForm').append(`<input type="hidden" name="page" value="${page}">`);
+            loadTrips();
+        });
     }
-    .page-item:first-child .page-link,
-    .page-item:last-child .page-link {
-        border-radius: 50rem !important;
-    }
-    .page-link {
-        color: #0d47a1;
-        border: 1px solid #dee2e6;
-        margin: 0 3px;
-        border-radius: 50rem !important;
-        min-width: 36px;
-        text-align: center;
-        font-size: 0.85rem;
-        padding: 0.375rem 0.75rem;
-    }
-    .page-item.active .page-link {
-        background-color: #0d47a1;
-        border-color: #0d47a1;
-        color: white;
-    }
-    .page-link:hover {
-        color: #1e88e5;
-        background-color: #e9ecef;
-        border-color: #dee2e6;
-    }
-    .page-item.disabled .page-link {
-        color: #6c757d;
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-    }
-</style>
+
+    // Initialiser la pagination
+    updatePaginationLinks();
+});
+</script>
 {% endblock %}
