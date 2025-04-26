@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liste des contrats</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Liste des contrats</h1>
+    <table>
+        <thead>
+            <tr>
+                
+                <th>Nom et Prénom</th>
+                <th>Date de début</th>
+                <th>Date de fin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contrat in contrats %}
+                <tr>
+                  
+                    <td>{{ contrat.nomprenom }}</td>
+                    <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}</td>
+                    <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
+                 
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Aucun contrat trouvé</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

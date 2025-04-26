@@ -65,7 +65,11 @@
                     {% endfor %}
                 </tbody>
             </table>
+
         </div>
+      <div>
+       <a href="{{ path('app_contrat_generate_pdf') }}" class="btn btn-primary">Télécharger  en PDF</a>
+       </div>
 
         <div class="mt-4">
             <a href="{{ path('app_contrat_new') }}" class="btn btn-success">Créer un nouveau contrat</a>
@@ -138,23 +142,56 @@ document.getElementById('sort-type').addEventListener('click', function() {
     sortAscType = !sortAscType; // Alterner l'ordre du tri
     document.getElementById('sort-type').innerText = sortAscType ? "⬇" : "⬆"; // Modifier l'icône du bouton
 });
+// Récupération et affichage des notifications de contrats expirants bientôt
 
-        // Notifications contrats expirant bientôt
-        fetch('{{ path('app_contrat_notifications') }}')
-            .then(response => response.json())
-            .then(contracts => {
-                if (contracts.length > 0) {
-                    const container = document.getElementById('notification-container');
-                    const list = document.getElementById('notification-list');
-                    container.classList.remove('d-none');
+fetch('/notifications')
+    .then(response => response.json())
+    .then(data => {
+        if (data.length > 0) {
+            const container = document.getElementById('notification-container');
+            const list = document.getElementById('notification-list');
 
-                    contracts.forEach(contract => {
-                        const li = document.createElement('li');
-                        li.textContent = `Contrat de ${contract.nomprenom} expire le ${contract.dateFin}`;
-                        list.appendChild(li);
-                    });
-                }
-            })
-            .catch(error => console.error('Erreur lors du chargement des notifications :', error));
+            container.classList.remove('d-none'); // Afficher le conteneur
+            list.innerHTML = ''; // Vider l'ancien contenu
+
+            data.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `Contrat de ${item.nomprenom} expirera le ${item.dateFin}`;
+                list.appendChild(li);
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Erreur lors du fetch :", error);
+    });
+
+// Refaire la requête toutes les 60 secondes
+setInterval(() => {
+    fetch('/notifications')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('notification-container');
+            const list = document.getElementById('notification-list');
+
+            if (data.length > 0) {
+                container.classList.remove('d-none');
+                list.innerHTML = '';
+
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `Contrat de ${item.nomprenom} expirera le ${item.dateFin}`;
+                    list.appendChild(li);
+                });
+            } else {
+                container.classList.add('d-none');
+                list.innerHTML = '';
+            }
+        })
+        .catch(error => {
+            console.error("Erreur lors de la mise à jour des notifications :", error);
+        });
+}, 60000); // toutes les 60 secondes
+
+
     </script>
 {% endblock %}

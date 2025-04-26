@@ -13,9 +13,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
 
 #[Route('/vehicule')]
 final class VehiculeController extends AbstractController{
@@ -185,7 +184,30 @@ $form->handleRequest($request);
 
         return $this->redirectToRoute('app_vehicule_index', [], Response::HTTP_SEE_OTHER);
     }
+
     
+    #[Route('/vehicule/calendar', name: 'app_vehicule_calendar')]
+    public function calendar(): Response
+    {
+        return $this->render('vehicule/calendar.html.twig');
+    }
+    
+    #[Route('/vehicule/events', name: 'app_vehicule_events')]
+    public function events(VehiculeRepository $vehiculeRepository): JsonResponse
+    {
+        $vehicules = $vehiculeRepository->findAll();
+    
+        $events = array_map(function ($vehicule) {
+            return [
+                'id' => $vehicule->getId(),
+                'title' => $vehicule->getName(),
+                'start' => $vehicule->getCreated()->format('Y-m-d'),
+                'backgroundColor' => 'blue', // Tu peux rendre dynamique si besoin
+            ];
+        }, $vehicules);
+    
+        return new JsonResponse($events);
+    }
 
 }
 

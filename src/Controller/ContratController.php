@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 #[Route('/contrat')]
 final class ContratController extends AbstractController
@@ -55,14 +57,15 @@ final class ContratController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_contrat_show', methods: ['GET'])]
+    #[Route('/contrat/{id}', name: 'app_contrat_show')]
     public function show(Contrat $contrat): Response
     {
         return $this->render('contrat/show.html.twig', [
             'contrat' => $contrat,
         ]);
     }
-
+   
+    
     #[Route('/{id}/edit', name: 'app_contrat_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Contrat $contrat, EntityManagerInterface $entityManager): Response
     {
@@ -91,7 +94,7 @@ final class ContratController extends AbstractController
 
         return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
     }
-    #[Route('/contrat/notifications', name: 'app_contrat_notifications')]
+    #[Route('/notifications', name: 'app_contrat_notifications', methods: ['GET'])]
     public function notifications(ContratRepository $contratRepository): JsonResponse
     {
         $contrats = $contratRepository->findContractsExpiringSoon();
@@ -107,4 +110,42 @@ final class ContratController extends AbstractController
         return new JsonResponse($data);
     }
     
+
+    #[Route('/generate-pdf', name: 'app_contrat_generate_pdf', methods: ['GET'])]
+public function generatePdf(ContratRepository $contratRepository): Response
+{
+    // Récupérer la liste des contrats
+    $contrats = $contratRepository->findAll();
+
+    // Générer le contenu HTML à partir de la liste des contrats
+    $html = $this->renderView('contrat/pdf.html.twig', [
+        'contrats' => $contrats,
+    ]);
+
+    // Initialiser Dompdf
+    $options = new Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isPhpEnabled', true);
+    $dompdf = new Dompdf($options);
+
+    // Charger le HTML dans Dompdf
+    $dompdf->loadHtml($html);
+
+    // (Optional) Définir la taille du papier
+    $dompdf->setPaper('A4', 'portrait');
+
+    // Rendre le PDF
+    $dompdf->render();
+
+    // Générer un fichier PDF et l'envoyer au navigateur
+    return new Response(
+        $dompdf->output(),
+        200,
+        [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="contrats_list.pdf"',
+        ]
+    );
+}
+
 }
