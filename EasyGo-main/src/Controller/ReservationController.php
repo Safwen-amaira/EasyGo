@@ -33,35 +33,79 @@ final class ReservationController extends AbstractController
     #[Route('/', name: 'app_reservation_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $query = $reservationRepository->createQueryBuilder('r')
-            ->orderBy('r.dateReservation', 'DESC')
-            ->getQuery();
+        $queryBuilder = $reservationRepository->createQueryBuilder('r')
+            ->leftJoin('r.trip', 't')
+            ->addSelect('t');
+    
+        // Gestion de la recherche
+        $searchTerm = $request->query->get('search');
+        if ($searchTerm) {
+            $queryBuilder
+                ->andWhere('r.etatReservation LIKE :searchTerm OR t.departure_point LIKE :searchTerm OR t.destination LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+    
+        // Gestion du tri
+        $sort = $request->query->get('sort', 'r.dateReservation');
+        $direction = $request->query->get('direction', 'DESC');
+        
+        // Validation des champs de tri pour éviter les injections SQL
+        $validSorts = ['r.dateReservation', 'r.etatReservation', 'r.montantTotal', 't.departure_point', 't.destination'];
+        $sort = in_array($sort, $validSorts) ? $sort : 'r.dateReservation';
+        $direction = in_array(strtoupper($direction), ['ASC', 'DESC']) ? strtoupper($direction) : 'DESC';
+        
+        $queryBuilder->orderBy($sort, $direction);
     
         $pagination = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', 1), // Numéro de page par défaut
-            10 // Nombre d'éléments par page
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
         );
     
         return $this->render('reservation/index.html.twig', [
             'pagination' => $pagination,
+            'sort' => $sort,
+            'direction' => $direction,
+            'searchTerm' => $searchTerm,
         ]);
     }
     #[Route('/admin', name: 'app_reservation_admin', methods: ['GET'])]
     public function indexadmin(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $query = $reservationRepository->createQueryBuilder('r')
-            ->orderBy('r.dateReservation', 'DESC')
-            ->getQuery();
+        $queryBuilder = $reservationRepository->createQueryBuilder('r')
+            ->leftJoin('r.trip', 't')
+            ->addSelect('t');
+    
+        // Gestion de la recherche
+        $searchTerm = $request->query->get('search');
+        if ($searchTerm) {
+            $queryBuilder
+                ->andWhere('r.etatReservation LIKE :searchTerm OR t.departure_point LIKE :searchTerm OR t.destination LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+    
+        // Gestion du tri
+        $sort = $request->query->get('sort', 'r.dateReservation');
+        $direction = $request->query->get('direction', 'DESC');
+        
+        // Validation des champs de tri pour éviter les injections SQL
+        $validSorts = ['r.dateReservation', 'r.etatReservation', 'r.montantTotal', 't.departure_point', 't.destination'];
+        $sort = in_array($sort, $validSorts) ? $sort : 'r.dateReservation';
+        $direction = in_array(strtoupper($direction), ['ASC', 'DESC']) ? strtoupper($direction) : 'DESC';
+        
+        $queryBuilder->orderBy($sort, $direction);
     
         $pagination = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', 1), // Numéro de page par défaut
-            10 // Nombre d'éléments par page
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
         );
     
         return $this->render('reservation/admin_reservation.html.twig', [
             'pagination' => $pagination,
+            'sort' => $sort,
+            'direction' => $direction,
+            'searchTerm' => $searchTerm,
         ]);
     }
 
@@ -72,21 +116,44 @@ final class ReservationController extends AbstractController
             'reservation' => $reservation,
         ]);
     }
+     
     #[Route('/driver', name: 'app_reservation_index_driver', methods: ['GET'])]
-    public function indexDriver(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
+    public function indexdriver(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $query = $reservationRepository->createQueryBuilder('r')
-            ->orderBy('r.dateReservation', 'DESC')
-            ->getQuery();
+        $queryBuilder = $reservationRepository->createQueryBuilder('r')
+            ->leftJoin('r.trip', 't')
+            ->addSelect('t');
+    
+        // Gestion de la recherche
+        $searchTerm = $request->query->get('search');
+        if ($searchTerm) {
+            $queryBuilder
+                ->andWhere('r.etatReservation LIKE :searchTerm OR t.departure_point LIKE :searchTerm OR t.destination LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+    
+        // Gestion du tri
+        $sort = $request->query->get('sort', 'r.dateReservation');
+        $direction = $request->query->get('direction', 'DESC');
+        
+        // Validation des champs de tri pour éviter les injections SQL
+        $validSorts = ['r.dateReservation', 'r.etatReservation', 'r.montantTotal', 't.departure_point', 't.destination'];
+        $sort = in_array($sort, $validSorts) ? $sort : 'r.dateReservation';
+        $direction = in_array(strtoupper($direction), ['ASC', 'DESC']) ? strtoupper($direction) : 'DESC';
+        
+        $queryBuilder->orderBy($sort, $direction);
     
         $pagination = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', 1), // Numéro de page par défaut
-            10 // Nombre d'éléments par page
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
         );
     
         return $this->render('reservation/index_driver.html.twig', [
             'pagination' => $pagination,
+            'sort' => $sort,
+            'direction' => $direction,
+            'searchTerm' => $searchTerm,
         ]);
     }
     #[Route('/new/{tripId}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
@@ -203,6 +270,48 @@ final class ReservationController extends AbstractController
         }
 
         return $this->redirectToRoute('app_reservation_index');
+    }
+    #[Route('/admin/{id}', name: 'app_reservation_delete_admin', methods: ['POST'])]
+    public function deleteadmin(Request $request, Reservation $reservation): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->request->get('_token'))) {
+            $trip = $reservation->getTrip();
+            
+            // On remet les places disponibles seulement si la réservation était confirmée
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            }
+
+            $this->entityManager->remove($reservation);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Réservation annulée avec succès');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide');
+        }
+
+        return $this->redirectToRoute('app_reservation_admin');
+    }
+    #[Route('/driver/{id}', name: 'app_reservation_delete_driver', methods: ['POST'])]
+    public function deletedriver(Request $request, Reservation $reservation): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->request->get('_token'))) {
+            $trip = $reservation->getTrip();
+            
+            // On remet les places disponibles seulement si la réservation était confirmée
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            }
+
+            $this->entityManager->remove($reservation);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Réservation annulée avec succès');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide');
+        }
+
+        return $this->redirectToRoute('app_reservation_index_driver');
     }
     
     #[Route('/{id}/manage-driver', name: 'app_reservation_manage_driver', methods: ['GET', 'POST'])]

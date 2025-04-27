@@ -6,6 +6,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\TripRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: TripRepository::class)]
 class Trip
@@ -50,6 +52,14 @@ class Trip
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $relay_points = null;
+    
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'trip')]
+    private Collection $reservations;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

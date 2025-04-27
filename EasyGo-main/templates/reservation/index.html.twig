@@ -18,17 +18,126 @@
                     </div>
                 </div>
                 
+                {# Section Recherche et Filtres #}
+                <div class="card-body border-bottom">
+                    <div class="row align-items-center mb-3">
+                        <div class="col-md-6 mb-2 mb-md-0">
+                            <form method="get" action="{{ path('app_reservation_index') }}" class="form-inline">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control rounded-start" 
+                                           placeholder="Rechercher par statut, départ ou destination..." 
+                                           value="{{ searchTerm|default('') }}">
+                                    <button type="submit" class="btn btn-primary rounded-end">
+                                        <i class="bi bi-search"></i> Rechercher
+                                    </button>
+                                    {% if searchTerm %}
+                                        <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-secondary ms-2 rounded">
+                                            <i class="bi bi-x-lg"></i> Réinitialiser
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="btn-group" role="group">
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><h6 class="dropdown-header">Trier par :</h6></li>
+                                    <li>
+                                        <a class="dropdown-item {% if sort == 'r.dateReservation' %}active{% endif %}" 
+                                           href="{{ path('app_reservation_index', {sort: 'r.dateReservation', direction: 'DESC', search: searchTerm}) }}">
+                                            <i class="bi bi-calendar-event me-2"></i> Date (récent)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item {% if sort == 'r.montantTotal' and direction == 'DESC' %}active{% endif %}" 
+                                           href="{{ path('app_reservation_index', {sort: 'r.montantTotal', direction: 'DESC', search: searchTerm}) }}">
+                                            <i class="bi bi-currency-euro me-2"></i> Montant (élevé)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item {% if sort == 'r.etatReservation' %}active{% endif %}" 
+                                           href="{{ path('app_reservation_index', {sort: 'r.etatReservation', direction: 'ASC', search: searchTerm}) }}">
+                                            <i class="bi bi-info-circle me-2"></i> Statut (A-Z)
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('app_reservation_index') }}">
+                                            <i class="bi bi-arrow-counterclockwise me-2"></i> Réinitialiser
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="card-body px-0 py-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="bg-light">
                                 <tr>  
-                                    <th class="text-primary">Trajet</th>
-                                    <th class="text-primary">Date réservation</th>
-                                    <th class="text-primary">Départ → Destination</th>
-                                    <th class="text-primary">Places réservées</th>
-                                    <th class="text-primary">Montant total</th>
-                                    <th class="text-primary">Statut</th>
+                                    <th class="text-primary">
+                                        <a href="{{ path('app_reservation_index', {
+                                            sort: 't.departure_point',
+                                            direction: (sort == 't.departure_point' and direction == 'ASC') ? 'DESC' : 'ASC',
+                                            search: searchTerm
+                                        }) }}" class="text-decoration-none text-primary d-flex align-items-center">
+                                            Trajet
+                                            {% if sort == 't.departure_point' %}
+                                                <i class="bi bi-caret-{{ direction == 'ASC' ? 'up' : 'down' }} ms-1"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th class="text-primary">
+                                        <a href="{{ path('app_reservation_index', {
+                                            sort: 'r.dateReservation',
+                                            direction: (sort == 'r.dateReservation' and direction == 'ASC') ? 'DESC' : 'ASC',
+                                            search: searchTerm
+                                        }) }}" class="text-decoration-none text-primary d-flex align-items-center">
+                                            Date réservation
+                                            {% if sort == 'r.dateReservation' %}
+                                                <i class="bi bi-caret-{{ direction == 'ASC' ? 'up' : 'down' }} ms-1"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th class="text-primary">
+                                        <a href="{{ path('app_reservation_index', {
+                                            sort: 't.destination',
+                                            direction: (sort == 't.destination' and direction == 'ASC') ? 'DESC' : 'ASC',
+                                            search: searchTerm
+                                        }) }}" class="text-decoration-none text-primary d-flex align-items-center">
+                                            Itinéraire
+                                            {% if sort == 't.destination' %}
+                                                <i class="bi bi-caret-{{ direction == 'ASC' ? 'up' : 'down' }} ms-1"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th class="text-primary">Places</th>
+                                    <th class="text-primary">
+                                        <a href="{{ path('app_reservation_index', {
+                                            sort: 'r.montantTotal',
+                                            direction: (sort == 'r.montantTotal' and direction == 'ASC') ? 'DESC' : 'ASC',
+                                            search: searchTerm
+                                        }) }}" class="text-decoration-none text-primary d-flex align-items-center">
+                                            Montant
+                                            {% if sort == 'r.montantTotal' %}
+                                                <i class="bi bi-caret-{{ direction == 'ASC' ? 'up' : 'down' }} ms-1"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
+                                    <th class="text-primary">
+                                        <a href="{{ path('app_reservation_index', {
+                                            sort: 'r.etatReservation',
+                                            direction: (sort == 'r.etatReservation' and direction == 'ASC') ? 'DESC' : 'ASC',
+                                            search: searchTerm
+                                        }) }}" class="text-decoration-none text-primary d-flex align-items-center">
+                                            Statut
+                                            {% if sort == 'r.etatReservation' %}
+                                                <i class="bi bi-caret-{{ direction == 'ASC' ? 'up' : 'down' }} ms-1"></i>
+                                            {% endif %}
+                                        </a>
+                                    </th>
                                     <th class="text-primary">Actions</th>
                                 </tr>
                             </thead>
@@ -39,7 +148,7 @@
                                     <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
                                     <td>
                                         {{ reservation.trip.departurePoint }} 
-                                        <i class="bi bi-arrow-right mx-1"></i> 
+                                        <i class="bi bi-arrow-right mx-1 text-muted"></i> 
                                         {{ reservation.trip.destination }}
                                     </td>
                                     <td>
@@ -65,14 +174,12 @@
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2" onclick="event.stopPropagation()">
-                                            {# Bouton d'édition seulement pour les réservations en attente #}
                                             {% if reservation.etatReservation|lower starts with 'en attente' %}
                                                 <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                             {% endif %}
                                             
-                                            {# Bouton de suppression toujours visible #}
                                             <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
                                                 <button class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">
@@ -143,68 +250,13 @@
         padding: 0.35rem 0.65rem;
         font-weight: 500;
     }
-    .btn-outline-secondary {
-        border-color: #6c757d;
-        color: #6c757d;
-    }
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: white;
-    }
-    .btn-outline-danger {
-        border-color: #dc3545;
-        color: #dc3545;
-    }
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: white;
-    }
-    .text-muted {
-        color: #6c757d !important;
-    }
-    .card {
-        border: 1px solid rgba(30, 136, 229, 0.1);
-    }
-    form {
-        display: inline-block;
-    }
-    .bi-arrow-right {
-        font-size: 0.8rem;
-        opacity: 0.7;
-    }
-    .badge.bg-danger {
-        background-color: rgba(220, 53, 69, 0.1) !important;
-        color: #dc3545 !important;
-    }
-    
-    /* Styles pour la pagination */
-    .pagination {
-        margin: 0;
-    }
-    .page-item:first-child .page-link,
-    .page-item:last-child .page-link {
-        border-radius: 50rem !important;
-    }
-    .page-link {
-        color: #0d47a1;
-        border: 1px solid #dee2e6;
-        margin: 0 3px;
-        border-radius: 50rem !important;
-        min-width: 36px;
-        text-align: center;
-    }
-    .page-item.active .page-link {
-        background-color: #0d47a1;
-        border-color: #0d47a1;
-    }
-    .page-link:hover {
-        color: #1e88e5;
+    .dropdown-item.active {
         background-color: #e9ecef;
-        border-color: #dee2e6;
+        color: #0d47a1;
+        font-weight: 500;
     }
-    .page-item.disabled .page-link {
-        color: #6c757d;
-        background-color: #f8f9fa;
+    .dropdown-item.active i {
+        color: #0d47a1;
     }
 </style>
 {% endblock %}

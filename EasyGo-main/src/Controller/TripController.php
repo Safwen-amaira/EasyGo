@@ -186,21 +186,58 @@ public function index(TripRepository $tripRepository, PaginatorInterface $pagina
         'searchCriteria' => $searchCriteria,
     ]);
 }
-#[Route('/admin_trip', name: 'app_trip_admin_trip', methods: ['GET'])]
-public function indexadmintrip(TripRepository $tripRepository, PaginatorInterface $paginator, Request $request): Response
+#[Route('/admin_trip', name: 'app_trip_admin_trip', methods: ['GET', 'POST'])]
+public function indexadmin(TripRepository $tripRepository, PaginatorInterface $paginator, Request $request): Response
 {
-    $query = $tripRepository->createQueryBuilder('t')
-        ->orderBy('t.trip_date', 'DESC')
-        ->getQuery();
+    $searchCriteria = [
+        'departurePoint' => $request->query->get('departurePoint'),
+        'destination' => $request->query->get('destination'),
+        'tripDate' => $request->query->get('tripDate'), // Un seul champ de date maintenant
+        'sort' => $request->query->get('sort', 't.trip_date'),
+        'direction' => $request->query->get('direction', 'DESC'),
+    ];
+
+    $query = $tripRepository->createQueryBuilder('t');
+
+    // Apply filters
+    if ($searchCriteria['departurePoint']) {
+        $query->andWhere('t.departure_point LIKE :departurePoint')
+              ->setParameter('departurePoint', '%'.$searchCriteria['departurePoint'].'%');
+    }
+
+    if ($searchCriteria['destination']) {
+        $query->andWhere('t.destination LIKE :destination')
+              ->setParameter('destination', '%'.$searchCriteria['destination'].'%');
+    }
+
+    if ($searchCriteria['tripDate']) {
+        try {
+            $tripDate = new \DateTime($searchCriteria['tripDate']);
+            $query->andWhere('t.trip_date = :tripDate')
+                  ->setParameter('tripDate', $tripDate);
+        } catch (\Exception $e) {
+            // Gérer l'erreur si nécessaire
+        }
+    }
+
+    // Tri
+    $query->orderBy($searchCriteria['sort'], $searchCriteria['direction']);
 
     $pagination = $paginator->paginate(
-        $query,
-        $request->query->getInt('page', 1), // Numéro de page par défaut
-        10 // Nombre d'éléments par page
+        $query->getQuery(),
+        $request->query->getInt('page', 1),
+        10
     );
+
+    if ($request->isXmlHttpRequest()) {
+        return $this->render('trip/_trips_table.html.twig', [
+            'pagination' => $pagination,
+        ]);
+    }
 
     return $this->render('trip/admin_trip.html.twig', [
         'pagination' => $pagination,
+        'searchCriteria' => $searchCriteria,
     ]);
 }
 
