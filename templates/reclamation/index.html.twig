@@ -5,7 +5,13 @@
 {% block css %}
   {{ parent() }}
   <style>
-    /* … ton style existant … */
+    /* Style pour les formulaires et boutons de recherche */
+    .search-form {
+        margin-bottom: 20px;
+    }
+    .search-form .form-control {
+        margin-right: 10px;
+    }
   </style>
 {% endblock %}
 
@@ -16,9 +22,35 @@
   </header>
 
   <div class="container my-5">
-    <h1 class="text-center mb-4">Reclamations</h1>
+    <h1 class="text-center mb-4">Réclamations</h1>
     <p class="text-center mb-5">Liste des réclamations</p>
 
+    <!-- Formulaire de recherche et de tri -->
+    <form method="get" class="search-form">
+      <div class="row">
+        <div class="col">
+          <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Recherche...">
+        </div>
+        <div class="col">
+          <select name="sortField" class="form-control">
+            <option value="dateCreation" {% if sortField == 'dateCreation' %}selected{% endif %}>Date de création</option>
+            <option value="categorie" {% if sortField == 'categorie' %}selected{% endif %}>Catégorie</option>
+            <!-- Ajoute d'autres champs de tri si nécessaire -->
+          </select>
+        </div>
+        <div class="col">
+          <select name="sortDirection" class="form-control">
+            <option value="ASC" {% if sortDirection == 'ASC' %}selected{% endif %}>Ascendant</option>
+            <option value="DESC" {% if sortDirection == 'DESC' %}selected{% endif %}>Descendant</option>
+          </select>
+        </div>
+        <div class="col">
+          <button type="submit" class="btn btn-primary">Filtrer</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Affichage des réclamations -->
     <div class="row g-4">
       {% for reclamation in pagination %}
         <div class="col-lg-4 col-md-6">
@@ -33,10 +65,8 @@
               </p>
 
               <div class="d-flex justify-content-between mt-3">
-                <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}"
-                   class="btn btn-outline-primary">Show</a>
-                <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}"
-                   class="btn btn-outline-secondary">Edit</a>
+                <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}" class="btn btn-outline-primary">Show</a>
+                <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-outline-secondary">Edit</a>
                 {{ include('reclamation/_delete_form.html.twig') }}
               </div>
             </div>
@@ -45,18 +75,20 @@
       {% else %}
         <div class="col-12">
           <div class="alert no-records-alert text-center" role="alert">
-            No records found
+            Aucun enregistrement trouvé
           </div>
         </div>
       {% endfor %}
     </div>
 
+    <!-- Pagination -->
     <div class="pagination-wrapper text-center mt-4">
       {{ knp_pagination_render(pagination) }}
     </div>
 
+    <!-- Bouton de création -->
     <div class="mt-4 text-center">
-      <a href="{{ path('app_reclamation_new') }}" class="btn create-new-btn">Create new</a>
+      <a href="{{ path('app_reclamation_new') }}" class="btn create-new-btn">Créer une nouvelle réclamation</a>
     </div>
   </div>
 {% endblock %}

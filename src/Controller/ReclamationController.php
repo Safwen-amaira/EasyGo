@@ -16,33 +16,45 @@ use Knp\Component\Pager\PaginatorInterface;
 final class ReclamationController extends AbstractController
 {
     #[Route('/', name: 'app_reclamation_index', methods: ['GET'])]
-    public function index(
-        ReclamationRepository $reclamationRepository,
-        Request $request,
-        PaginatorInterface $paginator
-    ): Response {
-        // Construire un QueryBuilder pour pouvoir paginer proprement
-        $qb = $reclamationRepository->createQueryBuilder('r')
-            ->orderBy('r.dateCreation', 'DESC')
-        ;
+public function index(
+    ReclamationRepository $reclamationRepository,
+    Request $request,
+    PaginatorInterface $paginator
+): Response {
+    // Recherche
+    $searchTerm = $request->query->get('search', '');
 
-        // Page courante et nombre d’items par page
-        $page   = $request->query->getInt('page', 1);
-        $limit  = 3; // par exemple 9 cartes par page
+    // Tri (par défaut par date de création)
+    $sortField = $request->query->get('sortField', 'dateCreation');
+    $sortDirection = $request->query->get('sortDirection', 'DESC');
 
-        // On demande à KNP Paginator de découper la requête
-        $pagination = $paginator->paginate(
-            $qb,
-            $page,
-            $limit
-        );
+    // Construire un QueryBuilder pour la recherche et le tri
+    $qb = $reclamationRepository->createQueryBuilder('r')
+        ->orderBy('r.' . $sortField, $sortDirection);
 
-        // On envoie l’objet “pagination” à Twig
-        return $this->render('reclamation/index.html.twig', [
-            'pagination' => $pagination,
-        ]);
+    if ($searchTerm) {
+        $qb->andWhere('r.description LIKE :searchTerm')
+           ->setParameter('searchTerm', '%' . $searchTerm . '%');
     }
 
+    // Pagination
+    $page = $request->query->getInt('page', 1);
+    $limit = 3; // nombre d'éléments par page
+
+    $pagination = $paginator->paginate(
+        $qb,
+        $page,
+        $limit
+    );
+
+    // Envoi des résultats à Twig
+    return $this->render('reclamation/index.html.twig', [
+        'pagination' => $pagination,
+        'search' => $searchTerm,
+        'sortField' => $sortField,
+        'sortDirection' => $sortDirection,
+    ]);
+}
     #[Route('/new', name: 'app_reclamation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
