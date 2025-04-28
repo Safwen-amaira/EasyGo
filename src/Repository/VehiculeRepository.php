@@ -15,6 +15,18 @@ class VehiculeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Vehicule::class);
     }
+    public function searchByName(?string $search): array
+{
+    $qb = $this->createQueryBuilder('v');
+
+    if ($search) {
+        $qb->andWhere('v.name LIKE :search')
+           ->setParameter('search', '%' . $search . '%');
+    }
+
+    return $qb->getQuery()->getResult();
+}
+
 
     public function searchByNameWithEtat(?string $name): array
     {
