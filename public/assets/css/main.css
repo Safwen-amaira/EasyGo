@@ -2321,10 +2321,10 @@ section,
   margin-right: 8px;
   color: var(--accent-color);
 }
-
 /*--------------------------------------------------------------
-# Starter Section Section
+# Starter Section
 --------------------------------------------------------------*/
 .starter-section {
-  /* Add your styles here */
+  padding: 60px 20px;
+  background-color: #f9f9f9;
 }

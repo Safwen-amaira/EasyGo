@@ -1,42 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Calendrier des Véhicules{% endblock %}
+{% block title %}Calendrier des véhicules{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Calendrier des Véhicules</h1>
+<h1>Calendrier</h1>
 
-        <div id="calendar"></div>
-    </div>
+<div id="calendar"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                events: '{{ path('app_vehicule_events') }}',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                buttonText: {
-                    today: 'Aujourd\'hui',
-                    month: 'Mois',
-                    week: 'Semaine',
-                    day: 'Jour'
-                },
-                height: 'auto',
-                eventColor: '#007bff', // Bleu Bootstrap
-                eventTextColor: 'white', 
-                locale: 'fr', // mettre en français
-                firstDay: 1, // Commencer par lundi
-            });
-
-            calendar.render();
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: '{{ path('app_vehicule_events') }}', // <- récupère tes événements dynamiquement
         });
-    </script>
+
+        calendar.render();
+    });
+</script>
 {% endblock %}

@@ -94,22 +94,21 @@ final class ContratController extends AbstractController
 
         return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
     }
-    #[Route('/notifications', name: 'app_contrat_notifications', methods: ['GET'])]
-    public function notifications(ContratRepository $contratRepository): JsonResponse
+    #[Route('/api/contrats-expirant-bientot', name: 'api_contrat_expirant_bientot', methods: ['GET'])]
+    public function getExpiringContracts(ContratRepository $contratRepository): JsonResponse
     {
-        $contrats = $contratRepository->findContractsExpiringSoon();
-    
+        $contratsExpirants = $contratRepository->findContractsExpiringSoon();
+
         $data = array_map(function ($contrat) {
             return [
                 'id' => $contrat->getId(),
                 'nomprenom' => $contrat->getNomprenom(),
                 'dateFin' => $contrat->getDateFin()->format('Y-m-d'),
             ];
-        }, $contrats);
-    
+        }, $contratsExpirants);
+
         return new JsonResponse($data);
     }
-    
 
     #[Route('/generate-pdf', name: 'app_contrat_generate_pdf', methods: ['GET'])]
 public function generatePdf(ContratRepository $contratRepository): Response

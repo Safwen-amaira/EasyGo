@@ -142,56 +142,28 @@ document.getElementById('sort-type').addEventListener('click', function() {
     sortAscType = !sortAscType; // Alterner l'ordre du tri
     document.getElementById('sort-type').innerText = sortAscType ? "⬇" : "⬆"; // Modifier l'icône du bouton
 });
-// Récupération et affichage des notifications de contrats expirants bientôt
 
-fetch('/notifications')
-    .then(response => response.json())
-    .then(data => {
-        if (data.length > 0) {
-            const container = document.getElementById('notification-container');
-            const list = document.getElementById('notification-list');
-
-            container.classList.remove('d-none'); // Afficher le conteneur
-            list.innerHTML = ''; // Vider l'ancien contenu
-
-            data.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = `Contrat de ${item.nomprenom} expirera le ${item.dateFin}`;
-                list.appendChild(li);
-            });
-        }
-    })
-    .catch(error => {
-        console.error("Erreur lors du fetch :", error);
-    });
-
-// Refaire la requête toutes les 60 secondes
-setInterval(() => {
-    fetch('/notifications')
+document.addEventListener('DOMContentLoaded', function() {
+    // Dès que la page est chargée, on appelle l'API pour vérifier les contrats expirants
+    fetch('{{ path('api_contrat_expirant_bientot') }}')
         .then(response => response.json())
         .then(data => {
-            const container = document.getElementById('notification-container');
-            const list = document.getElementById('notification-list');
-
             if (data.length > 0) {
-                container.classList.remove('d-none');
-                list.innerHTML = '';
+                // Montrer la div de notification
+                const notificationContainer = document.getElementById('notification-container');
+                const notificationList = document.getElementById('notification-list');
+                
+                notificationContainer.classList.remove('d-none');
 
-                data.forEach(item => {
+                // Ajouter chaque contrat à la liste
+                data.forEach(function(contrat) {
                     const li = document.createElement('li');
-                    li.textContent = `Contrat de ${item.nomprenom} expirera le ${item.dateFin}`;
-                    list.appendChild(li);
+                    li.textContent = `${contrat.nomprenom} - expire le ${contrat.dateFin}`;
+                    notificationList.appendChild(li);
                 });
-            } else {
-                container.classList.add('d-none');
-                list.innerHTML = '';
             }
         })
-        .catch(error => {
-            console.error("Erreur lors de la mise à jour des notifications :", error);
-        });
-}, 60000); // toutes les 60 secondes
-
-
+        .catch(error => console.error('Erreur lors de la récupération des contrats expirants:', error));
+});
     </script>
 {% endblock %}

@@ -187,29 +187,38 @@ $form->handleRequest($request);
 
     
     #[Route('/vehicule/calendar', name: 'app_vehicule_calendar')]
-    public function calendar(): Response
+    public function calendrier(VehiculeRepository $vehiculeRepository)
     {
-        return $this->render('vehicule/calendar.html.twig');
+        // Récupérer tous les véhicules avec leur état
+        $vehicules = $vehiculeRepository->searchByNameWithEtat(null);
+    
+        // Passer les véhicules à la vue
+        return $this->render('vehicule/calendar.html.twig', [
+            'vehicules' => $vehicules,
+        ]);
     }
+    
     
     #[Route('/vehicule/events', name: 'app_vehicule_events')]
-    public function events(VehiculeRepository $vehiculeRepository): JsonResponse
-    {
-        $vehicules = $vehiculeRepository->findAll();
-    
-        $events = array_map(function ($vehicule) {
-            return [
-                'id' => $vehicule->getId(),
-                'title' => $vehicule->getName(),
-                'start' => $vehicule->getCreated()->format('Y-m-d'),
-                'backgroundColor' => 'blue', // Tu peux rendre dynamique si besoin
-            ];
-        }, $vehicules);
-    
-        return new JsonResponse($events);
-    }
+public function events(VehiculeRepository $vehiculeRepository): JsonResponse
+{
+    $vehicules = $vehiculeRepository->findAll();
+    $today = new \DateTime(); // Date d'aujourd'hui
 
+    $events = array_map(function ($vehicule) use ($today) {
+        $createdDate = $vehicule->getCreated();
+        $etat = $createdDate > $today ? 'Disponible' : 'Attente';
+
+        return [
+            'id' => $vehicule->getId(),
+            'title' => $vehicule->getName() . ' - ' . $etat, // Ajouter l'état dans le titre
+            'start' => $createdDate->format('Y-m-d'),
+            'backgroundColor' => $etat === 'Disponible' ? 'green' : 'red', // Couleur selon l'état
+        ];
+    }, $vehicules);
+
+    return new JsonResponse($events);
 }
 
 
-
+}

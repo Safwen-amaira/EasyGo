@@ -33,10 +33,6 @@ class Vehicule
 
     #[ORM\Column(type: 'date')]
     #[Assert\NotBlank(message: "La date de création est requise.")]
-    #[Assert\LessThan(
-        value: "today",
-        message: "La date de création ne peut pas être aujourd'hui."
-    )]
     private ?\DateTimeInterface $created = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -173,5 +169,14 @@ class Vehicule
     {
         $this->categoriesId = $categoriesId;
         return $this;
+    }
+    public function getEtat(): string
+    {
+        // Vérifier si le véhicule a été créé il y a moins d'une semaine
+        if ($this->created > new \DateTime('-1 week')) {
+            return 'en_attente'; // Si créé récemment, statut "en attente"
+        }
+
+        return 'confirmée'; // Sinon, statut "confirmée"
     }
 }
