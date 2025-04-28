@@ -13,8 +13,12 @@
     </div>
 
     <div class="row" id="vehicule-container">
-        {# Inclure les cartes initiales avec les véhicules passés depuis le contrôleur #}
-        {% include 'uservehicule/_vehicule_cards.html.twig' with { vehicules: vehicules } %}
+        {# Passe pagination.items au lieu de vehicules directement #}
+        {% include 'uservehicule/_vehicule_cards.html.twig' with { vehicules: pagination.items } %}
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        {{ knp_pagination_render(pagination) }}
     </div>
 </div>
 
