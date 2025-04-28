@@ -1,0 +1,33 @@
+{% extends 'auth/dashboard.html.twig' %}
+
+{% block title %}Rider Dashboard | EasyGo{% endblock %}
+
+{% block sidebar_title %}Rider Panel{% endblock %}
+
+{% block sidebar_items %}
+    <div class="nav-item active">
+        <i class="fas fa-user"></i> Profile
+    </div>
+
+    <div class="nav-item">
+        <i class="fas fa-users"></i> Requests
+    </div>
+        <div class="nav-item">
+        <i class="fas fa-users"></i> Offers
+        </div>
+        <div class="nav-item">
+        <i class="fas fa-users"></i> Vehicules
+    </div>
+        <div class="nav-item">
+        <i class="fas fa-users"></i> Reclamations
+    </div>
+        <div class="nav-item">
+        <i class="fas fa-users"></i> Fidelity
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="section-header">
+        <h2 class="section-title">Welcome Rider</h2>
+    </div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{# templates/reservation/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle réservation{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Réservation pour le trajet {{ trip.departurePoint }} → {{ trip.destination }}</h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill"></i> 
+                        Places disponibles : {{ trip.availableSeats }} | 
+                        Contribution par place : {{ trip.contribution }} DNT
+                    </div>
+                    
+                    {{ form_start(form) }}
+                        <div class="mb-3">
+                            {{ form_label(form.nombre_places) }}
+                            {{ form_widget(form.nombre_places) }}
+                            <small class="text-muted">Maximum {{ trip.availableSeats }} places</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.lieu_escale) }}
+                            {{ form_widget(form.lieu_escale) }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form_label(form.type_handicap) }}
+                            {{ form_widget(form.type_handicap) }}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle-fill"></i> Confirmer la réservation
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

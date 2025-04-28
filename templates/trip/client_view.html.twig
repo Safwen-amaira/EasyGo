@@ -1,0 +1,162 @@
+{# templates/trip/client_view.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Trajet {{ trip.departurePoint }} → {{ trip.destination }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .trip-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    .trip-header {
+        background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+    .info-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+    .route-container {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+    .book-btn {
+        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        border: none;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 50px;
+        transition: all 0.3s;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+    .book-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Carte principale -->
+            <div class="card trip-card">
+                <!-- En-tête -->
+                <div class="card-header trip-header">
+                    <h2 class="h5 mb-0" style="color:rgb(54, 95, 244);">
+                        <i class="bi bi-car-front-fill me-2"></i>
+                        {{ trip.departurePoint }} → {{ trip.destination }}
+                    </h2>
+                </div>
+
+                <!-- Corps de la carte -->
+                <div class="card-body">
+                    <!-- En-tête de la publication -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="bi bi-calendar-date fs-4" style="color: #1e88e5;"></i>
+                            </div>
+                            <div>
+                                <h3 class="h6 mb-0">{{ trip.tripDate|date('d/m/Y') }}</h3>
+                                <small class="text-muted">Date du trajet</small>
+                            </div>
+                        </div>
+                        
+                        <div class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">
+                            <i class="bi bi-people-fill me-1"></i>
+                            {{ trip.availableSeats }} places disponibles
+                        </div>
+                    </div>
+                    
+                    <!-- Itinéraire -->
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <div class="row">
+                            <div class="col-md-6 border-end">
+                                <div class="d-flex mb-3">
+                                    <div class="me-3">
+                                        <i class="bi bi-geo-alt-fill fs-4" style="color: #4CAF50;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="h6 mb-1">Départ</h4>
+                                        <p class="mb-0">{{ trip.departurePoint }}</p>
+                                        <small class="text-muted">{{ trip.departureTime|date('H:i') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex mb-3">
+                                    <div class="me-3">
+                                        <i class="bi bi-geo-fill fs-4" style="color: #F44336;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="h6 mb-1">Destination</h4>
+                                        <p class="mb-0">{{ trip.destination }}</p>
+                                        <small class="text-muted">{{ trip.returnTime ? trip.returnTime|date('H:i') : 'Non précisé' }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Détails -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="h6 mb-2"><i class="bi bi-tag me-1" style="color: #9C27B0;"></i> Type</h5>
+                                <p class="mb-0">
+                                    {% if trip.tripType == 'aller_simple' %}
+                                        Aller simple
+                                    {% elseif trip.tripType == 'aller_retour' %}
+                                        Aller-retour
+                                    {% else %}
+                                        {{ trip.tripType }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="h6 mb-2"><i class="bi bi-cash-coin me-1" style="color: #2196F3;"></i> Contribution</h5>
+                                <p class="mb-0">{{ trip.contribution }} DNT</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="h6 mb-2"><i class="bi bi-signpost-split me-1" style="color:rgb(41, 26, 206);"></i> Points de relais</h5>
+                                <p class="mb-0">{{ trip.relayPoints }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bouton de réservation -->
+                    <div class="d-grid">
+                        <a href="{{ path('app_reservation_new', {'tripId': trip.id}) }}" class="btn btn-success btn-lg rounded-pill py-3 book-btn">
+                            <i class="bi bi-bookmark-check-fill me-2"></i> Réserver ce trajet
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

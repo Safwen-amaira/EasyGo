@@ -1,0 +1,67 @@
+{% extends 'admin/dashboard.html.twig' %}
+
+{% block title %}Admin Dashboard | EasyGo{% endblock %}
+
+{% block sidebar_title %}Admin Panel{% endblock %}
+
+{% block sidebar_items %}
+    <div class="nav-item active" data-url="{{ path('admin_dashboard') }}">
+        <i class="fas fa-home"></i> Dashboard
+    </div>
+    <div class="nav-item" data-url="{{ path('admin_users') }}">
+        <i class="fas fa-users"></i> User Management
+    </div>
+    <div class="nav-item" data-url="{{ path('admin_profile') }}" id="profile-link">
+        <i class="fas fa-user"></i> My Profile
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div id="dynamic-content">
+        <!-- Default initial content -->
+        <div class="section-header">
+            <h2 class="section-title">Welcome Admin!</h2>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Add user ID to profile link
+    const user = JSON.parse(localStorage.getItem('user'));
+    const profileLink = document.getElementById('profile-link');
+    
+    if (profileLink && user?.id) {
+        const baseUrl = profileLink.getAttribute('data-url');
+        profileLink.setAttribute('data-url', `${baseUrl}?userId=${user.id}`);
+    }
+
+    // Original navigation behavior
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+
+            const url = this.getAttribute('data-url');
+
+            if (url) {
+                fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network error while fetching section");
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById('dynamic-content').innerHTML = html;
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

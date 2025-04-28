@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du véhicule{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Détails du véhicule</h1>
+
+        <div class="card p-4">
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ vehicule.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nom</th>
+                        <td>{{ vehicule.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de mise à jour</th>
+                        <td>{{ vehicule.updated ? vehicule.updated|date('Y-m-d') : 'Non spécifié' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de création</th>
+                        <td>{{ vehicule.created ? vehicule.created|date('Y-m-d') : 'Non spécifié' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Image</th>
+                                                <td>
+                            {% if vehicule.image %}
+                                <img src="{{ asset('uploads/vehicules/' ~ vehicule.image) }}" alt="{{ vehicule.name }}" style="max-width: 100px;">
+                            {% else %}
+                                <span>Aucune image</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Contenu</th>
+                        <td>{{ vehicule.content }}</td>
+                    </tr>
+                    <tr>
+                        <th>Couleur</th>
+                        <td>{{ vehicule.color }}</td>
+                    </tr>
+                    <tr>
+                        <th>Prix</th>
+                        <td>{{ vehicule.prix }} €</td>
+                    </tr>
+                    <tr>
+                        <th>Total en stock</th>
+                        <td>{{ vehicule.totalEnStock }}</td>
+                    </tr>
+                    <tr>
+                        <th>Catégorie</th>
+                        <td>{{ vehicule.categoriesId }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ path('app_vehicule_index') }}" class="btn btn-secondary">Retour à la liste</a>
+            <a href="{{ path('app_vehicule_edit', {'id': vehicule.id}) }}" class="btn btn-warning ml-2">Modifier</a>
+
+            {{ include('vehicule/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

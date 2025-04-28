@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouveau contrat{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Créer un nouveau Contrat</h1>
+
+        <div class="card p-4">
+            {{ include('contrat/_form.html.twig') }}
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ path('app_contrat_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,84 @@
+app_register:
+    path: /register
+    controller: App\Controller\RegistrationController::register
+    methods: [GET, POST]
+
+app_home:
+    path: /index
+    controller: App\Controller\FrontOfficeController::Home
+    methods: GET
+
+api_login_check:
+    path: /api/login
+    controller: App\Controller\AuthController::ApiLogin
+    methods: POST
+
+
+app_logout:
+    path: /logout
+    controller: App\Controller\AuthController::logout
+    methods: POST
+    
+app_auth:
+    path: /auth
+    controller: App\Controller\SecurityController::authpage
+    methods: [GET,POST]
+
+Home:
+    path: /
+    controller: App\Controller\FrontOfficeController::index
+    methods: GET
+
+2fa_setup:
+    path: /2fa/setup
+    controller: App\Controller\SecurityController::setup2fa
+    methods: [GET]
+
+2fa_enter:
+    path: /2fa/enter
+    controller: App\Controller\SecurityController::enter2fa
+    methods: [GET]
+
+2fa_check:
+    path: /2fa/check
+    controller: App\Controller\SecurityController::check2fa
+    methods: [POST]
+# config/routes.yaml
+admin_dashboard:
+    path: /admin
+    controller: App\Controller\AdminController::dashboard
+    methods: GET
+
+admin_users:
+    path: /admin/users
+    controller: App\Controller\AdminController::users
+    methods: GET
+
+admin_user_edit:
+    path: /admin/user/edit/{id}
+    controller: App\Controller\AdminController::editUser
+    methods: [GET, POST]
+    requirements:
+        id: \d+  
+
+admin_user_delete:
+    path: /admin/user/delete/{id}
+    controller: App\Controller\AdminController::deleteUser
+    methods: POST
+    requirements:
+        id: \d+
+admin_profile:
+    path: /admin/profile
+    controller: App\Controller\AdminController::profile
+    methods: GET
+
+api_profile:
+    path: /api/profile
+    controller: App\Controller\AdminController::handleProfile
+    methods: [GET, POST]
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+
+    type: attribute

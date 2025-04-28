@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du contrat{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Détails du Contrat</h1>
+
+        <div class="card p-4">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ contrat.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nom et Prénom</th>
+                        <td>{{ contrat.nomprenom }}</td>
+                    </tr>
+                    <tr>
+<<<<<<< HEAD
+                        <th>fournisseur_service</th>
+=======
+                        <th>Adresse</th>
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
+                        <td>{{ contrat.adresse }}</td>
+                    </tr>
+                    <tr>
+                        <th>Téléphone</th>
+                        <td>{{ contrat.telephone }}</td>
+                    </tr>
+                    <tr>
+<<<<<<< HEAD
+                        <th>service_inclus</th>
+=======
+                        <th>Type de contrat</th>
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
+                        <td>{{ contrat.typeContrat }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de début</th>
+                        <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : 'Non spécifiée' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de fin</th>
+                        <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : 'Non spécifiée' }}</td>
+                    </tr>
+                    <tr>
+<<<<<<< HEAD
+                        <th>type_contrat</th>
+=======
+                        <th>Description</th>
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
+                        <td>{{ contrat.description }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ path('app_contrat_index') }}" class="btn btn-secondary">Retour à la liste</a>
+            <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-warning ml-2">Modifier</a>
+
+            {{ include('contrat/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

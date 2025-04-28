@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réponse à la réclamation{% endblock %}
+
+{% block body %}
+  <div class="container my-5">
+    <h1 class="text-center mb-4">Répondre à la réclamation #{{ reclamation.id }}</h1>
+
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Réclamation #{{ reclamation.id }}</h5>
+            <p><strong>Description:</strong> {{ reclamation.description }}</p>
+            <p><strong>Statut actuel:</strong> {{ reclamation.statut }}</p>
+
+            <form action="{{ path('admin_reclamation_reply', {'id': reclamation.id, 'statut': reclamation.statut}) }}" method="post">
+              {{ form_start(form) }}
+                {{ form_row(form.reponse) }}
+                <button type="submit" class="btn btn-primary mt-2">Soumettre la réponse</button>
+              {{ form_end(form) }}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

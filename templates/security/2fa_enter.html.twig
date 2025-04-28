@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Enter 2FA Code</h1>
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    <form action="{{ path('2fa_check') }}" method="post">
+    <input type="hidden" name="user_identifier" id="user_identifier" value="">
+        <input type="text" name="code" placeholder="Enter code" required>
+        <button type="submit">Verify</button>
+    </form>
+    <script>
+       document.getElementById('user_identifier').value = localStorage.getItem('user_identifier');
+
+       document.getElementById('user').value = localStorage.getItem('user');
+    </script>
+{% endblock %}  

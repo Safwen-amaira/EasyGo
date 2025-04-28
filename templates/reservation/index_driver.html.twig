@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Réservations{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg rounded-lg overflow-hidden">
+                <div class="card-header bg-primary text-white py-3" style="background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h4 mb-0 font-weight-light">
+                            <i class="bi bi-journal-check mr-2"></i> Liste des réservations
+                        </h1>
+                        <a href="{{ path('app_trip_index') }}" class="btn btn-sm btn-light rounded-pill" style="color: #0d47a1;">
+                            <i class="bi bi-car-front me-1"></i> Voir les trajets
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body px-0 py-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="text-primary">Date réservation</th>
+                                    <th class="text-primary">Trajet</th>
+                                    <th class="text-primary">Départ → Destination</th>
+                                    <th class="text-primary">Places réservées</th>
+                                    <th class="text-primary">Montant total</th>
+                                    <th class="text-primary">Statut</th>
+                                    <th class="text-primary">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for reservation in reservations %}
+<tr onclick="window.location='{{ path('app_reservation_manage_driver', {'id': reservation.id}) }}'" style="cursor: pointer;">                                    <td>{{ reservation.dateReservation|date('d/m/Y H:i') }}</td>
+                                    <td>{{ reservation.trip.id }}</td>
+                                    <td>
+                                        {{ reservation.trip.departurePoint }} 
+                                        <i class="bi bi-arrow-right mx-1"></i> 
+                                        {{ reservation.trip.destination }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                                            {{ reservation.nombrePlaces }} places
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold">{{ reservation.montantTotal }} DNT</td>
+                                    <td>
+                                        <span class="badge bg-{{ reservation.etatReservation == 'confirmé' ? 'success' : 'warning' }} bg-opacity-10 text-{{ reservation.etatReservation == 'confirmé' ? 'success' : 'warning' }} rounded-pill">
+                                            {{ reservation.etatReservation }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2" onclick="event.stopPropagation()">
+                                            <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
+                                                <button class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">
+                                        <i class="bi bi-info-circle me-2"></i>Aucune réservation trouvée
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if reservations|length > 5 %}
+                <div class="card-footer bg-light py-3">
+                    <small class="text-muted">Affichage de {{ reservations|length }} réservations</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(30, 136, 229, 0.1);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 1rem 1.5rem;
+    }
+    .table td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        transition: all 0.2s ease;
+    }
+    .badge {
+        padding: 0.35rem 0.65rem;
+        font-weight: 500;
+    }
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+    .text-muted {
+        color: #6c757d !important;
+    }
+    .card {
+        border: 1px solid rgba(30, 136, 229, 0.1);
+    }
+    form {
+        display: inline-block;
+    }
+    .bi-arrow-right {
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}

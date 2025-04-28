@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion Réservation - Conducteur{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">Gestion de la réservation </h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert alert-{{ reservation.etatReservation == 'confirmé' ? 'success' : 
+                                          (reservation.etatReservation == 'refusé' ? 'danger' : 'warning') }}">
+                        Statut actuel : <strong>{{ reservation.etatReservation }}</strong>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="h5">Détails du trajet</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Départ:</strong> {{ reservation.trip.departurePoint }}</li>
+                                <li class="list-group-item"><strong>Destination:</strong> {{ reservation.trip.destination }}</li>
+                                <li class="list-group-item"><strong>Date:</strong> {{ reservation.trip.tripDate|date('d/m/Y H:i') }}</li>
+                                <li class="list-group-item"><strong>Places disponibles:</strong> {{ reservation.trip.availableSeats }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="h5">Détails réservation</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Passager:</strong> {{ reservation.user.fullName ?? 'Non spécifié' }}</li>
+                                <li class="list-group-item"><strong>Places:</strong> {{ reservation.nombrePlaces }}</li>
+                                <li class="list-group-item"><strong>Montant:</strong> {{ reservation.montantTotal }} DNT</li>
+                                <li class="list-group-item"><strong>Date réservation:</strong> {{ reservation.dateReservation|date('d/m/Y H:i') }}</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {% if reservation.etatReservation != 'confirmé' %}
+                        <form method="post" class="mb-3">
+                            <input type="hidden" name="_token" value="{{ csrf_token('manage_reservation') }}">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <button type="submit" name="action" value="confirm" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle"></i> Confirmer la réservation
+                                </button>
+                                <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-x-circle"></i> Refuser la réservation
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_reservation_index_driver') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

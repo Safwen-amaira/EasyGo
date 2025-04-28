@@ -1,0 +1,28 @@
+{% extends 'admin/dashboard.html.twig' %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const requiredRole = "{{ required_role }}"; 
+    
+    if (!user ) {
+        localStorage.clear();
+        window.location.href = "/auth";
+    }
+    
+    initializeDashboard(user);
+});
+
+function initializeDashboard(user) {
+    document.getElementById('logoutTrigger').addEventListener('click', showLogoutModal);
+    
+    {% block dashboard_init %}{% endblock %}
+}
+
+function showLogoutModal() {
+    document.getElementById('logoutModal').style.display = 'flex';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contrats{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Liste des Contrats</h1>
+        <input type="text" id="search" class="form-control mb-3" placeholder="Rechercher un véhicule...">
+
+        <div class="card p-4">
+            <table class="table table-striped" id="contrat-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom et Prénom</th>
+<<<<<<< HEAD
+                        <th>fournisseur_service</th>
+                        <th>Téléphone</th>
+                        <th>service_inclus</th>
+                        <th>date debut</th>
+                        <th>Date fin</th>
+                        <th>type_contrat</th>
+=======
+                        <th>Adresse</th>
+                        <th>Téléphone</th>
+                        <th>
+                            
+                            <button id="sort-type" class="btn btn-link btn-sm">⬇</button> <!-- bouton pour trier par type de contrat -->
+                     <br>
+                       Type de contrat
+                        </th>
+
+                        <th>
+                            
+                            <button id="sort-date" class="btn btn-link btn-sm">⬇</button> <!-- bouton pour trier -->
+                           <br> Date début 
+                        </th>
+                        <th>Date fin</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
+                        
+                    </tr>
+                </thead>
+                <tbody id="vehicule-table-body">
+                    {% for contrat in contrats %}
+                        <tr>
+                            <td>{{ contrat.id }}</td>
+                            <td>{{ contrat.nomprenom }}</td>
+                            <td>{{ contrat.adresse }}</td>
+                            <td>{{ contrat.telephone }}</td>
+                            <td>{{ contrat.typeContrat }}</td>
+                            <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}</td>
+                            <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
+                            <td>{{ contrat.description }}</td>
+                            <td>
+                                <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}" class="btn btn-info btn-sm">Voir</a>
+                                <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                            </td>
+                           
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center">Aucun contrat trouvé</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ path('app_contrat_new') }}" class="btn btn-success">Créer un nouveau contrat</a>
+        </div>
+    </div>
+
+<<<<<<< HEAD
+    
+=======
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+>>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
+{% endblock %}

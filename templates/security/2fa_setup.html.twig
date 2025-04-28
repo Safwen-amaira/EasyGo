@@ -1,0 +1,280 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}2FA Setup | EasyGo{% endblock %}
+
+    {% block css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            background: #fff;
+        }
+
+        /* Left Navigation */
+        .sidebar {
+            width: 280px;
+            padding: 32px;
+            border-right: 1px solid #EAECF0;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #F2F4F7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #667085;
+        }
+
+        .step.active .step-number {
+            background: #3F5BF6;
+            color: white;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 14px;
+            color: #101828;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .step-description {
+            font-size: 12px;
+            color: #667085;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 48px;
+            max-width: 1260px;
+        }
+
+        h1 {
+            font-size: 20px;
+            color: #101828;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #667085;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 24px;
+            border: 1px solid #EAECF0;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #667085;
+            font-size: 12px;
+            margin: 24px 0;
+        }
+
+        .separator-line {
+            flex: 1;
+            height: 1px;
+            background: #EAECF0;
+        }
+
+        .manual-code {
+            background: #F9FAFB;
+            border: 1px solid #EAECF0;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        code {
+            font-family: monospace;
+            font-size: 14px;
+            color: #101828;
+        }
+
+        .copy-button {
+            background: none;
+            border: none;
+            color: #3F5BF6;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .continue-button {
+            width: 30%;
+            padding: 12px 20px;
+            background:rgb(63, 164, 246);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .continue-button:hover {
+            background: #2E4AD7;
+        }
+    </style>
+    {% endblock %}
+{% block body %}
+    <div class="container">
+        <!-- Left Navigation -->
+        <div class="sidebar">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">Logging In</div>
+                    <div class="step-description">Cin and Password</div>
+                </div>
+            </div>
+            
+            <div class="step active">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">Scan QR code</div>
+                    <div class="step-description">Verify 2FA device</div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">Enjoying using EasyGo</div>
+                    <div class="step-description">Get your life easier ! </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <center>
+        <div class="main-content">
+            <h1>Scan QR code</h1>
+            <p class="description">Scan this QR code in-app to verify a device.</p>
+            
+            <div class="qr-container">
+                <div class="qr-code">
+                    <!-- Replace with actual QR code image -->
+                    <img src="{{ qrCode }}" alt="QR Code" style="width: 100%; height: 100%">
+                </div>
+                
+                <div class="separator">
+                    <div class="separator-line"></div>
+                    <span>or enter code manually</span>
+                    <div class="separator-line"></div>
+                </div>
+
+                <div class="manual-code">
+                    <code>{{ secret }}</code>
+                    <button class="copy-button">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.5 2H2.5C1.94772 2 1.5 2.44772 1.5 3V11C1.5 11.5523 1.94772 12 2.5 12H10.5C11.0523 12 11.5 11.5523 11.5 11V9M4.5 2H9.5C10.0523 2 10.5 2.44772 10.5 3V7M4.5 2C4.5 2.55228 4.94772 3 5.5 3H7.5M7.5 9H12.5V12M9.5 5.5L12.5 2.5M12.5 2.5V5.5M12.5 2.5H9.5" stroke="#3F5BF6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+            
+        <form action="{{ path('2fa_check') }}" method="POST" id="otpForm">
+            <input 
+                type="text" 
+                name="code" 
+                class="code-input"
+                placeholder="Enter 6-digit code"
+                pattern="\d{6}"
+                maxlength="6"
+                required
+                oninput="validateCode(this)"
+            >
+<BR/><BR/><BR/>
+            <button class="continue-button">Continue</button>
+        </div>
+    </div>
+</center>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.getElementById('otpForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitButton = document.getElementById('submitButton');
+        const errorMessage = document.getElementById('errorMessage');
+        const formData = new FormData(e.target);
+
+        // Clear previous errors
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+        
+        // Show loading state
+        submitButton.disabled = true;
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Verifying...';
+
+        try {
+            const response = await fetch('{{ path('2fa_check') }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                errorMessage.textContent = data.error || 'Invalid verification code';
+                errorMessage.style.display = 'block';
+            } else {
+                window.location.href = "{{ path('dashboard') }}";
+            }
+        } catch (error) {
+            errorMessage.textContent = 'An error occurred. Please try again.';
+            errorMessage.style.display = 'block';
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
+    });
+</script>
+{% endblock %}

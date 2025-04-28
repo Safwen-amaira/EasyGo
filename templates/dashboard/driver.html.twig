@@ -1,0 +1,46 @@
+{% extends 'dashboard/base_dashboard.html.twig' %}
+
+{% set required_role = 'isDriver' %}
+
+{% block title %}Driver Dashboard{% endblock %}
+
+{% block body %}
+<div class="driver-container">
+    <!-- Driver-specific content -->
+    <div class="driver-sidebar">
+        {% include 'dashboard/_driver_sidebar.html.twig' %}
+    </div>
+    
+    <div class="driver-main">
+        {% block driver_content %}{% endblock %}
+    </div>
+</div>
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!token || !user) {
+        window.location.href = "{{ path('app_login') }}";
+    }
+    
+    // Verify user role matches dashboard
+    const requiredRole = "{{ required_role }}"; // Set this in each template
+    if (!user[requiredRole]) {
+        localStorage.clear();
+        window.location.href = "{{ path('app_login') }}";
+    }
+    
+    // Set authorization header for API calls
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+});
+</script>
+{% endblock %}
+{% endblock %}
+
+{% block dashboard_init %}
+initializeRideManagement();
+initializeNavigation();
+{% endblock %}

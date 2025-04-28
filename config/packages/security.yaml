@@ -1,0 +1,48 @@
+security:
+    enable_authenticator_manager: true
+    password_hashers:
+        App\Entity\Users:
+            algorithm: auto
+
+    providers:
+        # Configure how users are loaded from the database
+        database_users:
+            entity:
+                class: App\Entity\Users
+                property: cin 
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: 
+            
+        main:
+            lazy: true
+
+
+        api_profile:
+            pattern: ^/api/profile
+            stateless: true
+            security: false
+
+        api:
+            pattern: ^/api/(?!login)
+            stateless: true
+            jwt: ~
+
+
+
+    access_control:
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: PUBLIC_ACCESS }
+        - { path: ^/driver, roles: PUBLIC_ACCESS }
+        - { path: ^/rider, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/2fa/enter, roles: PUBLIC_ACCESS }
+        - { path: ^/2fa/check, roles: PUBLIC_ACCESS }
+        - { path: ^/admin/profile, roles: PUBLIC_ACCESS }
+        - { path: ^/admin/dashboard, roles: PUBLIC_ACCESS }
+        - { path: ^/driver/dashboard, roles: PUBLIC_ACCESS }
+        - { path: ^/rider/dashboard, roles: PUBLIC_ACCESS }
+

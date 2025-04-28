@@ -1,0 +1,30 @@
+{{ form_start(form, {'attr': form_attr|default({})}) }}
+    <div class="mb-3">
+        {{ form_label(form.nombre_places, 'Nombre de places') }}
+        {{ form_widget(form.nombre_places, {
+            'attr': {
+                'class': 'form-control',
+                'min': 1,
+                'max': reservation.trip.availableSeats + reservation.nombrePlaces
+            }
+        }) }}
+        <small class="text-muted">Maximum {{ reservation.trip.availableSeats + reservation.nombrePlaces }} places disponibles</small>
+        {{ form_errors(form.nombre_places) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.lieu_escale, 'Lieu d\'escale (optionnel)') }}
+        {{ form_widget(form.lieu_escale, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.lieu_escale) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.type_handicap, 'Type de handicap (optionnel)') }}
+        {{ form_widget(form.type_handicap, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.type_handicap) }}
+    </div>
+
+    <button class="btn btn-success">
+        <i class="bi bi-check-circle"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+{{ form_end(form) }}

@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Feedback{% endblock %}
+
+{% block body %}
+  <div class="container my-5">
+    <h1 class="text-center mb-4">Donner un Feedback</h1>
+
+    {{ form_start(form) }}
+      <div class="mb-3">
+        {{ form_label(form.note) }}
+        {{ form_widget(form.note, {'attr': {'class': 'form-control'}}) }}
+      </div>
+
+      <div class="mb-3">
+        {{ form_label(form.commentaire) }}
+        {{ form_widget(form.commentaire, {'attr': {'class': 'form-control'}}) }}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Envoyer</button>
+    {{ form_end(form) }}
+  </div>
+        <a href="{{ path('app_feedback_index') }}" class="btn btn-outline-secondary">retour a la  liste</a>
+
+{% endblock %}

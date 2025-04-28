@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}🎁 Nouvelle Récompense{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg rounded-4 border-0 p-4">
+                <h2 class="text-center mb-4 text-gradient fw-bold">🎁 Créer une nouvelle récompense</h2>
+
+                {{ form_start(form) }}
+                    <div class="row g-3">
+                        {% for field in form %}
+                            {% if field.vars.name != '_token' %}
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form_label(field) }}
+                                        {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                                        {{ form_errors(field) }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary px-4 py-2 rounded-pill shadow-sm animate__animated animate__pulse">✅ Créer</button>
+                    </div>
+                {{ form_end(form) }}
+
+                <div class="text-center mt-3">
+                    <a href="{{ path('recompense_index') }}" class="btn btn-outline-secondary rounded-pill">⬅️ Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(to right, #4e54c8, #8f94fb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .form-group label {
+        font-weight: 600;
+        color: #555;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}

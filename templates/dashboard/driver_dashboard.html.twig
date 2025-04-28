@@ -1,0 +1,29 @@
+{% extends 'auth/dashboard.html.twig' %}
+
+{% block title %}Driver Dashboard | EasyGo{% endblock %}
+
+{% block sidebar_title %}Driver Panel{% endblock %}
+
+{% block sidebar_items %}
+    <div class="nav-item active">
+        <i class="fas fa-user"></i> Profile
+    </div>
+    <div class="nav-item">
+        <i class="fas fa-users"></i> Reclamations
+    </div>
+    <div class="nav-item">
+        <i class="fas fa-users"></i> Requests
+    </div>
+        <div class="nav-item">
+        <i class="fas fa-users"></i> Offers
+    </div>
+        <div class="nav-item">
+        <i class="fas fa-users"></i> someThing else
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="section-header">
+        <h2 class="section-title">Welcome Driver</h2>
+    </div>
+{% endblock %}
