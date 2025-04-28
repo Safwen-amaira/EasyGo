@@ -1,0 +1,73 @@
+{% extends 'admin/dashboard.html.twig' %}
+
+{% block title %}📊 Statistiques des types de récompense{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-primary mb-4">📊 Statistiques des types de récompense</h2>
+
+    <div style="max-width: 700px; margin: 2rem auto;">
+        <canvas id="statsChart"></canvas>
+    </div>
+
+    <div class="text-center">
+        <button onclick="downloadChart()" class="btn btn-outline-primary">
+            📥 Télécharger le graphique
+        </button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('{{ path('type_recompense_api_stats') }}');
+
+        const result = await response.json();
+
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        const statsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: result.labels,
+                datasets: [{
+                    label: 'Nombre de récompenses',
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    data: result.data
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+        // On enregistre le graphique dans window pour pouvoir l'utiliser pour download
+        window.currentChart = statsChart;
+
+    } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+        alert('Erreur de chargement des statistiques.');
+    }
+});
+
+function downloadChart() {
+    const canvas = document.getElementById('statsChart');
+    if (!canvas) {
+        alert("Graphique introuvable !");
+        return;
+    }
+    const link = document.createElement('a');
+    link.download = 'chart.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+</script>
+{% endblock %}

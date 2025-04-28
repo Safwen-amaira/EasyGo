@@ -1,0 +1,22 @@
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Points</th>
+            <th>Type</th>
+            <th>Expiration</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in recompenses %}
+            <tr>
+                <td>{{ r.description }}</td>
+                <td>{{ r.pointsRequis }}</td>
+                <td>{{ r.typeRecompense.nom }}</td>
+                <td>{{ r.dateExpiration ? r.dateExpiration|date('Y-m-d') : '-' }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4">Aucune récompense trouvée.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

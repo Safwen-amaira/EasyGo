@@ -1,71 +1,243 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/dashboard.html.twig' %}
 
 {% block title %}🎁 Liste des Récompenses{% endblock %}
 
-{% block body %}
+{% block content %}
 <div class="container py-5">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary fw-bold">🎁 Récompenses Fidélité</h2>
         <a href="{{ path('recompense_new') }}" class="btn btn-outline-primary rounded-pill">➕ Ajouter</a>
-
     </div>
+    <a href="{{ path('recompense_statistiques') }}" class="btn btn-outline-info mb-4">📈 Voir les statistiques</a>
+    <a href="/admin/dashboard" class="btn btn-outline-info mb-4">Return to Dashboard</a>
 
-    <form method="get" action="{{ path('recompense_index') }}" class="mb-4 row g-2 align-items-center">
-        <div class="col-sm-8">
-            <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="🔍 Rechercher une description...">
+    <form method="get" class="row g-2 align-items-center mb-4" id="filter-form">
+        <div class="col-sm-4">
+            <input type="text" name="search" id="search" value="{{ search }}" class="form-control" placeholder="🔍 Rechercher une description...">
         </div>
-        <div class="col-sm-2">
-            <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+        <div class="col-sm-3">
+            <input type="text" name="type" id="type-filter" class="form-control" placeholder="Filtrer par type">
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="user" id="user-filter" class="form-control" placeholder="Filtrer par utilisateur">
         </div>
     </form>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle shadow-sm">
-            <thead class="table-light">
-                <tr>
-                    <th>#</th>
-                    <th>Description</th>
-                    <th>Points</th>
-                    <th>Type</th>
-                    <th>Expiration</th>
-                    <th>Utilisateur</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for recompense in recompenses %}
-                <tr>
-                    <td>{{ recompense.id }}</td>
-                    <td>{{ recompense.description|default('—') }}</td>
-                    <td><span class="badge bg-warning text-dark">{{ recompense.points_requis }}</span></td>
-                    <td>
-                        <span class="badge bg-info text-white">
-                            {% if recompense.typeRecompense %}
-                                {{ recompense.typeRecompense.nom }}
-                            {% else %}
-                                –
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td>{{ recompense.date_expiration ? recompense.date_expiration|date('d/m/Y') : '—' }}</td>
-                    <td>
-                        {% if recompense.utilisateurfidelite %}
-                            {{ recompense.utilisateurfidelite.id }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </td>
-                    <td class="text-center">
-                        <a href="{{ path('recompense_show', {id: recompense.id}) }}" class="btn btn-sm btn-outline-secondary">👁️</a>
-                        <a href="{{ path('recompense_edit', {id: recompense.id}) }}" class="btn btn-sm btn-outline-primary">✏️</a>
-                        <a href="{{ path('recompense_delete', {id: recompense.id}) }}" class="btn btn-sm btn-outline-danger">🗑️</a>
-                    </td>
-                </tr>
-            {% else %}
-                <tr><td colspan="7" class="text-center text-muted">Aucune récompense trouvée.</td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
+    <div id="recompense-results">
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-striped table-bordered align-middle shadow-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th><a href="#" class="sort" data-sort="id">#</a></th>
+                        <th><a href="#" class="sort" data-sort="description">Description</a></th>
+                        <th><a href="#" class="sort" data-sort="points_requis">Points</a></th>
+                        <th>Type</th>
+                        <th><a href="#" class="sort" data-sort="date_expiration">Expiration</a></th>
+                        <th>Utilisateur</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recompense-body">
+                    {% for recompense in recompenses %}
+                        <tr>
+                            <td>{{ recompense.id }}</td>
+                            <td>{{ recompense.description|default('—') }}</td>
+                            <td><span class="badge bg-warning text-dark">{{ recompense.pointsRequis }}</span></td>
+                            <td>
+                                <span class="badge bg-info text-white">
+                                    {{ recompense.typeRecompense ? recompense.typeRecompense.nom : '—' }}
+                                </span>
+                            </td>
+                            <td>{{ recompense.dateExpiration ? recompense.dateExpiration|date('d/m/Y') : '—' }}</td>
+                            <td>{{ recompense.utilisateurfidelite ? recompense.utilisateurfidelite.nomUtilisateur : '—' }}</td>
+                            <td class="text-center">
+                                <a href="{{ path('recompense_edit', {id: recompense.id}) }}" class="btn btn-sm btn-outline-primary">✏️</a>
+<a href="{{ path('recompense_delete', {id: recompense.id}) }}"
+   onclick="return confirm('Are you sure you want to delete this reward?');"
+   class="btn btn-danger">
+   Delete
+</a>
+
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="7" class="text-center text-muted">Aucune récompense trouvée.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+       {# ✅ Beautiful Bootstrap pagination #}
+{% if not app.request.isXmlHttpRequest %}
+    <div class="d-flex justify-content-center mt-4">
+        {{ knp_pagination_render(recompenses) }}
+    </div>
+
+
+</div>
+
+        {% endif %}
     </div>
 </div>
+
+<script>
+let currentDirection = 'ASC';
+let currentSort = '';
+
+function fetchRewards(page = 1) {
+    const search = document.getElementById('search').value;
+    const type = document.getElementById('type-filter').value;
+    const user = document.getElementById('user-filter').value;
+
+    const params = new URLSearchParams({
+        search: search,
+        sort: currentSort,
+        direction: currentDirection,
+        type: type,
+        user: user,
+        page: page
+    });
+
+    fetch(`?${params.toString()}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const tbody = document.getElementById('recompense-body');
+        tbody.innerHTML = '';
+
+        if (data.length > 0) {
+            data.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${r.description}</td>
+                        <td><span class="badge bg-warning text-dark">${r.points}</span></td>
+                        <td><span class="badge bg-info text-white">${r.type ?? '—'}</span></td>
+                        <td>${r.expiration ?? '—'}</td>
+                        <td>${r.user ?? '—'}</td>
+                        <td class="text-center">
+                            <a href="/recompense/${r.id}/edit" class="btn btn-sm btn-outline-primary">✏️</a>
+                            <a href="/recompense/${r.id}/delete" class="btn btn-sm btn-outline-danger">🗑️</a>
+                        </td>
+                    </tr>`;
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Aucune récompense trouvée.</td></tr>`;
+        }
+    });
+}
+
+['search', 'type-filter', 'user-filter'].forEach(id =>
+    document.getElementById(id).addEventListener('input', () => fetchRewards())
+);
+
+document.querySelectorAll('.sort').forEach(link => {
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const sort = this.dataset.sort;
+        currentDirection = (currentSort === sort && currentDirection === 'ASC') ? 'DESC' : 'ASC';
+        currentSort = sort;
+        fetchRewards();
+    });
+});
+</script>
+<style>
+.container {
+    background: #f9fbfd;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Title */
+h1, h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    background: linear-gradient(90deg, #007bff, #5f27cd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* "Ajouter" button and general buttons */
+.add-btn, .filter-button, .btn-outline-primary, .btn-outline-info {
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #6366f1;
+    color: #6366f1;
+    font-weight: 600;
+    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.add-btn:hover, .filter-button:hover, .btn-outline-primary:hover, .btn-outline-info:hover {
+    background: #6366f1;
+    color: white;
+}
+
+/* Filter form inputs */
+#filter-form input {
+    border-radius: 2rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #dee2e6;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+#filter-form input::placeholder {
+    color: #adb5bd;
+}
+
+/* Table */
+.table {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.table thead {
+    background: #f1f3f5;
+    color: #343a40;
+    font-weight: 600;
+}
+
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table tbody tr {
+    transition: background 0.2s;
+}
+
+.table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* Empty table message */
+.table tbody td {
+    color: #6c757d;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+    .add-btn, .filter-button {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    #filter-form input {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
 {% endblock %}

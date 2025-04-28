@@ -9,6 +9,7 @@
         }
     },
 
+
     "doctrine/doctrine-bundle": {
         "version": "2.13",
         "recipe": {
@@ -35,6 +36,10 @@
             "./config/packages/doctrine_migrations.yaml",
             "./migrations/.gitignore"
         ]
+    },
+
+    "knplabs/knp-paginator-bundle": {
+        "version": "v6.8.0"
     },
     "knpuniversity/oauth2-client-bundle": {
         "version": "2.18",
@@ -140,6 +145,19 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
+
+    "symfony/notifier": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.0",
+            "ref": "178877daf79d2dbd62129dd03612cb1a2cb407cc"
+        },
+        "files": [
+            "./config/packages/notifier.yaml"
+        ]
+    },
     "symfony/routing": {
         "version": "6.4",
         "recipe": {
@@ -166,6 +184,34 @@
             "./config/routes/security.yaml"
         ]
     },
+
+    "symfony/stimulus-bundle": {
+        "version": "2.24",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.13",
+            "ref": "6acd9ff4f7fd5626d2962109bd4ebab351d43c43"
+        },
+        "files": [
+            "./assets/bootstrap.js",
+            "./assets/controllers.json",
+            "./assets/controllers/hello_controller.js"
+        ]
+    },
+    "symfony/translation": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.3",
+            "ref": "e28e27f53663cc34f0be2837aba18e3a1bef8e7b"
+        },
+        "files": [
+            "./config/packages/translation.yaml",
+            "./translations/.gitignore"
+        ]
+    },
     "symfony/twig-bundle": {
         "version": "6.4",
         "recipe": {
@@ -179,6 +225,10 @@
             "./templates/base.html.twig"
         ]
     },
+
+    "symfony/ux-chartjs": {
+        "version": "v2.24.0"
+    },
     "symfony/validator": {
         "version": "6.4",
         "recipe": {
@@ -191,7 +241,6 @@
             "./config/packages/validator.yaml"
         ]
     },
-
     "symfony/webpack-encore-bundle": {
         "version": "2.2",
         "recipe": {

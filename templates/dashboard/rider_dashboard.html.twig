@@ -1,33 +1,271 @@
-{% extends 'auth/dashboard.html.twig' %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-{% block title %}Rider Dashboard | EasyGo{% endblock %}
+        /* Sidebar Styling */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 25px 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
 
-{% block sidebar_title %}Rider Panel{% endblock %}
+        .sidebar h2 {
+            color: #ecf0f1;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #34495e;
+        }
 
-{% block sidebar_items %}
-    <div class="nav-item active">
-        <i class="fas fa-user"></i> Profile
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav li {
+            margin: 10px 0;
+        }
+
+        .sidebar nav a {
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar nav a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar nav a i {
+            width: 25px;
+            text-align: center;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background: #f5f6fa;
+            min-height: 100vh;
+        }
+
+        /* Table Styling */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .data-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .data-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Button Styling */
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-edit {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #219a52;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        /* Form Styling */
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-cog"></i> Rider Panel</h2>
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{ path('admin_dashboard') }}">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_users') }}">
+                        <i class="fas fa-users"></i>
+                        User Management
+                    </a>
+                </li>
+   <li>
+                    <a href="{{ path('admin_profile') }}" id="profile-link">
+                        <i class="fas fa-user"></i>
+                        My Profile
+                    </a>
+                </li>
+
+   <li>
+                    <a href="/recompense/mon-profil">
+                        <i class="fas fa-user"></i>
+                        Fidelity
+                    </a>
+                </li>
+
+
+
+
+
+
+
+
+
+                <li>
+            <a href="#" id="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+    </a>
+</li>
+            </ul>
+        </nav>
     </div>
 
-    <div class="nav-item">
-        <i class="fas fa-users"></i> Requests
+    <div class="main-content">
+        {% block content %}{% endblock %}
     </div>
-        <div class="nav-item">
-        <i class="fas fa-users"></i> Offers
-        </div>
-        <div class="nav-item">
-        <i class="fas fa-users"></i> Vehicules
-    </div>
-        <div class="nav-item">
-        <i class="fas fa-users"></i> Reclamations
-    </div>
-        <div class="nav-item">
-        <i class="fas fa-users"></i> Fidelity
-    </div>
-{% endblock %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Authentication check
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token');
+    const userIdentifier = localStorage.getItem('user_identifier');
 
-{% block body %}
-    <div class="section-header">
-        <h2 class="section-title">Welcome Rider</h2>
-    </div>
-{% endblock %}
+    // Check if user is authenticated and is admin
+    if (!user || !user.isRider || !token || !userIdentifier) {
+        // Clear all auth data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user_identifier');
+        // Redirect to auth page
+        window.location.href = '/auth';
+        return; // Stop execution
+    }
+
+    // Logout functionality
+    const logoutButton = document.getElementById('logout-btn');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user_identifier');
+            window.location.href = '/auth'; 
+        });
+    }
+
+    // Profile link setup
+    const profileLink = document.getElementById('profile-link');
+    if (profileLink && user?.id) {
+        const baseUrl = profileLink.getAttribute('href');
+        profileLink.setAttribute('href', `${baseUrl}?userId=${user.id}`);
+    }
+});
+</script>
+</body>
+
+</html>

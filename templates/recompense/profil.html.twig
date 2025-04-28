@@ -5,81 +5,37 @@
 {% block stylesheets %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
     <style>
+        .hero-section{
+            display:none !important;
+        }
+        .main{
+            display:none
+        }
+        /* Custom Styles */
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 1s ease forwards;
         }
-
         @keyframes fadeInUp {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
-        .profile-gradient {
-            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-        }
-
-        .profile-card {
-            border-radius: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .profile-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        .value-box {
-            border-radius: 1rem;
-            background: #ffffffcc;
-            backdrop-filter: blur(10px);
-            border: 1px solid #ffffff22;
-        }
-
-        .section-title {
-            font-size: 1.7rem;
-            font-weight: bold;
-            background: linear-gradient(to right, #007bff, #6f42c1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .table thead th {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-
-        .badge-gradient {
-            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-            color: white;
-        }
-
-        .glow {
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 5px #a18cd1;
-            }
-            to {
-                box-shadow: 0 0 20px #fbc2eb;
-            }
-        }
+        /* Other custom styles here... */
     </style>
 {% endblock %}
 
 {% block body %}
 <div class="container py-5 fade-in">
-    <div>
-        <a href="{{ path('recompense_spin_page') }}" class="btn btn-success me-2">🎡 Lancer la roue</a>
+    <!-- User Profile Section -->
+     <div class="text-end mb-4">
+        <a href="{{ path('recompense_spin_page') }}" class="btn btn-lg btn-gradient rounded-pill fw-semibold shadow">
+            🎡 Lancer la roue de la chance
+        </a>
     </div>
-
     <div class="profile-gradient p-5 text-white rounded-5 shadow-lg mb-5">
         <div class="text-center">
             <h1 class="fw-bold display-5 mb-2">✨ Espace Fidélité</h1>
@@ -89,25 +45,25 @@
         <div class="row g-4 mt-4 text-dark">
             <div class="col-md-3">
                 <div class="value-box p-4 text-center shadow-sm animate__animated animate__fadeInUp animate__delay-1s">
-                    <h6 class="text-muted">Points</h6>
-                    <h3 class="fw-bold text-success">{{ user.pointsAccumules }}</h3>
+                    <h6 class="text-muted">🌟 Points</h6>
+                    <h3 class="fw-bold text-success counter">{{ user.pointsAccumules }}</h3>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="value-box p-4 text-center shadow-sm animate__animated animate__fadeInUp animate__delay-1s">
-                    <h6 class="text-muted">Trajets</h6>
-                    <h3 class="fw-bold text-primary">{{ user.totalTrajets }}</h3>
+                    <h6 class="text-muted">🚗 Trajets</h6>
+                    <h3 class="fw-bold text-primary counter">{{ user.totalTrajets }}</h3>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="value-box p-4 text-center shadow-sm animate__animated animate__fadeInUp animate__delay-1s">
-                    <h6 class="text-muted">Dépensé</h6>
+                    <h6 class="text-muted">💰 Dépensé</h6>
                     <h3 class="fw-bold text-danger">{{ user.totalMontant }} TND</h3>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="value-box p-4 text-center shadow-sm animate__animated animate__fadeInUp animate__delay-1s">
-                    <h6 class="text-muted">📅 Dernière mise à jour</h6>
+                    <h6 class="text-muted">🕒 Dernière mise à jour</h6>
                     <h5 class="fw-semibold">
                         {{ user.dateDerniereMiseAJour is defined and user.dateDerniereMiseAJour ? user.dateDerniereMiseAJour|date('d/m/Y') : '—' }}
                     </h5>
@@ -125,7 +81,7 @@
                      aria-valuemax="100">
                 </div>
             </div>
-            <small class="text-light">Objectif : 100 points</small>
+            <small class="text-dark fw-semibold">🎯 Objectif : 100 points</small>
         </div>
     </div>
 
@@ -142,6 +98,7 @@
         </div>
     {% endif %}
 
+    <!-- Rewards Table -->
     <div class="card profile-card p-4">
         <h3 class="section-title text-center mb-4">🎁 Vos Récompenses</h3>
 
@@ -167,7 +124,7 @@
                             <tr class="{% if r.dateExpiration and r.dateExpiration|date('U') < (now|date('U') + 604800) %}glow{% endif %}">
                                 <td>{{ loop.index }}</td>
                                 <td>{{ r.description ?? '-' }}</td>
-                                <td><span class="badge badge-gradient px-3 py-2">{{ r.typeRecompense ?? '—' }}</span></td>
+                                <td><span class="badge badge-gradient px-3 py-2">{{ r.typeRecompense.nom ?? '—' }}</span></td>
                                 <td><span class="badge bg-warning text-dark">{{ r.pointsRequis }} pts</span></td>
                                 <td>
                                     {% if r.bonusPoints is defined and r.bonusPoints %}
@@ -191,4 +148,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/spin.js') }}"></script>
 
+    <script>
+        document.querySelectorAll('.counter').forEach(el => {
+            let end = parseInt(el.innerText);
+            if (isNaN(end)) return;
+            let start = 0;
+            let step = Math.ceil(end / 50);
+            let counter = setInterval(() => {
+                start += step;
+                if (start >= end) {
+                    el.innerText = end;
+                    clearInterval(counter);
+                } else {
+                    el.innerText = start;
+                }
+            }, 20);
+        });
+    </script>
 {% endblock %}

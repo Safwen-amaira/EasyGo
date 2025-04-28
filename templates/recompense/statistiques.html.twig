@@ -1,0 +1,107 @@
+{% extends 'admin/dashboard.html.twig' %}
+
+{% block title %}📈 Statistiques des Récompenses{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4 text-gradient">📊 Tableau de Bord des Récompenses</h2>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <div class="mb-2 text-primary fs-3">🎁</div>
+                    <h6 class="text-muted">Total des récompenses</h6>
+                    <h3 class="fw-bold text-primary">{{ total }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <div class="mb-2 text-success fs-3">⭐</div>
+                    <h6 class="text-muted">Points requis moyens</h6>
+                    <h3 class="fw-bold text-success">{{ avgPoints }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="mb-2 text-info fs-3 text-center">📑</div>
+                    <h6 class="text-muted text-center">Top 3 Types les plus utilisés</h6>
+                    <ul class="list-unstyled mb-0 ps-3">
+                        {% for t in topTypes %}
+                            <li>🔹 {{ t.nom }} — <strong>{{ t.total }}</strong> fois</li>
+                        {% else %}
+                            <li class="text-muted">Aucune attribution</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3 text-gradient">👑 Top 5 Utilisateurs les plus actifs</h4>
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm rounded">
+            <thead class="table-light">
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Points</th>
+                    <th>Trajets</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in topUsers %}
+                    <tr>
+                        <td>{{ user.nomUtilisateur }}</td>
+                        <td><span class="badge bg-success">{{ user.points_accumules }}</span></td>
+                        <td>{{ user.totalTrajets ?? 0 }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3" class="text-center text-muted">Aucun utilisateur trouvé</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% block scc%}
+<style>
+/* Gradient Text */
+.text-gradient {
+    background: linear-gradient(90deg, #007bff, #5f27cd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Cards */
+.card {
+    border-radius: 1rem;
+    background: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Table Styling */
+.table {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.table-hover tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* Icons */
+.fs-3 {
+    font-size: 2rem;
+}
+
+</style>
+{% endblock %}
+{% endblock %}
