@@ -13,9 +13,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
 
 #[Route('/vehicule')]
 final class VehiculeController extends AbstractController{
@@ -58,7 +57,7 @@ final class VehiculeController extends AbstractController{
 
     
 
-    
+
 
     #[Route('/vehicule/search', name: 'app_vehicule_search', methods: ['GET'])]
 public function search(Request $request, VehiculeRepository $vehiculeRepository): Response
@@ -98,10 +97,11 @@ public function search(Request $request, VehiculeRepository $vehiculeRepository)
                     $this->addFlash('error', 'Erreur lors du téléchargement de l\'image.');
                 }
             }
-
+//Marque l'objet pour insertion
             $entityManager->persist($vehicule);
+            //Exécute toutes les insertions/mises à jour en attente
             $entityManager->flush();
-
+// Redirection vers la page d’index après enregistrement
             return $this->redirectToRoute('app_vehicule_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -184,4 +184,41 @@ $form->handleRequest($request);
 
         return $this->redirectToRoute('app_vehicule_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    
+    #[Route('/vehicule/calendar', name: 'app_vehicule_calendar')]
+    public function calendrier(VehiculeRepository $vehiculeRepository)
+    {
+        // Récupérer tous les véhicules avec leur état
+        $vehicules = $vehiculeRepository->searchByNameWithEtat(null);
+    
+        // Passer les véhicules à la vue
+        return $this->render('vehicule/calendar.html.twig', [
+            'vehicules' => $vehicules,
+        ]);
+    }
+    
+    
+    #[Route('/vehicule/events', name: 'app_vehicule_events')]
+public function events(VehiculeRepository $vehiculeRepository): JsonResponse
+{
+    $vehicules = $vehiculeRepository->findAll();
+    $today = new \DateTime(); // Date d'aujourd'hui
+
+    $events = array_map(function ($vehicule) use ($today) {
+        $createdDate = $vehicule->getCreated();
+        $etat = $createdDate > $today ? 'Disponible' : 'Attente';
+
+        return [
+            'id' => $vehicule->getId(),
+            'title' => $vehicule->getName() . ' - ' . $etat, // Ajouter l'état dans le titre
+            'start' => $createdDate->format('Y-m-d'),
+            'backgroundColor' => $etat === 'Disponible' ? 'green' : 'red', // Couleur selon l'état
+        ];
+    }, $vehicules);
+
+    return new JsonResponse($events);
+}
+
+
 }

@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class VehiculeType extends AbstractType
 {
@@ -26,11 +27,19 @@ class VehiculeType extends AbstractType
 
           
 
-            ->add('updated', DateType::class, [
-                'widget' => 'single_text',
-            
-                
-                'empty_data' => null,
+            ->add('carburant', ChoiceType::class, [
+                'label' => 'Type de carburant',
+                'choices' => [
+                    'Essence' => 'essence',
+                    'Diesel' => 'diesel',
+                    'Électrique' => 'electrique',
+                    'Hybride' => 'hybride'
+                ],
+                'placeholder' => 'Sélectionnez un carburant',
+                'required' => true, // ou false selon vos besoins
+                'attr' => [
+                    'class' => 'form-control' // classe CSS optionnelle
+                ]
             ])
             ->add('created', DateType::class, [
                 'widget' => 'single_text',
@@ -66,7 +75,7 @@ class VehiculeType extends AbstractType
                 ],
                 'required' => false
             ])
-            ->add('totalEnStock', IntegerType::class, [
+            ->add('NombrePlaces', IntegerType::class, [
                 'attr' => [
                     'class' => 'form-control',
                     'novalidate' => 'novalidate',

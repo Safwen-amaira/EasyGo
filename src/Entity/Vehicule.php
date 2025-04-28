@@ -6,6 +6,7 @@ use App\Repository\VehiculeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints\Date;
 
 
 #[ORM\Entity(repositoryClass: VehiculeRepository::class)]
@@ -21,14 +22,14 @@ class Vehicule
     #[Assert\Length(
         min: 4,
         minMessage: "Le nom du véhicule doit comporter au moins {{ limit }} caractères.",
-        max: 255,
+        max: 8,
         maxMessage: "Le nom du véhicule ne peut pas dépasser {{ limit }} caractères."
     )]
     private ?string $name = null;
 
-    #[ORM\Column(type: 'date')]
-    #[Assert\NotBlank(message: "La date de mise à jour est requise.")]
-    private ?\DateTimeInterface $updated = null;
+    #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message: "Le type de carburant est requis..")]
+    private ?string $Carburant = null;
 
     #[ORM\Column(type: 'date')]
     #[Assert\NotBlank(message: "La date de création est requise.")]
@@ -38,9 +39,17 @@ class Vehicule
     private ?string $image = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        min: 4,
+        minMessage: "Le nom du véhicule doit comporter au moins {{ limit }} caractères.",
+    )]
     private ?string $content = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        max: 8,
+        maxMessage: "La couleur ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $color = null;
 
     #[ORM\Column(type: 'integer')]
@@ -48,10 +57,10 @@ class Vehicule
     #[Assert\Positive(message: "Le prix doit être un nombre positif.")]
     private ?int $prix = null;
 
-    #[ORM\Column(type: 'integer', name: 'total_en_stock')]
-    #[Assert\NotBlank(message: "Le nombre total en stock est requis.")]
-    #[Assert\Positive(message: "Le nombre total en stock doit être un nombre positif.")]
-    private ?int $totalEnStock = null;
+    #[ORM\Column(type: 'integer', name: 'NombrePlaces')]
+    #[Assert\NotBlank(message: "Le Nombre Places en stock est requis.")]
+    #[Assert\Positive(message: "Le Nombre Places en stock doit être un nombre positif.")]
+    private ?int $NombrePlaces = null;
 
     #[ORM\Column(type: 'integer', name: 'categories_id')]
     #[Assert\NotBlank(message: "La catégorie du véhicule est requise.")]
@@ -74,14 +83,14 @@ class Vehicule
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getCarburant(): ?string
     {
-        return $this->updated;
+        return $this->Carburant;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setCarburant(string $Carburant): self
     {
-        $this->updated = $updated;
+        $this->Carburant = $Carburant;
         return $this;
     }
 
@@ -140,14 +149,14 @@ class Vehicule
         return $this;
     }
 
-    public function getTotalEnStock(): ?int
+    public function getNombrePlaces(): ?int
     {
-        return $this->totalEnStock;
+        return $this->NombrePlaces;
     }
 
-    public function setTotalEnStock(int $totalEnStock): self
+    public function setNombrePlaces(int $NombrePlaces): self
     {
-        $this->totalEnStock = $totalEnStock;
+        $this->NombrePlaces = $NombrePlaces;
         return $this;
     }
 
@@ -160,5 +169,14 @@ class Vehicule
     {
         $this->categoriesId = $categoriesId;
         return $this;
+    }
+    public function getEtat(): string
+    {
+        // Vérifier si le véhicule a été créé il y a moins d'une semaine
+        if ($this->created > new \DateTime('-1 week')) {
+            return 'en_attente'; // Si créé récemment, statut "en attente"
+        }
+
+        return 'confirmée'; // Sinon, statut "confirmée"
     }
 }

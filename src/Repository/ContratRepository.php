@@ -5,7 +5,8 @@ namespace App\Repository;
 use App\Entity\Contrat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * @extends ServiceEntityRepository<Contrat>
  */
@@ -25,10 +26,41 @@ class ContratRepository extends ServiceEntityRepository
                ->setParameter('nomprenom', '%' . $name . '%');
         }
     
-        return $qb->orderBy('v.id', 'DESC')
+        return $qb->orderBy('v.dateFin', 'DESC')
                   ->getQuery()
                   ->getResult();
     }
+   // Dans ContratRepository
+public function findContractsExpiringSoon(): array
+{
+    $entityManager = $this->getEntityManager();
+    
+    // Requête pour récupérer les contrats expirant dans les 5 prochains jours
+    $qb = $entityManager->createQueryBuilder();
+    $qb->select('c')
+       ->from(Contrat::class, 'c')
+       ->where('c.dateFin <= :dateLimit')
+       ->andWhere('c.dateFin >= :currentDate')
+       ->setParameter('dateLimit', new \DateTime('+5 days'))
+       ->setParameter('currentDate', new \DateTime('now'));
+
+    return $qb->getQuery()->getResult();
+}
+/* @Route("/notifications", name="notifications")
+     */
+    public function getExpiringContracts()
+    {
+        // Récupère les contrats expirants depuis la base de données
+        $contratsExpirants = $this->getDoctrine()
+            ->getRepository(Contrat::class)
+            ->findExpiringContracts();  // Exemple de méthode personnalisée
+
+        // Retourner une réponse JSON avec les contrats expirants
+        return new JsonResponse($contratsExpirants);
+    }
+
+
+
 
 //    /**
 //     * @return Contrat[] Returns an array of Contrat objects

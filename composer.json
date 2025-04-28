@@ -31,6 +31,7 @@
         "symfony/mime": "6.4.*",
         "symfony/notifier": "6.4.*",
         "symfony/password-hasher": "6.4.*",
+
         "symfony/property-access": "6.4.*",
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
@@ -93,6 +94,7 @@
     },
     "require-dev": {
         "symfony/debug-bundle": "6.4.*"
+
 
 
     }

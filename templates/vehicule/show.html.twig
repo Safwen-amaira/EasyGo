@@ -1,69 +1,305 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/dashboard.html.twig' %}
 
-{% block title %}Détails du véhicule{% endblock %}
+{% block title %}Détails du véhicule - {{ vehicule.name }}{% endblock %}
 
-{% block body %}
-    <div class="container mt-4">
-        <h1>Détails du véhicule</h1>
-
-        <div class="card p-4">
-            <table class="table table-striped">
-                <tbody>
-                    <tr>
-                        <th>ID</th>
-                        <td>{{ vehicule.id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Nom</th>
-                        <td>{{ vehicule.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Date de mise à jour</th>
-                        <td>{{ vehicule.updated ? vehicule.updated|date('Y-m-d') : 'Non spécifié' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Date de création</th>
-                        <td>{{ vehicule.created ? vehicule.created|date('Y-m-d') : 'Non spécifié' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Image</th>
-                                                <td>
-                            {% if vehicule.image %}
-                                <img src="{{ asset('uploads/vehicules/' ~ vehicule.image) }}" alt="{{ vehicule.name }}" style="max-width: 100px;">
-                            {% else %}
-                                <span>Aucune image</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Contenu</th>
-                        <td>{{ vehicule.content }}</td>
-                    </tr>
-                    <tr>
-                        <th>Couleur</th>
-                        <td>{{ vehicule.color }}</td>
-                    </tr>
-                    <tr>
-                        <th>Prix</th>
-                        <td>{{ vehicule.prix }} €</td>
-                    </tr>
-                    <tr>
-                        <th>Total en stock</th>
-                        <td>{{ vehicule.totalEnStock }}</td>
-                    </tr>
-                    <tr>
-                        <th>Catégorie</th>
-                        <td>{{ vehicule.categoriesId }}</td>
-                    </tr>
-                </tbody>
-            </table>
+{% block content %}
+<div class="container-fluid px-0">
+    {# Header with back button and actions #}
+    <div class="detail-header">
+        <div class="back-action">
+            <a href="{{ path('app_vehicule_index') }}" class="btn btn-icon">
+                <i class="ph-arrow-left"></i>
+            </a>
+            <h1>{{ vehicule.name }}</h1>
         </div>
-
-        <div class="mt-4">
-            <a href="{{ path('app_vehicule_index') }}" class="btn btn-secondary">Retour à la liste</a>
-            <a href="{{ path('app_vehicule_edit', {'id': vehicule.id}) }}" class="btn btn-warning ml-2">Modifier</a>
-
-            {{ include('vehicule/_delete_form.html.twig') }}
+        <div class="actions">
+            <a href="{{ path('app_vehicule_edit', {'id': vehicule.id}) }}" class="btn btn-primary">
+                <i class="ph-pencil-simple"></i> Modifier
+            </a>
+            {{ include('vehicule/_delete_form.html.twig', {
+                'delete_button_class': 'btn btn-danger',
+                'delete_button_label': '<i class="ph-trash"></i> Supprimer'
+            }) }}
         </div>
     </div>
+
+    <div class="detail-grid">
+        {# Main vehicle image #}
+        <div class="vehicle-image-container">
+            {% if vehicule.image %}
+            <div class="vehicle-image">
+                <img src="{{ asset('uploads/vehicules/' ~ vehicule.image) }}" 
+                     alt="{{ vehicule.name }}" 
+                     class="rounded-3 shadow-sm">
+                <div class="image-meta">Image: {{ vehicule.image }}</div>
+            </div>
+            {% else %}
+            <div class="no-image">
+                <i class="ph-car"></i>
+                <span>Aucune image disponible</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Vehicle specifications #}
+        <div class="specs-card">
+            <div class="specs-header">
+                <h2><i class="ph-list-checks"></i> Spécifications</h2>
+            </div>
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Carburant</div>
+                    <div class="spec-value">
+                        <span class="badge bg-blue-soft">{{ vehicule.carburant }}</span>
+                    </div>
+                </div>
+                
+                <div class="spec-item">
+                    <div class="spec-label">Prix</div>
+                    <div class="spec-value text-success">{{ vehicule.prix }} €</div>
+                </div>
+                
+                <div class="spec-item">
+                    <div class="spec-label">Places</div>
+                    <div class="spec-value">
+                        <span class="badge bg-purple-soft">
+                            <i class="ph-users"></i> {{ vehicule.nombrePlaces }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="spec-item">
+                    <div class="spec-label">Couleur</div>
+                    <div class="spec-value">
+                        <div class="color-chip" style="--vehicle-color: {{ vehicule.color }}"></div>
+                        {{ vehicule.color }}
+                    </div>
+                </div>
+                
+                <div class="spec-item">
+                    <div class="spec-label">Catégorie</div>
+                    <div class="spec-value">
+                        <span class="badge bg-dark-soft">{{ vehicule.categoriesId }}</span>
+                    </div>
+                </div>
+                
+                <div class="spec-item">
+                    <div class="spec-label">Date création</div>
+                    <div class="spec-value">
+                        <i class="ph-calendar-blank text-muted"></i>
+                        {{ vehicule.created ? vehicule.created|date('d/m/Y') : 'N/A' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Description card #}
+        <div class="description-card">
+            <div class="card-header">
+                <h2><i class="ph-note-pencil"></i> Description</h2>
+            </div>
+            <div class="card-body">
+                <p>{{ vehicule.content }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modern layout variables */
+    :root {
+        --card-radius: 12px;
+        --card-shadow: 0 4px 24px rgba(0,0,0,0.05);
+        --color-blue-soft: rgba(70, 128, 255, 0.1);
+        --color-purple-soft: rgba(132, 94, 247, 0.1);
+        --color-dark-soft: rgba(30, 30, 30, 0.1);
+    }
+
+    /* Header styles */
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .back-action {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .back-action h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .btn-icon {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.03);
+        transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+        background: rgba(0,0,0,0.08);
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    /* Main grid layout */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 992px) {
+        .detail-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* Image container */
+    .vehicle-image-container {
+        position: relative;
+    }
+
+    .vehicle-image {
+        background: white;
+        border-radius: var(--card-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+    }
+
+    .vehicle-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .image-meta {
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+        background: rgba(0,0,0,0.02);
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .no-image {
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        color: #adb5bd;
+    }
+
+    .no-image i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    .description-card{
+        margin-left:650px !important; 
+        width:85% !important; 
+    }
+    /* Cards styling */
+    .specs-card, .description-card {
+        background: white;
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .card-header h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Specifications grid */
+    .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .spec-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .spec-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .spec-value {
+        font-weight: 500;
+    }
+
+    /* Badges and chips */
+    .badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.8em;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+
+    .bg-blue-soft {
+        background: var(--color-blue-soft);
+        color: #4680ff;
+    }
+
+    .bg-purple-soft {
+        background: var(--color-purple-soft);
+        color: #845ef7;
+    }
+
+    .bg-dark-soft {
+        background: var(--color-dark-soft);
+        color: #1e1e1e;
+    }
+
+    .color-chip {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        display: inline-block;
+        background: var(--vehicle-color);
+        vertical-align: middle;
+        margin-right: 8px;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    /* Description card */
+    .description-card .card-body {
+        padding: 1.5rem;
+        line-height: 1.6;
+  }
+</style>
 {% endblock %}

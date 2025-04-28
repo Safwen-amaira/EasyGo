@@ -1,49 +1,404 @@
+{% extends 'dashboard/driver_dashboard.html.twig' %}
 
-{% extends 'fronttest.html.twig' %}
+{% block title %}Available Vehicles · Modern UI{% endblock %}
 
-{% block title %}Liste des véhicules{% endblock %}
-
-{% block body %}
-    <div class="container mt-4">
-        <h1 class="mb-4 text-center">Nos véhicules disponibles</h1>
-
-        <div class="row mb-4">
-            <div class="col-md-6 mx-auto">
-                <input type="text" id="search" class="form-control" placeholder="Rechercher un véhicule...">
-            </div>
-        </div>
-
-        <div class="row" id="vehicule-container">
-            {% include 'uservehicule/_vehicule_cards.html.twig' %}
+{% block content %}
+<div class="vehicles-modern-container">
+    {# Modern header section #}
+    <div class="modern-header">
+        <div>
+            <h1 class="modern-title">
+                <span class="modern-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"></path>
+                        <circle cx="7.5" cy="16.5" r="1.5"></circle>
+                        <circle cx="16.5" cy="16.5" r="1.5"></circle>
+                    </svg>
+                </span>
+                Available Vehicles
+            </h1>
+            <div class="modern-subtitle">Browse our premium fleet selection</div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('search').addEventListener('input', function() {
-            const searchValue = this.value;
-            const container = document.getElementById('vehicule-container');
+    {# Modern search bar #}
+    <div class="modern-search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search" class="modern-search-input" placeholder="Search vehicles...">
+        <button class="modern-search-clear d-none" id="search-clear">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
 
-            // Afficher un indicateur de chargement
-            container.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div></div>';
+    {# Vehicles grid with modern cards #}
+    <div class="modern-grid" id="vehicule-container">
+        {% include 'uservehicule/_vehicule_cards.html.twig' with { vehicules: vehicules } %}
+    </div>
 
-            fetch('{{ path('app_vehicule_searcc') }}?search=' + encodeURIComponent(searchValue), {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur réseau');
-                }
-                return response.text();
-            })
-            .then(html => {
-                container.innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                container.innerHTML = '<div class="col-12"><div class="alert alert-danger">Une erreur s\'est produite lors de la recherche</div></div>';
-            });
+    {# Loading state (hidden by default) #}
+    <div class="modern-loading-state d-none" id="loading-state">
+        <div class="loading-spinner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+            </svg>
+        </div>
+        <div class="loading-text">Loading vehicles...</div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary: #4361ee;
+    --primary-light: #e6e9ff;
+    --text: #2b2d42;
+    --text-light: #8d99ae;
+    --border: #edf2f4;
+    --bg: #ffffff;
+    --card-bg: #ffffff;
+    --hover-bg: #f8f9fa;
+    --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: all 0.2s ease;
+}
+
+/* Base container */
+.vehicles-modern-container {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Modern header */
+.modern-header {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.modern-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.modern-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+}
+
+.modern-subtitle {
+    color: var(--text-light);
+    font-size: 16px;
+    margin-top: 4px;
+}
+
+/* Search bar */
+.modern-search-wrapper {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto 32px auto;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    pointer-events: none;
+}
+
+.modern-search-input {
+    width: 100%;
+    padding: 12px 20px 12px 44px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 15px;
+    transition: var(--transition);
+    background: var(--bg);
+    box-shadow: var(--shadow);
+}
+
+.modern-search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.modern-search-clear {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.modern-search-clear:hover {
+    color: var(--text);
+}
+
+/* Vehicles grid */
+.modern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+}
+
+/* Vehicle card (you'll need to adapt your _vehicule_cards.html.twig to match this style) */
+.modern-vehicle-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.modern-vehicle-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.vehicle-image-container {
+    height: 180px;
+    background: #f5f7fa;
+    position: relative;
+    overflow: hidden;
+}
+
+.vehicle-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.modern-vehicle-card:hover .vehicle-image {
+    transform: scale(1.05);
+}
+
+.vehicle-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.vehicle-content {
+    padding: 20px;
+}
+
+.vehicle-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.vehicle-specs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.vehicle-spec {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.vehicle-spec svg {
+    width: 14px;
+    height: 14px;
+}
+
+.vehicle-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+}
+
+.vehicle-price span {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-light);
+}
+
+.vehicle-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Loading state */
+.modern-loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+.loading-spinner svg {
+    color: var(--primary);
+}
+
+.loading-text {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.modern-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: var(--border);
+    margin-bottom: 16px;
+}
+
+.empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.empty-description {
+    color: var(--text-light);
+    margin-bottom: 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modern-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .modern-title {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modern-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modern-search-input {
+        padding: 10px 16px 10px 40px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search');
+    const searchClear = document.getElementById('search-clear');
+    const container = document.getElementById('vehicule-container');
+    const loadingState = document.getElementById('loading-state');
+
+    searchInput.addEventListener('input', function() {
+        const searchValue = this.value.trim();
+        
+        if (searchValue === '') {
+            searchClear.classList.add('d-none');
+        } else {
+            searchClear.classList.remove('d-none');
+        }
+        
+        // Show loading state
+        container.classList.add('d-none');
+        loadingState.classList.remove('d-none');
+        
+        fetch('{{ path('app_vehicule_searcc') }}?search=' + encodeURIComponent(searchValue), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network error');
+            }
+            return response.text();
+        })
+        .then(html => {
+            container.innerHTML = html;
+            container.classList.remove('d-none');
+            loadingState.classList.add('d-none');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            container.innerHTML = `
+                <div class="modern-empty-state">
+                    <div class="empty-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <h3 class="empty-title">Search Error</h3>
+                    <p class="empty-description">We couldn't complete your search request</p>
+                    <button class="modern-primary-btn" onclick="window.location.reload()">
+                        Try Again
+                    </button>
+                </div>
+            `;
+            container.classList.remove('d-none');
+            loadingState.classList.add('d-none');
         });
-    </script>
+    });
+    
+    searchClear.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        this.classList.add('d-none');
+    });
+});
+</script>
 {% endblock %}

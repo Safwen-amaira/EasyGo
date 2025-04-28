@@ -1,4 +1,59 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': form_class|default('')}}) }}
+
+    <div class="mb-3">
+        {{ form_label(form.name, 'Nom du véhicule') }}
+        {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.name) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.carburant, 'Type de carburant') }}
+        {{ form_widget(form.carburant, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.carburant) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.created, 'Date de création') }}
+        {{ form_widget(form.created, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.created) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.image, 'Image du véhicule') }}
+        {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.image) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.content, 'Description') }}
+        {{ form_widget(form.content, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.content) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.color, 'Couleur') }}
+        {{ form_widget(form.color, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.color) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.prix, 'Prix (€)') }}
+        {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.prix) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.NombrePlaces, 'Nombre de places') }}
+        {{ form_widget(form.NombrePlaces, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.NombrePlaces) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.categoriesId, 'Catégorie (ID)') }}
+        {{ form_widget(form.categoriesId, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.categoriesId) }}
+    </div>
+
+    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+
 {{ form_end(form) }}

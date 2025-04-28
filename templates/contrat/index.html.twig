@@ -1,82 +1,923 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/dashboard.html.twig' %}
 
-{% block title %}Contrats{% endblock %}
+{% block title %}Contracts Dashboard · Modern UI{% endblock %}
 
-{% block body %}
-    <div class="container mt-4">
-        <h1>Liste des Contrats</h1>
-        <input type="text" id="search" class="form-control mb-3" placeholder="Rechercher un véhicule...">
+{% block content %}
+<div class="contracts-modern-container">
+    {# Header with minimalist design #}
+    <div class="modern-header">
+        <div>
+            <h1 class="modern-title">
+                <span class="modern-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+                Contract Management
+            </h1>
+            <div class="modern-subtitle">Active agreements and service records</div>
+        </div>
+        <a href="{{ path('app_contrat_new') }}" class="modern-primary-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Contract
+        </a>
+    </div>
 
-        <div class="card p-4">
-            <table class="table table-striped" id="contrat-table">
+    {# Floating notification panel #}
+    <div id="notification-container" class="modern-notification-panel d-none">
+        <div class="notification-header">
+            <div class="notification-alert-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <div>
+                <div class="notification-title">Upcoming Expirations</div>
+                <div class="notification-subtitle">Contracts ending soon require attention</div>
+            </div>
+            <button class="notification-close" data-dismiss="notification">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="notification-items" id="notification-list"></div>
+    </div>
+
+    {# Stats cards with modern layout #}
+    <div class="modern-stats-grid">
+        <div class="modern-stat-card">
+            <div class="stat-value">{{ contrats|length }}</div>
+            <div class="stat-label">Total Contracts</div>
+            <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+        </div>
+        <div class="modern-stat-card">
+            <div class="stat-value" id="active-contracts">0</div>
+            <div class="stat-label">Active</div>
+            <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+        </div>
+        <div class="modern-stat-card">
+            <div class="stat-value" id="expiring-contracts">0</div>
+            <div class="stat-label">Expiring</div>
+            <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+        </div>
+        <div class="modern-stat-card">
+            <div class="stat-value" id="expired-contracts">0</div>
+            <div class="stat-label">Expired</div>
+            <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+        </div>
+    </div>
+
+    {# Main content area #}
+    <div class="modern-content-card">
+        {# Search and actions #}
+        <div class="modern-table-header">
+            <div class="modern-search-wrapper">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="search" class="modern-search-input" placeholder="Filter contracts...">
+                <button class="modern-search-clear d-none" id="search-clear">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modern-actions">
+                <button id="sort-date" class="modern-sort-btn">
+                    <span>Sort by Date</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <a href="{{ path('app_contrat_generate_pdf') }}" class="modern-export-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export
+                </a>
+            </div>
+        </div>
+
+        {# Modern table design #}
+        <div class="modern-table-container">
+            <table class="modern-table" id="contrat-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nom et Prénom</th>
-<<<<<<< HEAD
-                        <th>fournisseur_service</th>
-                        <th>Téléphone</th>
-                        <th>service_inclus</th>
-                        <th>date debut</th>
-                        <th>Date fin</th>
-                        <th>type_contrat</th>
-=======
-                        <th>Adresse</th>
-                        <th>Téléphone</th>
-                        <th>
-                            
-                            <button id="sort-type" class="btn btn-link btn-sm">⬇</button> <!-- bouton pour trier par type de contrat -->
-                     <br>
-                       Type de contrat
-                        </th>
-
-                        <th>
-                            
-                            <button id="sort-date" class="btn btn-link btn-sm">⬇</button> <!-- bouton pour trier -->
-                           <br> Date début 
-                        </th>
-                        <th>Date fin</th>
-                        <th>Description</th>
-                        <th>Actions</th>
->>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
-                        
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Period</th>
+                        <th>Status</th>
+                        <th>Vehicle</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="vehicule-table-body">
                     {% for contrat in contrats %}
-                        <tr>
-                            <td>{{ contrat.id }}</td>
-                            <td>{{ contrat.nomprenom }}</td>
-                            <td>{{ contrat.adresse }}</td>
-                            <td>{{ contrat.telephone }}</td>
-                            <td>{{ contrat.typeContrat }}</td>
-                            <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}</td>
-                            <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
-                            <td>{{ contrat.description }}</td>
+                        {% set isExpired = date(contrat.dateFin) < date() %}
+                        {% set isExpiring = date(contrat.dateFin) < date('+30 days') and not isExpired %}
+                        <tr class="{% if isExpired %}status-expired{% elseif isExpiring %}status-expiring{% endif %}">
                             <td>
-                                <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}" class="btn btn-info btn-sm">Voir</a>
-                                <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                <div class="client-cell">
+                                    <div class="client-avatar">
+                                        {{ contrat.nomprenom|split(' ')|map(word => word|first)|join('')|upper }}
+                                    </div>
+                                    <div class="client-info">
+                                        <div class="client-name">{{ contrat.nomprenom }}</div>
+                                        <div class="client-contact">{{ contrat.telephone }}</div>
+                                    </div>
+                                </div>
                             </td>
-                           
+                            <td>
+                                <div class="service-cell">
+                                    <div class="service-name">{{ contrat.typeContrat }}</div>
+                                    <div class="service-provider">{{ contrat.adresse }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="period-cell">
+                                    <div class="date-range">
+                                        <span class="date-start">{{ contrat.dateDebut ? contrat.dateDebut|date('M d, Y') : '' }}</span>
+                                        <span class="date-arrow">→</span>
+                                        <span class="date-end">{{ contrat.dateFin ? contrat.dateFin|date('M d, Y') : '' }}</span>
+                                    </div>
+                                    <div class="days-remaining">
+                                        {% if isExpired %}
+                                            Expired
+                                        {% elseif isExpiring %}
+                                            {{ date(contrat.dateFin).diff(date())|date('%a') }} days left
+                                        {% else %}
+                                            Active
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="status-badge {% if isExpired %}expired{% elseif isExpiring %}expiring{% else %}active{% endif %}">
+                                    {% if isExpired %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        Expired
+                                    {% elseif isExpiring %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        Ending
+                                    {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                        Active
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="vehicle-cell">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"></path><circle cx="7.5" cy="16.5" r="1.5"></circle><circle cx="16.5" cy="16.5" r="1.5"></circle></svg>
+                                    #{{ contrat.vehicule.id }}
+                                </div>
+                            </td>
+                            <td class="text-right">
+                                <div class="action-buttons">
+                                    <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}" class="action-btn view">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </a>
+                                    <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="action-btn edit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </a>
+                                    <a href="{{ path('app_contrat_generate_pdf', {'id': contrat.id}) }}" class="action-btn download">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="10" class="text-center">Aucun contrat trouvé</td>
+                            <td colspan="6" class="empty-state">
+                                <div class="empty-content">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    <h4>No Contracts Found</h4>
+                                    <p>Create your first contract to get started</p>
+                                    <a href="{{ path('app_contrat_new') }}" class="modern-primary-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        New Contract
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        <div class="mt-4">
-            <a href="{{ path('app_contrat_new') }}" class="btn btn-success">Créer un nouveau contrat</a>
-        </div>
     </div>
+</div>
 
-<<<<<<< HEAD
+<style>
+:root {
+    --primary: #4361ee;
+    --primary-light: #e6e9ff;
+    --success: #4cc9f0;
+    --warning: #f8961e;
+    --danger: #f94144;
+    --text: #2b2d42;
+    --text-light: #8d99ae;
+    --border: #edf2f4;
+    --bg: #ffffff;
+    --card-bg: #ffffff;
+    --hover-bg: #f8f9fa;
+    --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: all 0.2s ease;
+}
+
+/* Base layout */
+.contracts-modern-container {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Header styles */
+.modern-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.modern-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modern-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+}
+
+.modern-subtitle {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.modern-primary-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.modern-primary-btn:hover {
+    background: #3a56d4;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+}
+
+/* Notification panel */
+.modern-notification-panel {
+    background: #fff8e6;
+    border-left: 4px solid var(--warning);
+    border-radius: var(--radius-sm);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.notification-header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    gap: 12px;
+}
+
+.notification-alert-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(248, 150, 30, 0.1);
+    border-radius: 50%;
+    color: var(--warning);
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.notification-subtitle {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 2px;
+}
+
+.notification-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.notification-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.notification-items {
+    max-height: 200px;
+    overflow-y: auto;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Stats grid */
+.modern-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.modern-stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.modern-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text);
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.stat-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    opacity: 0.2;
+    color: var(--text);
+}
+
+/* Content card */
+.modern-content-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.modern-table-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+}
+
+.modern-search-wrapper {
+    position: relative;
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    pointer-events: none;
+}
+
+.modern-search-input {
+    width: 100%;
+    padding: 10px 16px 10px 36px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    transition: var(--transition);
+    background: var(--bg);
+}
+
+.modern-search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+}
+
+.modern-search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.modern-search-clear:hover {
+    color: var(--text);
+}
+
+.modern-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modern-sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.modern-sort-btn:hover {
+    background: var(--hover-bg);
+}
+
+.modern-sort-btn svg {
+    transition: var(--transition);
+}
+
+.modern-sort-btn.active svg {
+    transform: rotate(180deg);
+}
+
+.modern-export-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.modern-export-btn:hover {
+    background: var(--hover-bg);
+}
+
+/* Modern table */
+.modern-table-container {
+    overflow-x: auto;
+    padding: 0 8px;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+.modern-table th {
+    text-align: left;
+    padding: 16px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.modern-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.modern-table tr:last-child td {
+    border-bottom: none;
+}
+
+.modern-table tr:hover td {
+    background: var(--hover-bg);
+}
+
+/* Status rows */
+.status-expiring td {
+    background: rgba(248, 150, 30, 0.03);
+}
+
+.status-expiring:hover td {
+    background: rgba(248, 150, 30, 0.08) !important;
+}
+
+.status-expired td {
+    background: rgba(249, 65, 68, 0.03);
+}
+
+.status-expired:hover td {
+    background: rgba(249, 65, 68, 0.08) !important;
+}
+
+/* Cell styles */
+.client-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.client-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.client-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.client-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.client-contact {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.service-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.service-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.service-provider {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.period-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.date-start, .date-end {
+    font-weight: 500;
+}
+
+.date-arrow {
+    color: var(--text-light);
+    font-size: 12px;
+}
+
+.days-remaining {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: rgba(76, 201, 240, 0.1);
+    color: var(--success);
+}
+
+.status-badge.expiring {
+    background: rgba(248, 150, 30, 0.1);
+    color: var(--warning);
+}
+
+.status-badge.expired {
+    background: rgba(249, 65, 68, 0.1);
+    color: var(--danger);
+}
+
+.vehicle-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.vehicle-cell svg {
+    color: var(--text-light);
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: var(--transition);
+    color: var(--text-light);
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+.action-btn.view:hover {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary);
+}
+
+.action-btn.edit:hover {
+    background: rgba(248, 150, 30, 0.1);
+    color: var(--warning);
+}
+
+.action-btn.download:hover {
+    background: rgba(249, 65, 68, 0.1);
+    color: var(--danger);
+}
+
+/* Empty state */
+.empty-state {
+    padding: 40px 0;
+}
+
+.empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.empty-content svg {
+    color: var(--border);
+    margin-bottom: 16px;
+}
+
+.empty-content h4 {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.empty-content p {
+    color: var(--text-light);
+    margin-bottom: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modern-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
     
-=======
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    .modern-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .modern-table-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .modern-search-wrapper {
+        max-width: 100%;
+    }
+    
+    .modern-actions {
+        justify-content: flex-end;
+    }
+}
 
->>>>>>> 2e8a2d4a8ada53e0c16bc283700a8efcda9ba6b2
+@media (max-width: 480px) {
+    .modern-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modern-table th, 
+    .modern-table td {
+        padding: 12px 8px;
+    }
+    
+    .client-cell {
+        gap: 8px;
+    }
+    
+    .client-avatar {
+        width: 32px;
+        height: 32px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Calculate contract status counts
+    function updateContractStats() {
+        const now = new Date();
+        const soon = new Date();
+        soon.setDate(now.getDate() + 30);
+        
+        let activeCount = 0;
+        let expiringCount = 0;
+        let expiredCount = 0;
+        
+        document.querySelectorAll('#vehicule-table-body tr').forEach(row => {
+            const dateText = row.querySelector('.date-end').textContent.trim();
+            if (dateText) {
+                const endDate = new Date(dateText);
+                
+                if (endDate < now) {
+                    expiredCount++;
+                } else if (endDate < soon) {
+                    expiringCount++;
+                } else {
+                    activeCount++;
+                }
+            }
+        });
+        
+        document.getElementById('active-contracts').textContent = activeCount;
+        document.getElementById('expiring-contracts').textContent = expiringCount;
+        document.getElementById('expired-contracts').textContent = expiredCount;
+    }
+    
+    // Initialize stats
+    updateContractStats();
+
+    // Search functionality
+    const searchInput = document.getElementById('search');
+    const searchClear = document.getElementById('search-clear');
+    
+    searchInput.addEventListener('input', function() {
+        const searchValue = this.value.trim().toLowerCase();
+        
+        if (searchValue === '') {
+            searchClear.classList.add('d-none');
+        } else {
+            searchClear.classList.remove('d-none');
+        }
+        
+        let visibleCount = 0;
+        
+        document.querySelectorAll('#vehicule-table-body tr').forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            if (rowText.includes(searchValue)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('contract-count').textContent = visibleCount;
+        updateContractStats();
+    });
+    
+    searchClear.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        this.classList.add('d-none');
+    });
+
+    // Sort functionality
+    let sortAscDate = true;
+    let sortAscType = true;
+
+    document.getElementById('sort-date').addEventListener('click', function() {
+        const table = document.getElementById('contrat-table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr:not([style*="display: none"])'));
+        
+        const sortedRows = rows.sort((rowA, rowB) => {
+            const dateA = new Date(rowA.querySelector('.date-end').textContent.trim());
+            const dateB = new Date(rowB.querySelector('.date-end').textContent.trim());
+            
+            return sortAscDate ? dateA - dateB : dateB - dateA;
+        });
+        
+        // Re-append sorted rows
+        tbody.innerHTML = '';
+        sortedRows.forEach(row => tbody.appendChild(row));
+        
+        // Toggle sort direction
+        sortAscDate = !sortAscDate;
+        this.querySelector('svg').style.transform = sortAscDate ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+
+    // Check for expiring contracts
+    fetch('{{ path('api_contrat_expirant_bientot') }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const notificationContainer = document.getElementById('notification-container');
+                const notificationList = document.getElementById('notification-list');
+                
+                notificationContainer.classList.remove('d-none');
+
+                data.forEach(contrat => {
+                    const li = document.createElement('div');
+                    li.className = 'notification-item';
+                    li.innerHTML = `
+                        <div class="notification-item-content">
+                            <div class="notification-item-title">${contrat.nomprenom}</div>
+                            <div class="notification-item-desc">Expires on ${contrat.dateFin}</div>
+                        </div>
+                        <a href="/contrat/${contrat.id}/edit" class="notification-item-action">
+                            Renew
+                        </a>
+                    `;
+                    notificationList.appendChild(li);
+                });
+            }
+        })
+        .catch(error => console.error('Error:', error));
+});
+</script>
 {% endblock %}

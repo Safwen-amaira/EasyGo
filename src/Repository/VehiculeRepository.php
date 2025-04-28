@@ -15,21 +15,40 @@ class VehiculeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Vehicule::class);
     }
-
-
-    public function searchByName(?string $name): array
+    public function searchByName(?string $search): array
 {
     $qb = $this->createQueryBuilder('v');
 
-    if ($name) {
-        $qb->andWhere('v.name LIKE :name')
-           ->setParameter('name', '%' . $name . '%');
+    if ($search) {
+        $qb->andWhere('v.name LIKE :search')
+           ->setParameter('search', '%' . $search . '%');
     }
 
-    return $qb->orderBy('v.id', 'DESC')
-              ->getQuery()
-              ->getResult();
+    return $qb->getQuery()->getResult();
 }
+
+
+    public function searchByNameWithEtat(?string $name): array
+    {
+        $qb = $this->createQueryBuilder('v');
+
+        if ($name) {
+            $qb->andWhere('v.name LIKE :name')
+               ->setParameter('name', '%' . $name . '%');
+        }
+
+        $vehicules = $qb->orderBy('v.created', 'DESC')
+                        ->getQuery()
+                        ->getResult();
+
+        // Ajouter l'état calculé pour chaque véhicule
+        foreach ($vehicules as $vehicule) {
+            $vehicule->getEtat();  // Appel de la méthode getEtat sur chaque véhicule
+        }
+
+        return $vehicules;
+    }
+
 
 
 //    /**
