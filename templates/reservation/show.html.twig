@@ -7,70 +7,95 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0">Confirmation de votre réservation</h2>
+                <div class="card-header bg-{{ reservation.etatReservation == 'confirmé' ? 'success' : 
+                                      (reservation.etatReservation == 'refusé' ? 'danger' : 'warning') }} text-white d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Détails de votre réservation</h2>
                     <div class="btn-group">
-                        <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-warning">
-                            <i class="bi bi-pencil-fill"></i> Modifier
-                        </a>
-                        <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" 
-                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
-                            <button class="btn btn-sm btn-danger ms-2">
-                                <i class="bi bi-trash-fill"></i> Supprimer
-                            </button>
-                        </form>
+                        {% if reservation.etatReservation == 'en_attente' %}
+                            <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-success " >
+                                <i class="bi bi-pencil-fill"></i> Modifier
+                            </a>
+                            <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" 
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
+                                <button class="btn btn-sm btn-danger ms-2">
+                                    <i class="bi bi-trash-fill"></i> Annuler
+                                </button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
                 
                 <div class="card-body">
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-circle-fill"></i> 
-                        Votre réservation a été enregistrée avec succès !
+                    {% if reservation.etatReservation == 'confirmé' %}
+                        <div class="alert alert-success d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill me-2" style="color: #198754;"></i>
+                            <div>Votre réservation est confirmée !</div>
+                        </div>
+                    {% elseif reservation.etatReservation == 'refusé' %}
+                        <div class="alert alert-danger d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill me-2" style="color: #dc3545;"></i>
+                            <div>Votre réservation a été refusée par le conducteur.</div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning d-flex align-items-center">
+                            <i class="bi bi-hourglass-split me-2" style="color: #ffc107;"></i>
+                            <div>Votre réservation est en attente de confirmation par le conducteur.</div>
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="h4 text-primary mb-3">Détails du trajet</h3>
+                            <div class="mb-4">
+                                <p><strong><i class="bi bi-geo-alt-fill" style="color: #0d6efd;"></i> Départ:</strong> {{ reservation.trip.departurePoint }}</p>
+                                <p><strong><i class="bi bi-geo-fill" style="color: #fd7e14;"></i> Destination:</strong> {{ reservation.trip.destination }}</p>
+                                <p><strong><i class="bi bi-calendar-check" style="color: #6f42c1;"></i> Date du trajet:</strong> {{ reservation.trip.tripDate|date('d/m/Y H:i') }}</p>
+                                <p><strong><i class="bi bi-people-fill" style="color: #20c997;"></i> Places disponibles:</strong> {{ reservation.trip.availableSeats }}</p>
+                                {% if reservation.trip.user is defined %}
+                                    <p><strong><i class="bi bi-person-badge" style="color: #6610f2;"></i> Conducteur:</strong> {{ reservation.trip.user.fullName }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="h4 text-primary mb-3">Détails de la réservation</h3>
+                            <div class="mb-4">
+                                <p><strong><i class="bi bi-calendar-check" style="color: #d63384;"></i> Date de réservation:</strong> {{ reservation.dateReservation|date('d/m/Y H:i') }}</p>
+                                <p><strong><i class="bi bi-ticket-perforated" style="color: #0dcaf0;"></i> Places réservées:</strong> {{ reservation.nombrePlaces }}</p>
+                                <p><strong><i class="bi bi-cash-stack" style="color: #198754;"></i> Montant total:</strong> {{ reservation.montantTotal }} DNT</p>
+                                <p><strong><i class="bi bi-info-circle" style="color: #6c757d;"></i> Statut:</strong> 
+                                    <span class="badge bg-{{ reservation.etatReservation == 'confirmé' ? 'success' : 
+                                                   (reservation.etatReservation == 'refusé' ? 'danger' : 'warning') }}">
+                                        {{ reservation.etatReservation }}
+                                    </span>
+                                </p>
+                                
+                                {% if reservation.lieuEscale %}
+                                    <p><strong><i class="bi bi-signpost-split" style="color: #fd7e14;"></i> Lieu d'escale:</strong> {{ reservation.lieuEscale }}</p>
+                                {% endif %}
+                                
+                                {% if reservation.typeHandicap %}
+                                    <p><strong><i class="bi bi-universal-access" style="color: #20c997;"></i> Type de handicap:</strong> 
+                                        {% if reservation.typeHandicap == 'mobilite_reduite' %}
+                                            Mobilité réduite
+                                        {% elseif reservation.typeHandicap == 'malvoyant' %}
+                                            Malvoyant
+                                        {% elseif reservation.typeHandicap == 'malentendant' %}
+                                            Malentendant
+                                        {% elseif reservation.typeHandicap == 'autre' %}
+                                            Autre
+                                        {% else %}
+                                            {{ reservation.typeHandicap }}
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
 
-                    <h3 class="h4">Détails du trajet</h3>
-                    <div class="mb-4">
-                        <p><strong>Départ:</strong> {{ reservation.trip.departurePoint }}</p>
-                        <p><strong>Destination:</strong> {{ reservation.trip.destination }}</p>
-                        <p><strong>Date du trajet:</strong> {{ reservation.trip.tripDate|date('d/m/Y ') }}</p>
-                        {% if reservation.trip.user is defined %}
-                            <p><strong>Conducteur:</strong> {{ reservation.trip.user.fullName }}</p>
-                        {% endif %}
-                    </div>
-
-                    <h3 class="h4">Détails de la réservation</h3>
-                    <div class="mb-4">
-                        <p><strong>Date de réservation:</strong> {{ reservation.dateReservation|date('d/m/Y ') }}</p>
-                        <p><strong>Nombre de places réservées:</strong> {{ reservation.nombrePlaces }}</p>
-                        <p><strong>Montant total:</strong> {{ reservation.montantTotal }} DNT</p>
-                        <p><strong>Statut:</strong> 
-                            <span class="badge bg-{{ reservation.etatReservation == 'confirmé' ? 'success' : 'warning' }}">
-                                {{ reservation.etatReservation }}
-                            </span>
-                        </p>
-                        
-                        {% if reservation.lieuEscale %}
-                            <p><strong>Lieu d'escale:</strong> {{ reservation.lieuEscale }}</p>
-                        {% endif %}
-                        
-                        {% if reservation.typeHandicap %}
-                            <p><strong>Type de handicap:</strong> {{ reservation.typeHandicap }}</p>
-                        {% endif %}
-                    </div>
-
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle-fill"></i> 
-                        {% if reservation.etatReservation == 'confirmé' %}
-                            Votre réservation est confirmée. Vous recevrez un email avec les détails du trajet.
-                        {% else %}
-                            Votre réservation est en attente de confirmation. Vous recevrez un email une fois confirmée.
-                        {% endif %}
-                    </div>
-
-                    <div class="d-grid gap-2">
+                    <div class="d-grid gap-2 mt-4">
                         <a href="{{ path('app_reservation_index') }}" class="btn btn-primary">
-                            <i class="bi bi-arrow-left"></i> Retour aux réservations
+                            <i class="bi bi-arrow-left" style="color: white;"></i> Retour aux réservations
                         </a>
                     </div>
                 </div>

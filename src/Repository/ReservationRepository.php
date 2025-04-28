@@ -40,4 +40,13 @@ class ReservationRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function getMonthlyReservations(): array
+{
+    return $this->createQueryBuilder('r')
+        ->select('SUBSTRING(r.dateReservation, 6, 2) as month, COUNT(r.id) as count')
+        ->groupBy('month')
+        ->orderBy('month', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
 }

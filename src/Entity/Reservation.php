@@ -36,9 +36,16 @@ class Reservation
     private ?string $lieuEscale = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Assert\NotBlank(message: "Le nombre de places est obligatoire")]
+    #[Assert\Positive(message: "Le nombre de places doit être supérieur à 0")]
+    #[Assert\Expression(
+        "this.getNombrePlaces() <= this.getTrip().getAvailableSeats()",
+        message: "Le nombre de places demandé dépasse les places disponibles"
+    )]
     private ?int $nombrePlaces = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Assert\NotBlank(message: "Le type de handicap est obligatoire")]
     private ?string $typeHandicap = null;
 
     // Getters and Setters

@@ -16,6 +16,8 @@ class User
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+private ?string $phoneNumber = null;
 
     public function getId(): ?int
     {
@@ -168,6 +170,16 @@ class User
         return $this;
     }
 
+    public function getPhoneNumber(): ?string
+{
+    return $this->phoneNumber;
+}
+
+public function setPhoneNumber(?string $phoneNumber): self
+{
+    $this->phoneNumber = $phoneNumber;
+    return $this;
+}
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'user')]
     private Collection $reservations;
 
@@ -261,4 +273,4 @@ class User
         return $this;
     }
 
-}
+} 

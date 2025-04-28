@@ -6,6 +6,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\TripRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: TripRepository::class)]
 class Trip
@@ -17,11 +19,6 @@ class Trip
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: "La date du voyage est obligatoire")]
-    #[Assert\Range(
-        min: "tomorrow",
-        max: "+1 week",
-        notInRangeMessage: "La date doit être entre demain et la semaine prochaine"
-    )]
     private ?\DateTimeInterface $trip_date = null;
 
     #[ORM\Column(length: 255)]
@@ -43,18 +40,26 @@ class Trip
 
     #[ORM\Column]
     #[Assert\NotBlank(message: "Le nombre de places est obligatoire")]
-    #[Assert\PositiveOrZero(message: "Le nombre doit être positif ou zéro")]
+    #[Assert\Positive(message: "Le nombre de places doit être supérieur à 0")]
     private ?int $available_seats = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(length: 20)]
     private ?string $trip_type = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    #[Assert\PositiveOrZero(message: "La cotisation doit être positive ")]
+    #[Assert\PositiveOrZero(message: "La cotisation doit être positive ou nulle")]
     private ?string $contribution = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $relay_points = null;
+    
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'trip')]
+    private Collection $reservations;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -188,6 +193,5 @@ class Trip
         }
 
         return $this;
-    }
-    
+    } 
 }

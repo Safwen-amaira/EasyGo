@@ -83,3 +83,18 @@ controllers:
 
     type: attribute
 
+reservation_stats:
+    path: /reservations/statistiques
+    controller: App\Controller\ReservationController::statistics
+app_trip_qrcode:
+    path: /trip/{id}/qrcode
+    controller: App\Controller\TripController::generateQrCode
+
+app_trip_map:
+    path: /trip/{id}/map
+    controller: App\Controller\TripController::showMap
+    
+trip_show:
+    path: /trip/{id}
+    controller: App\Controller\TripController::show
+    

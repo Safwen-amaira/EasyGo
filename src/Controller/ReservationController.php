@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Reservation;
 use App\Entity\Trip;
+use App\Form\TripType;
+use App\Repository\TripRepository;
 use App\Form\ReservationType;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,27 +13,99 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
+use Knp\Component\Pager\PaginatorInterface;
+use App\Service\InfobipService;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Psr\Log\LoggerInterface; 
+
+
 
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager
-    ) {}
-
+    ) {
+    }
+    
     #[Route('/', name: 'app_reservation_index', methods: ['GET'])]
-    public function index(ReservationRepository $reservationRepository): Response
+    public function index(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $queryBuilder = $reservationRepository->createQueryBuilder('r')
+            ->leftJoin('r.trip', 't')
+            ->addSelect('t');
+    
+        // Gestion de la recherche
+        $searchTerm = $request->query->get('search');
+        if ($searchTerm) {
+            $queryBuilder
+                ->andWhere('r.etatReservation LIKE :searchTerm OR t.departure_point LIKE :searchTerm OR t.destination LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+    
+        // Gestion du tri
+        $sort = $request->query->get('sort', 'r.dateReservation');
+        $direction = $request->query->get('direction', 'DESC');
+        
+        // Validation des champs de tri pour éviter les injections SQL
+        $validSorts = ['r.dateReservation', 'r.etatReservation', 'r.montantTotal', 't.departure_point', 't.destination'];
+        $sort = in_array($sort, $validSorts) ? $sort : 'r.dateReservation';
+        $direction = in_array(strtoupper($direction), ['ASC', 'DESC']) ? strtoupper($direction) : 'DESC';
+        
+        $queryBuilder->orderBy($sort, $direction);
+    
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
+        );
+    
         return $this->render('reservation/index.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'pagination' => $pagination,
+            'sort' => $sort,
+            'direction' => $direction,
+            'searchTerm' => $searchTerm,
         ]);
     }
-
     #[Route('/admin', name: 'app_reservation_admin', methods: ['GET'])]
-    public function indexadmin(ReservationRepository $reservationRepository): Response
+    public function indexadmin(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $queryBuilder = $reservationRepository->createQueryBuilder('r')
+            ->leftJoin('r.trip', 't')
+            ->addSelect('t');
+    
+        // Gestion de la recherche
+        $searchTerm = $request->query->get('search');
+        if ($searchTerm) {
+            $queryBuilder
+                ->andWhere('r.etatReservation LIKE :searchTerm OR t.departure_point LIKE :searchTerm OR t.destination LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+    
+        // Gestion du tri
+        $sort = $request->query->get('sort', 'r.dateReservation');
+        $direction = $request->query->get('direction', 'DESC');
+        
+        // Validation des champs de tri pour éviter les injections SQL
+        $validSorts = ['r.dateReservation', 'r.etatReservation', 'r.montantTotal', 't.departure_point', 't.destination'];
+        $sort = in_array($sort, $validSorts) ? $sort : 'r.dateReservation';
+        $direction = in_array(strtoupper($direction), ['ASC', 'DESC']) ? strtoupper($direction) : 'DESC';
+        
+        $queryBuilder->orderBy($sort, $direction);
+    
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
+        );
+    
         return $this->render('reservation/admin_reservation.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'pagination' => $pagination,
+            'sort' => $sort,
+            'direction' => $direction,
+            'searchTerm' => $searchTerm,
         ]);
     }
 
@@ -42,15 +116,46 @@ final class ReservationController extends AbstractController
             'reservation' => $reservation,
         ]);
     }
-
+     
     #[Route('/driver', name: 'app_reservation_index_driver', methods: ['GET'])]
-    public function indexDriver(ReservationRepository $reservationRepository): Response
+    public function indexdriver(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $queryBuilder = $reservationRepository->createQueryBuilder('r')
+            ->leftJoin('r.trip', 't')
+            ->addSelect('t');
+    
+        // Gestion de la recherche
+        $searchTerm = $request->query->get('search');
+        if ($searchTerm) {
+            $queryBuilder
+                ->andWhere('r.etatReservation LIKE :searchTerm OR t.departure_point LIKE :searchTerm OR t.destination LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+    
+        // Gestion du tri
+        $sort = $request->query->get('sort', 'r.dateReservation');
+        $direction = $request->query->get('direction', 'DESC');
+        
+        // Validation des champs de tri pour éviter les injections SQL
+        $validSorts = ['r.dateReservation', 'r.etatReservation', 'r.montantTotal', 't.departure_point', 't.destination'];
+        $sort = in_array($sort, $validSorts) ? $sort : 'r.dateReservation';
+        $direction = in_array(strtoupper($direction), ['ASC', 'DESC']) ? strtoupper($direction) : 'DESC';
+        
+        $queryBuilder->orderBy($sort, $direction);
+    
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
+        );
+    
         return $this->render('reservation/index_driver.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
+            'pagination' => $pagination,
+            'sort' => $sort,
+            'direction' => $direction,
+            'searchTerm' => $searchTerm,
         ]);
     }
-
     #[Route('/new/{tripId}', name: 'app_reservation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, int $tripId): Response
     {
@@ -82,13 +187,14 @@ final class ReservationController extends AbstractController
     
             $montantTotal = $trip->getContribution() * $nombrePlaces;
             $reservation->setMontantTotal($montantTotal);
-            $trip->setAvailableSeats($trip->getAvailableSeats() - $nombrePlaces);
+            // On ne décrémente pas encore les places disponibles, seulement à la confirmation
+            $reservation->setUser($this->getUser());
     
             try {
                 $this->entityManager->persist($reservation);
                 $this->entityManager->flush();
     
-                $this->addFlash('success', 'Réservation effectuée avec succès !');
+                $this->addFlash('success', 'Réservation effectuée avec succès ! En attente de confirmation du conducteur.');
                 return $this->redirectToRoute('app_reservation_show', ['id' => $reservation->getId()]);
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de la réservation');
@@ -117,16 +223,19 @@ final class ReservationController extends AbstractController
         $oldPlaces = $reservation->getNombrePlaces();
 
         $form = $this->createForm(ReservationType::class, $reservation, [
-            'available_seats' => $trip->getAvailableSeats() + $oldPlaces
+            'available_seats' => $trip->getAvailableSeats() + ($reservation->getEtatReservation() === 'confirmé' ? $oldPlaces : 0)
         ]);
         
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $newPlaces = $reservation->getNombrePlaces();
-            $difference = $oldPlaces - $newPlaces;
-
-            $trip->setAvailableSeats($trip->getAvailableSeats() + $difference);
+            
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $difference = $oldPlaces - $newPlaces;
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $difference);
+            }
+            
             $reservation->setMontantTotal($trip->getContribution() * $newPlaces);
 
             $this->entityManager->flush();
@@ -146,7 +255,11 @@ final class ReservationController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->request->get('_token'))) {
             $trip = $reservation->getTrip();
-            $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            
+            // On remet les places disponibles seulement si la réservation était confirmée
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            }
 
             $this->entityManager->remove($reservation);
             $this->entityManager->flush();
@@ -158,20 +271,134 @@ final class ReservationController extends AbstractController
 
         return $this->redirectToRoute('app_reservation_index');
     }
-
-    #[Route('/{id}/manage-driver', name: 'app_reservation_manage_driver', methods: ['GET', 'POST'])]
-    public function manageDriver(Request $request, Reservation $reservation): Response
+    #[Route('/admin/{id}', name: 'app_reservation_delete_admin', methods: ['POST'])]
+    public function deleteadmin(Request $request, Reservation $reservation): Response
     {
+        if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->request->get('_token'))) {
+            $trip = $reservation->getTrip();
+            
+            // On remet les places disponibles seulement si la réservation était confirmée
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            }
+
+            $this->entityManager->remove($reservation);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Réservation annulée avec succès');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide');
+        }
+
+        return $this->redirectToRoute('app_reservation_admin');
+    }
+    #[Route('/driver/{id}', name: 'app_reservation_delete_driver', methods: ['POST'])]
+    public function deletedriver(Request $request, Reservation $reservation): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$reservation->getId(), $request->request->get('_token'))) {
+            $trip = $reservation->getTrip();
+            
+            // On remet les places disponibles seulement si la réservation était confirmée
+            if ($reservation->getEtatReservation() === 'confirmé') {
+                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
+            }
+
+            $this->entityManager->remove($reservation);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Réservation annulée avec succès');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide');
+        }
+
+        return $this->redirectToRoute('app_reservation_index_driver');
+    }
+    
+    #[Route('/{id}/manage-driver', name: 'app_reservation_manage_driver', methods: ['GET', 'POST'])]
+    public function manageDriver(
+        Request $request, 
+        Reservation $reservation,
+        InfobipService $infobipService,
+        ParameterBagInterface $params,
+        LoggerInterface $logger
+    ): Response {
+        $logger->info('Entering manageDriver', ['reservation' => $reservation->getId()]);
+        
         if ($request->isMethod('POST')) {
             $action = $request->request->get('action');
+            $logger->info('Action received', ['action' => $action]);
+            $trip = $reservation->getTrip();
             
             if ($action === 'confirm') {
+                $logger->debug('Confirming reservation');
+                
+                if ($reservation->getNombrePlaces() > $trip->getAvailableSeats()) {
+                    $this->addFlash('error', 'Pas assez de places disponibles pour confirmer cette réservation');
+                    return $this->redirectToRoute('app_reservation_manage_driver', ['id' => $reservation->getId()]);
+                }
+                
                 $reservation->setEtatReservation('confirmé');
+                $trip->setAvailableSeats($trip->getAvailableSeats() - $reservation->getNombrePlaces());
                 $this->addFlash('success', 'Réservation confirmée avec succès');
+                
+                // Envoi du SMS modifié
+                $user = $reservation->getUser();
+                $phoneNumber = $user?->getPhoneNumber() ?? $params->get('test_phone_number');
+                if (!empty($phoneNumber)) {
+                    // Ajoutez ce logging
+                    $logger->info('Phone number to use', [
+                        'phone' => $phoneNumber,
+                        'source' => $user ? 'user profile' : 'test number'
+                    ]);
+                    
+                    $message = sprintf(
+                        "EasyGo - Confirmation de réservation\n\n" .
+                        "Votre réservation N°%d est confirmée :\n" .
+                        "Départ: %s\n" .
+                        "Arrivée: %s\n" .
+                        "Date: %s\n" .
+                        "Détails: %d place(s) - %.2f DNT\n\n" .
+                        "Merci de voyager avec EasyGo!",
+                        $reservation->getId(),
+                        $trip->getDeparturePoint(),
+                        $trip->getDestination(),
+                        $trip->getTripDate()->format('d/m/Y H:i'),
+                        $reservation->getNombrePlaces(),
+                        $reservation->getMontantTotal()
+                    );
+
+                    $logger->debug('Attempting to send SMS', [
+                        'phone' => $phoneNumber,
+                        'message' => $message
+                    ]);
+                    
+                    try {
+                        $smsSent = $infobipService->sendSms($phoneNumber, $message);
+                        
+                        if ($smsSent) {
+                            $logger->info('SMS successfully sent');
+                            $this->addFlash('success', 'SMS de confirmation envoyé au passager');
+                        } else {
+                            $logger->error('SMS sending failed (no exception)');
+                            $this->addFlash('warning', 'Réservation confirmée mais échec d\'envoi du SMS');
+                        }
+                    } catch (\Exception $e) {
+                        $logger->error('SMS sending error', [
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
+                        ]);
+                        $this->addFlash('warning', 'Réservation confirmée mais erreur lors de l\'envoi du SMS');
+                    }
+                } else {
+                    $logger->warning('No phone number available for SMS', [
+                        'user_id' => $user?->getId(),
+                        'has_phone' => !empty($phoneNumber)
+                    ]);
+                    $this->addFlash('warning', 'Réservation confirmée mais SMS non envoyé (numéro non disponible)');
+                }
             } elseif ($action === 'reject') {
+                $logger->debug('Rejecting reservation');
                 $reservation->setEtatReservation('refusé');
-                $trip = $reservation->getTrip();
-                $trip->setAvailableSeats($trip->getAvailableSeats() + $reservation->getNombrePlaces());
                 $this->addFlash('warning', 'Réservation refusée');
             }
             
@@ -184,3 +411,4 @@ final class ReservationController extends AbstractController
         ]);
     }
 }
+    
