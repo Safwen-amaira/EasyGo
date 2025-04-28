@@ -4,3 +4,6 @@ twig:
 when@test:
     twig:
         strict_variables: true
+    filters:
+        month_name: App\Twig\MonthNameFilter
+   

@@ -2,31 +2,52 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Carte des vols</title>
+    <title>Carte du trajet {{ trip.departurePoint }} → {{ trip.destination }}</title>
 
-    <!-- Leaflet CSS & JS sans integrity -->
+    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
         #map {
             height: 600px;
+            margin-bottom: 20px;
+        }
+        .trip-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .trip-info h2 {
+            color: #365ff4;
+            margin-top: 0;
+        }
+        .back-link {
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 
-<h2>Carte des vols</h2>
+<div class="container">
+<a href="{{ path('app_trip_home') }}" class="back-link" title="Retour">
+    <i class="bi bi-arrow-left" style="font-size: 1.5rem;"></i>
+</a>
 
-<div id="map"></div>
+    <div class="trip-info">
+        <h2>Trajet {{ trip.departurePoint }} → {{ trip.destination }}</h2>
+    </div>
+    <div id="map"></div>
+</div>
 
 <script>
-    // Récupérer les données des vols envoyées par Symfony
+    // Récupérer les données du trajet
     const vols = {{ vols|json_encode|raw }};
-    console.log(vols);  // Vérification dans la console pour s'assurer que les données sont bien récupérées
+    console.log(vols);  // Vérification dans la console
 
-    // Créer la carte
-    const map = L.map('map').setView([36.8, 10.18], 5);
+    // Créer la carte avec une vue plus adaptée à un seul trajet
+    const map = L.map('map').setView([36.8, 10.18], 7);
 
     // Ajouter le fond de carte OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -43,20 +64,23 @@
         return null;
     }
 
-    // Dessiner les trajets de vol
-    vols.forEach(async (vol) => {
+    // Dessiner le trajet
+    async function drawTrip() {
+        const vol = vols[0]; // On prend le seul trajet
         const departCoord = await getLatLng(vol.depart);
         const destCoord = await getLatLng(vol.destination);
 
         if (departCoord && destCoord) {
             // Tracer une ligne entre le départ et la destination
-            L.polyline([departCoord, destCoord], {color: 'red'}).addTo(map);
-
-            // Ajouter des marqueurs pour le départ et la destination
+            const polyline = L.polyline([departCoord, destCoord], {color: 'red', weight: 3}).addTo(map);
+            
+ // Ajouter des marqueurs pour le départ et la destination
             L.marker(departCoord).addTo(map).bindPopup("Départ : " + vol.depart);
             L.marker(destCoord).addTo(map).bindPopup("Destination : " + vol.destination);
-        }
-    });
+    }}
+
+    // Appeler la fonction pour dessiner le trajet
+    drawTrip();
 </script>
 
 </body>
