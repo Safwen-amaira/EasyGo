@@ -17,10 +17,7 @@
                         <th>Nom</th>
                         <td>{{ vehicule.name }}</td>
                     </tr>
-                    <tr>
-                        <th>Date de mise à jour</th>
-                        <td>{{ vehicule.updated ? vehicule.updated|date('Y-m-d') : 'Non spécifié' }}</td>
-                    </tr>
+                    
                     <tr>
                         <th>Date de création</th>
                         <td>{{ vehicule.created ? vehicule.created|date('Y-m-d') : 'Non spécifié' }}</td>
@@ -47,10 +44,7 @@
                         <th>Prix</th>
                         <td>{{ vehicule.prix }} €</td>
                     </tr>
-                    <tr>
-                        <th>Total en stock</th>
-                        <td>{{ vehicule.totalEnStock }}</td>
-                    </tr>
+                    
                     <tr>
                         <th>Catégorie</th>
                         <td>{{ vehicule.categoriesId }}</td>
