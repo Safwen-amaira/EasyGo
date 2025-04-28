@@ -3,7 +3,7 @@
 {% block title %}Tableau de Bord - Statistiques{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-2">
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm border-0">
@@ -11,21 +11,21 @@
                     <h1 class="h5 mb-0 text-primary">
                         <i class="bi bi-bar-chart-line me-2"></i>Tableau de Bord Statistique
                     </h1>
-                   <span class="badge bg-primary bg-opacity-10 text-primary">
-    <i class="bi bi-calendar me-1"></i> {{ "now"|date("d/m/Y") }}
-</span>
+                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-calendar me-1"></i> {{ "now"|date("d/m/Y") }}
+                    </span>
                 </div>
                 
-                <div class="card-body">
+                <div class="card-body p-3">
                     <!-- Section Réservations -->
-                    <section class="mb-5">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                           <h2 class="h5 mb-0 text-primary"> <!-- Changé de text-gray-800 à text-primary -->
-    <i class="bi bi-journal-check me-2"></i> Statistiques des Réservations
-</h2>
+                    <section class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h2 class="h5 mb-0 text-primary">
+                                <i class="bi bi-journal-check me-2"></i> Statistiques des Réservations
+                            </h2>
                         </div>
                         
-                        <div class="row g-4">
+                        <div class="row g-2">
                             <!-- Carte Total Réservations -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="card border-start border-primary border-4 h-100">
@@ -98,65 +98,87 @@
                             </div>
                         </div>
                         
-                        
-                        <div class="card mt-4 border-0" style="background: linear-gradient(to right, #f8f9fa, #ffffff); box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-    <div class="card-header bg-transparent border-bottom-0">
-        <h3 class="h5 mb-0 text-primary">
-            <i class="bi bi-calendar-month me-2"></i> Répartition Mensuelle
-            <span class="badge bg-primary bg-opacity-10 text-primary ms-2">{{ reservation_stats.monthly|length }} mois</span>
-        </h3>
-    </div>
-    <div class="card-body pt-0">
-        <div class="table-responsive">
-            <table class="table table-borderless table-hover align-middle">
-                <thead>
-                    <tr class="text-uppercase" style="background: rgba(78, 115, 223, 0.05);">
-                        <th class="ps-4 text-muted fw-medium" style="width: 25%;">Mois</th>
-                        <th class="text-muted fw-medium" style="width: 20%;">Nombre</th>
-                        <th class="text-muted fw-medium" style="width: 20%;">Pourcentage</th>
-                        <th class="pe-4 text-muted fw-medium" style="width: 35%;">Répartition</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for month in reservation_stats.monthly %}
-                    <tr class="position-relative" style="border-bottom: 1px solid rgba(0,0,0,0.03);">
-                        <td class="ps-4 fw-medium text-dark">
-                            <span class="badge bg-primary bg-opacity-10 text-primary me-2">{{ loop.index }}</span>
-                            {{ month.month|month_name }}
-                        </td>
-                        <td class="text-dark">{{ month.count }}</td>
-                        <td class="text-primary fw-bold">{{ ((month.count/reservation_stats.total)*100)|number_format(1) }}%</td>
-                        <td class="pe-4">
-                            <div class="d-flex align-items-center">
-                                <div class="progress flex-grow-1" style="height: 10px; border-radius: 5px;">
-                                    <div class="progress-bar bg-gradient-primary progress-bar-striped progress-bar-animated" 
-                                         style="width: {{ (month.count/reservation_stats.total)*100 }}%"
-                                         role="progressbar" 
-                                         aria-valuenow="{{ (month.count/reservation_stats.total)*100 }}" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="100">
+                        <!-- Graphique des réservations par statut -->
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm mb-2">
+                                    <div class="card-header bg-white">
+                                        <h3 class="h6 mb-0 text-primary">
+                                            <i class="bi bi-pie-chart me-2"></i> Répartition des Réservations
+                                        </h3>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-2">
+                                        <img src="{{ reservation_chart }}" 
+                                             alt="Statut des réservations" 
+                                             class="img-fluid chart-img"
+                                             style="max-height: 220px;">
                                     </div>
                                 </div>
-                                <small class="text-muted ms-2">{{ (month.count/reservation_stats.total)*100|number_format(1) }}%</small>
                             </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                            
+                            <!-- Tableau mensuel -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm mb-2">
+                                    <div class="card-header bg-transparent border-bottom-0">
+                                        <h3 class="h5 mb-0 text-primary">
+                                            <i class="bi bi-calendar-month me-2"></i> Répartition Mensuelle
+                                            <span class="badge bg-primary bg-opacity-10 text-primary ms-2">{{ reservation_stats.monthly|length }} mois</span>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body pt-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless table-hover align-middle">
+                                                <thead>
+                                                    <tr class="text-uppercase" style="background: rgba(78, 115, 223, 0.05);">
+                                                        <th class="ps-4 text-muted fw-medium" style="width: 25%;">Mois</th>
+                                                        <th class="text-muted fw-medium" style="width: 20%;">Nombre</th>
+                                                        <th class="text-muted fw-medium" style="width: 20%;">Pourcentage</th>
+                                                        <th class="pe-4 text-muted fw-medium" style="width: 35%;">Répartition</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for month in reservation_stats.monthly %}
+                                                    <tr class="position-relative" style="border-bottom: 1px solid rgba(0,0,0,0.03);">
+                                                        <td class="ps-4 fw-medium text-dark">
+                                                            <span class="badge bg-primary bg-opacity-10 text-primary me-2">{{ loop.index }}</span>
+                                                            {{ month.month|month_name }}
+                                                        </td>
+                                                        <td class="text-dark">{{ month.count }}</td>
+                                                        <td class="text-primary fw-bold">{{ ((month.count/reservation_stats.total)*100)|number_format(1) }}%</td>
+                                                        <td class="pe-4">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="progress flex-grow-1" style="height: 10px; border-radius: 5px;">
+                                                                    <div class="progress-bar bg-gradient-primary progress-bar-striped progress-bar-animated" 
+                                                                         style="width: {{ (month.count/reservation_stats.total)*100 }}%"
+                                                                         role="progressbar" 
+                                                                         aria-valuenow="{{ (month.count/reservation_stats.total)*100 }}" 
+                                                                         aria-valuemin="0" 
+                                                                         aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                                <small class="text-muted ms-2">{{ (month.count/reservation_stats.total)*100|number_format(1) }}%</small>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                     
                     <!-- Section Trajets -->
-                    <section>
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-<h2 class="h5 mb-0 text-primary"> <!-- Changé de text-gray-800 à text-primary -->
-    <i class="bi bi-car-front me-2"></i> Statistiques des Trajets
-</h2>
+                    <section class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h2 class="h5 mb-0 text-primary">
+                                <i class="bi bi-car-front me-2"></i> Statistiques des Trajets
+                            </h2>
                         </div>
                         
-                        <div class="row g-4">
+                        <div class="row g-2">
                             <!-- Carte Total Trajets -->
                             <div class="col-md-4">
                                 <div class="card border-start border-primary border-4 h-100">
@@ -211,68 +233,116 @@
                             </div>
                         </div>
                         
-                        <!-- Destinations populaires -->
-                        <div class="card mt-4 border-0 shadow-sm">
-                            <div class="card-header bg-white border-bottom">
-                            <h2 class="h5 mb-0 text-primary"> <!-- Changé de text-gray-800 à text-primary -->
-    <i class="bi bi-map me-2"></i> Destinations Populaires
-</h2>
+                        <!-- Graphique des trajets -->
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm mb-2">
+                                    <div class="card-header bg-white">
+                                        <h3 class="h6 mb-0 text-primary">
+                                            <i class="bi bi-graph-up me-2"></i> Statut des Trajets
+                                        </h3>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-2">
+                                        <img src="{{ trip_chart }}" 
+                                             alt="Statut des trajets" 
+                                             class="img-fluid chart-img"
+                                             style="max-height: 220px;">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    {% for destination in trip_stats.popular_destinations %}
-                                    <div class="col-md-6 mb-3">
-                                        <div class="d-flex align-items-center p-3 bg-light rounded-3">
-                                            <div class="flex-grow-1">
-                                                <h6 class="mb-1 fw-medium">{{ destination.destination }}</h6>
-                                                <div class="progress" style="height: 6px;">
-                                                    <div class="progress-bar bg-gradient-primary" 
-                                                         style="width: {{ (destination.tripCount/trip_stats.total)*100 }}%">
+                            
+                            <!-- Destinations populaires -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm mb-2">
+                                    <div class="card-header bg-white border-bottom">
+                                        <h2 class="h5 mb-0 text-primary">
+                                            <i class="bi bi-map me-2"></i> Destinations Populaires
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            {% for destination in trip_stats.popular_destinations %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="d-flex align-items-center p-3 bg-light rounded-3">
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1 fw-medium">{{ destination.destination }}</h6>
+                                                        <div class="progress" style="height: 6px;">
+                                                            <div class="progress-bar bg-gradient-primary" 
+                                                                 style="width: {{ (destination.tripCount/trip_stats.total)*100 }}%">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-shrink-0 ms-3">
+                                                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                                                            {{ destination.tripCount }} trajets
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="flex-shrink-0 ms-3">
-                                                <span class="badge bg-primary rounded-pill px-3 py-2">
-                                                    {{ destination.tripCount }} trajets
-                                                </span>
-                                            </div>
+                                            {% endfor %}
                                         </div>
                                     </div>
-                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <!-- Section Revenus -->
+                    </section>
                     
-                    <div class="card mt-4 border-0 shadow-sm">
-                            <div class="card-header bg-white border-bottom">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                           <h2 class="h5 mb-0 text-primary"> <!-- Changé de text-gray-800 à text-primary -->
-    <i class="bi bi-cash-coin me-2"></i> Revenus
-</h2>
-                        </div>
-                        
-                                <div class="row align-items-center">
-                                    <div class="col-md-6">
-                                        <h3 class="display-5 fw-bold text-success mb-2">{{ total_revenue|number_format(2, ',', ' ') }} DNT</h3>
-                                        <p class="text-muted mb-0">Revenus totaux des réservations confirmées</p>
-                                        <div class="mt-3">
-                                            <span class="badge bg-success bg-opacity-10 text-success">
-                                                <i class="bi bi-arrow-up me-1"></i> Performance financière
-                                            </span>
+                    <!-- Section Revenus et Graphique Mensuel -->
+                    <section>
+                        <div class="row g-2">
+                            <!-- Revenus -->
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm h-100 mb-2">
+                                    <div class="card-header bg-white border-bottom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h2 class="h5 mb-0 text-primary">
+                                                <i class="bi bi-cash-coin me-2"></i> Revenus
+                                            </h2>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="revenue-visualization">
-                                            {% set max_count = max(reservation_stats.monthly|map(m => m.count)) %}
-                                            {% for month in reservation_stats.monthly %}
-                                            <div class="revenue-column" 
-                                                 style="height: {{ (month.count/max_count) * 100 }}%;"
-                                                 data-bs-toggle="tooltip" 
-                                                 title="{{ month.month|month_name }}: {{ month.count }} réservations">
-                                                <div class="revenue-bar bg-gradient-success"></div>
+                                    <div class="card-body">
+                                        <div class="row align-items-center h-100">
+                                            <div class="col-md-6">
+                                                <h3 class="display-5 fw-bold text-success mb-2">{{ total_revenue|number_format(2, ',', ' ') }} DNT</h3>
+                                                <p class="text-muted mb-0">Revenus totaux des réservations confirmées</p>
+                                                <div class="mt-2">
+                                                    <span class="badge bg-success bg-opacity-10 text-success">
+                                                        <i class="bi bi-arrow-up me-1"></i> Performance financière
+                                                    </span>
+                                                </div>
                                             </div>
-                                            {% endfor %}
+                                            <div class="col-md-6">
+                                                <div class="revenue-visualization">
+                                                    {% set max_count = max(reservation_stats.monthly|map(m => m.count)) %}
+                                                    {% for month in reservation_stats.monthly %}
+                                                    <div class="revenue-column" 
+                                                         style="height: {{ (month.count/max_count) * 100 }}%;"
+                                                         data-bs-toggle="tooltip" 
+                                                         title="{{ month.month|month_name }}: {{ month.count }} réservations">
+                                                        <div class="revenue-bar bg-gradient-success"></div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Graphique mensuel -->
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm h-100 mb-2">
+                                    <div class="card-header bg-white">
+                                        <h3 class="h6 mb-0 text-primary">
+                                            <i class="bi bi-calendar-month me-2"></i> Évolution Mensuelle des Réservations
+                                        </h3>
+                                    </div>
+                                    <div class="card-body p-2 d-flex align-items-center">
+                                        <div class="text-center w-100">
+                                            <img src="{{ monthly_chart }}" 
+                                                 alt="Réservations par mois" 
+                                                 class="img-fluid" 
+                                                 style="max-height: 250px;">
                                         </div>
                                     </div>
                                 </div>
@@ -298,12 +368,13 @@
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px);
+        box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.08);
     }
     .card-header {
         background-color: #fff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 0.75rem 1.25rem;
     }
     .table th {
         font-weight: 600;
@@ -332,9 +403,9 @@
     .revenue-visualization {
         display: flex;
         align-items: flex-end;
-        height: 150px;
-        gap: 8px;
-        padding-top: 20px;
+        height: 100px;
+        gap: 6px;
+        padding-top: 10px;
     }
     .revenue-column {
         flex: 1;
@@ -357,8 +428,25 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 20px;
+        height: 15px;
         background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    }
+    
+    /* Styles des graphiques */
+    .chart-img {
+        max-height: 220px;
+        width: auto;
+        transition: opacity 0.5s ease;
+    }
+    
+    /* Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
     }
     
     /* Bordures colorées */
@@ -370,14 +458,23 @@
     
     /* Icônes */
     .fs-1 { font-size: 2.5rem !important; }
+    
+    /* Espacement réduit entre les sections */
+    section {
+        margin-bottom: 1rem !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        margin-bottom: 0.5rem !important;
+    }
 </style>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
 <script>
-// Animation des barres de revenus
 document.addEventListener('DOMContentLoaded', function() {
+    // Animation des barres de revenus
     const revenueColumns = document.querySelectorAll('.revenue-column');
     revenueColumns.forEach(col => {
         const bar = col.querySelector('.revenue-bar');
@@ -389,11 +486,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     });
     
-    // Initialiser les tooltips
+    // Animation des graphiques
+    const charts = document.querySelectorAll('.chart-img, .card img.img-fluid');
+    charts.forEach((chart, index) => {
+        chart.style.opacity = '0';
+        setTimeout(() => {
+            chart.classList.add('fade-in');
+            chart.style.opacity = '1';
+        }, index * 200);
+    });
+    
+    // Tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function(tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 });
 </script>
-{% endblock %} 
+{% endblock %}
