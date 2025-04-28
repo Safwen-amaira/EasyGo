@@ -41,6 +41,34 @@ class AdminReclamationController extends AbstractController
 
         return $this->redirectToRoute('admin_reclamation_index');
     }
+    #[Route('/admin/reclamations/search', name: 'admin_reclamation_search')]
+public function search(Request $request, EntityManagerInterface $entityManager): Response
+{
+    $search = $request->query->get('search');
+    $sortBy = $request->query->get('sort_by', 'id');
+    $sortOrder = $request->query->get('sort_order', 'asc');
+
+    $queryBuilder = $entityManager->getRepository(Reclamation::class)->createQueryBuilder('r');
+
+    if (!empty($search)) {
+        $queryBuilder
+            ->where('r.categorie LIKE :search OR r.description LIKE :search OR r.statut LIKE :search')
+            ->setParameter('search', '%'.$search.'%');
+    }
+
+    if (in_array($sortBy, ['id', 'dateCreation', 'categorie', 'statut'])) {
+        $queryBuilder->orderBy('r.' . $sortBy, $sortOrder);
+    }
+
+    $reclamations = $queryBuilder->getQuery()->getResult();
+
+    // Retourner la vue avec les réclamations filtrées et triées
+    return $this->render('admin/reclamation/index.html.twig', [
+        'reclamations' => $reclamations,
+    ]);
+}
+
+
 
     #[Route('/admin/reclamation/{id}/repondre', name: 'admin_reclamation_reply')]
     public function reply(

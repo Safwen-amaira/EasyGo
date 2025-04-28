@@ -55,6 +55,7 @@ public function index(
         'sortDirection' => $sortDirection,
     ]);
 }
+
     #[Route('/new', name: 'app_reclamation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {

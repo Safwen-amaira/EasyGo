@@ -6,10 +6,23 @@
   <div class="container my-5">
     <h1 class="text-center mb-4">Réclamations</h1>
 
-    <div class="row">
+    <!-- Barre de recherche et tri -->
+    <div class="mb-4">
+      <input type="text" id="search" class="form-control mb-2" placeholder="Rechercher une réclamation..." value="{{ app.request.query.get('search') }}">
+
+      <select id="sort" class="form-select">
+        <option value="id" {% if app.request.query.get('sort_by') == 'id' %}selected{% endif %}>Tri par ID</option>
+        <option value="dateCreation" {% if app.request.query.get('sort_by') == 'dateCreation' %}selected{% endif %}>Tri par Date de création</option>
+        <option value="categorie" {% if app.request.query.get('sort_by') == 'categorie' %}selected{% endif %}>Tri par Catégorie</option>
+        <option value="statut" {% if app.request.query.get('sort_by') == 'statut' %}selected{% endif %}>Tri par Statut</option>
+      </select>
+    </div>
+
+    <!-- Zone des réclamations à mettre à jour dynamiquement -->
+    <div id="reclamation-list" class="row">
       {% for reclamation in reclamations %}
         <div class="col-md-4">
-          <div class="card">
+          <div class="card mb-4">
             <div class="card-body">
               <h5 class="card-title">Réclamation #{{ reclamation.id }}</h5>
               <h6 class="card-subtitle mb-2 text-muted">{{ reclamation.categorie }}</h6>
@@ -20,25 +33,48 @@
               <div class="d-flex justify-content-between">
                 <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Acceptée'}) }}" class="btn btn-success">Accepter</a>
                 <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Refusée'}) }}" class="btn btn-danger">Refuser</a>
-                <a href="{{ path('admin_reclamation_reply', {'id': reclamation.id, 'statut': reclamation.statut}) }}" class="btn btn-primary">Répondre</a>
+                <a href="{{ path('admin_reclamation_reply', {'id': reclamation.id}) }}" class="btn btn-primary">Répondre</a>
               </div>
-
-              <!-- Formulaire pour répondre à la réclamation, s'il est affiché -->
-              {% if form is defined %}
-                <form action="{{ path('admin_reclamation_reply', {'id': reclamation.id, 'statut': reclamation.statut}) }}" method="post">
-                  {{ form_start(form) }}
-                    {{ form_row(form.reponse) }}
-                    <button type="submit" class="btn btn-primary mt-2">Soumettre la réponse</button>
-                  {{ form_end(form) }}
-                </form>
-              {% endif %}
             </div>
           </div>
         </div>
+      {% else %}
+        <div class="col-12 text-center">
+          <p>Aucune réclamation trouvée.</p>
+        </div>
       {% endfor %}
-      <a href="{{ path('app_reclamation_stats') }}" class="btn btn-info">
-        <i class="bi bi-bar-chart-line"></i> Voir les statistiques
-      </a>
     </div>
+
+    <!-- Bouton voir statistiques -->
+    <a href="{{ path('app_reclamation_stats') }}" class="btn btn-info mt-4">
+      <i class="bi bi-bar-chart-line"></i> Voir les statistiques
+    </a>
   </div>
+
+  <!-- JS Ajax -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    function fetchReclamations() {
+      const search = $('#search').val();
+      const sortBy = $('#sort').val();
+      const sortOrder = 'asc'; // Optionnel: tu peux ajouter un switch pour asc/desc
+
+      $.ajax({
+        url: "{{ path('admin_reclamation_search') }}",
+        method: 'GET',
+        data: { search: search, sort_by: sortBy, sort_order: sortOrder },
+        success: function(data) {
+          $('#reclamation-list').html(data); // Mettre à jour uniquement la zone des réclamations
+        },
+        error: function() {
+          alert('Erreur lors de la recherche.');
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      $('#search').on('input', fetchReclamations);
+      $('#sort').on('change', fetchReclamations);
+    });
+  </script>
 {% endblock %}
