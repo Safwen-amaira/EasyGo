@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Carte du trajet {{ trip.departurePoint }} → {{ trip.destination }}</title>
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        #map {
+            height: 600px;
+            margin-bottom: 20px;
+        }
+        .trip-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .trip-info h2 {
+            color: #365ff4;
+            margin-top: 0;
+        }
+        .back-link {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+<a href="{{ path('app_trip_home') }}" class="back-link" title="Retour">
+    <i class="bi bi-arrow-left" style="font-size: 1.5rem;"></i>
+</a>
+
+    <div class="trip-info">
+        <h2>Trajet {{ trip.departurePoint }} → {{ trip.destination }}</h2>
+    </div>
+    <div id="map"></div>
+</div>
+
+<script>
+    // Récupérer les données du trajet
+    const vols = {{ vols|json_encode|raw }};
+    console.log(vols);  // Vérification dans la console
+
+    // Créer la carte avec une vue plus adaptée à un seul trajet
+    const map = L.map('map').setView([36.8, 10.18], 7);
+
+    // Ajouter le fond de carte OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Fonction pour récupérer les coordonnées d'une ville avec l'API Nominatim
+    async function getLatLng(ville) {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${ville}&limit=1`);
+        const data = await response.json();
+        if (data.length > 0) {
+            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        }
+        return null;
+    }
+
+    // Dessiner le trajet
+    async function drawTrip() {
+        const vol = vols[0]; // On prend le seul trajet
+        const departCoord = await getLatLng(vol.depart);
+        const destCoord = await getLatLng(vol.destination);
+
+        if (departCoord && destCoord) {
+            // Tracer une ligne entre le départ et la destination
+            const polyline = L.polyline([departCoord, destCoord], {color: 'red', weight: 3}).addTo(map);
+            
+ // Ajouter des marqueurs pour le départ et la destination
+            L.marker(departCoord).addTo(map).bindPopup("Départ : " + vol.depart);
+            L.marker(destCoord).addTo(map).bindPopup("Destination : " + vol.destination);
+    }}
+
+    // Appeler la fonction pour dessiner le trajet
+    drawTrip();
+</script>
+
+</body>
+</html>

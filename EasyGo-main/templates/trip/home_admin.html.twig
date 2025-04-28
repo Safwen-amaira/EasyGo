@@ -1,0 +1,199 @@
+
+{# templates/trip/home.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Liste des trajets{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4"  style="color:rgb(5, 28, 114);">
+                <h1 class="h3 mb-3">
+                    <i class="bi bi-car-front-fill me-2"></i> Trajets disponibles
+                </h1>
+                <div>
+                    <a href="{{ path('app_trip_admin_trip') }}" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="bi bi-list-ul me-1"></i> Voir trajets
+                    </a>
+                    <a href="{{ path('app_reservation_admin') }}" class="btn btn-sm btn-primary me-2">
+                        <i class="bi bi-eye  me-1"></i> Voir reservations
+                    </a>
+                     <a href="{{ path('app_vol_map')}}" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="bi bi-geo-alt me-1"></i> Voir carte
+                    </a>
+                    <a href="{{ path('app_trip_statistics') }}" class="btn btn-sm btn-primary me-2">
+                        <i class="bi bi-graph-up me-1"></i> Voir statistiques
+                    </a>
+                </div>
+            </div>
+            {# Barre de recherche #}
+<div class="card mb-4 shadow-sm">
+    <div class="card-body p-3">
+        <form method="get" action="{{ path('app_trip_home_admin') }}" class="row g-3 align-items-center">
+            <!-- Champ de recherche -->
+            <div class="col-md-6">
+                <div class="input-group" style="height: 38px;">
+                    <span class="input-group-text bg-light border-0 d-flex align-items-center">
+                        <i class="bi bi-search" style="color: rgb(54, 95, 244);"></i>
+                    </span>
+                    <input type="text" 
+                           class="form-control border-0 bg-light" 
+                           name="search" 
+                           value="{{ app.request.query.get('search') }}" 
+                           placeholder="Rechercher ">
+                </div>
+            </div>
+            
+            <!-- Boutons de tri -->
+            <div class="col-md-4">
+                <div class="d-flex" style="height: 38px; gap: 8px;">
+                    <a href="{{ path('app_trip_home_admin', app.request.query.all|merge({'order': 'ASC'}))  }}" 
+                       class="btn btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center {{ app.request.query.get('order', 'ASC') == 'ASC' ? 'active' : '' }}">
+                        <i class="bi bi-sort-down me-1"></i>Anciens
+                    </a>
+                    <a href="{{ path('app_trip_home_admin', app.request.query.all|merge({'order': 'DESC'})) }}" 
+                       class="btn btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center {{ app.request.query.get('order', 'ASC') == 'DESC' ? 'active' : '' }}">
+                        <i class="bi bi-sort-up me-1"></i>Récents
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bouton Rechercher -->
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-search me-1"></i>Rechercher
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+            {% if trips|length > 0 %}
+                {% for trip in trips %}
+                    <div class="card trip-card mb-4">
+                        <div class="card-header trip-header d-flex justify-content-between align-items-center">
+                            <h2 class="h5 mb-0" style="color:rgb(54, 95, 244);">
+                                <i class="bi bi-car-front-fill me-2"></i>
+                                {{ trip.departurePoint }} → {{ trip.destination }}
+                            </h2>
+                            <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">
+                                <i class="bi bi-people-fill me-1"></i>
+                                {{ trip.availableSeats }} places
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- En-tête de la publication -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="bi bi-calendar-date fs-4" style="color: #1e88e5;"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="h6 mb-0">{{ trip.tripDate|date('d/m/Y') }}</h3>
+                                        <small class="text-muted">Date du trajet</small>
+                                    </div>
+                                </div>
+                                
+                                <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill">
+                                    {{ trip.contribution }} DNT
+                                </span>
+                            </div>
+                            
+                            <!-- Itinéraire -->
+                            <div class="mb-4 p-3 bg-light rounded">
+                                <div class="row">
+                                    <div class="col-md-6 border-end">
+                                        <div class="d-flex mb-3">
+                                            <div class="me-3">
+                                                <i class="bi bi-geo-alt-fill fs-4" style="color: #4CAF50;"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="h6 mb-1">Départ</h4>
+                                                <p class="mb-0">{{ trip.departurePoint }}</p>
+                                                <small class="text-muted">{{ trip.departureTime|date('H:i') }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="d-flex mb-3">
+                                            <div class="me-3">
+                                                <i class="bi bi-geo-fill fs-4" style="color: #F44336;"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="h6 mb-1">Destination</h4>
+                                                <p class="mb-0">{{ trip.destination }}</p>
+                                                <small class="text-muted">{{ trip.returnTime ? trip.returnTime|date('H:i') : 'Non précisé' }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{{ path('app_trip_publication_admin', {'id': trip.id}) }}" class="btn btn-sm btn-primary me-2">
+                                    <i class="bi bi-eye me-1"></i> Voir détails
+                                </a>
+                                <a href="{{ path('app_vol_maps', {'id': trip.id}) }}" class="btn btn-sm btn-outline-primary me-2">
+    <i class="bi bi-geo-alt me-1"></i> Voir sur la carte
+</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-info-circle fs-1 text-muted mb-3"></i>
+                    <p class="h5 text-muted">Aucun trajet disponible pour le moment</p>
+                    <a href="{{ path('app_trip_new') }}" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-circle me-1"></i> Créer un premier trajet
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .trip-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .trip-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .trip-header {
+        background: linear-gradient(135deg, rgba(54, 95, 244, 0.1) 0%, rgba(13, 71, 161, 0.1) 100%);
+        border-bottom: none;
+        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    .detail-card {
+        text-align: center;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .detail-icon {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .action-buttons .btn {
+        min-width: 120px;
+    }
+</style>
+{% endblock %}

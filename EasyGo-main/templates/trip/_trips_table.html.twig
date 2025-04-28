@@ -1,0 +1,42 @@
+{% for trip in pagination %}
+    <tr onclick="window.location='{{ path('app_trip_show', {'id': trip.id}) }}'" style="cursor: pointer;">
+        <td>TRP-{{ trip.id|slice(0, 8)|upper }}</td>
+        <td>{{ trip.tripDate ? trip.tripDate|date('d/m/Y') : '' }}</td>
+        <td>{{ trip.departurePoint }}</td>
+        <td>{{ trip.destination }}</td>
+        <td>{{ trip.departureTime ? trip.departureTime|date('H:i') : '' }}</td>
+        <td>{{ trip.returnTime ? trip.returnTime|date('H:i') : '' }}</td>
+        <td>
+            {% if trip.availableSeats > 0 %}
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                    {{ trip.availableSeats }} places
+                </span>
+            {% else %}
+                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Complet
+                </span>
+            {% endif %}
+        </td>
+        <td>{{ trip.tripType ? trip.tripType : '-' }}</td>
+        <td class="fw-bold">{{ trip.contribution ? trip.contribution ~ ' DNT' : '-' }}</td>
+        <td>
+            <div class="d-flex gap-2" onclick="event.stopPropagation()">
+                <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <form method="post" action="{{ path('app_trip_delete', {'id': trip.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce voyage ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trip.id) }}">
+                    <button class="btn btn-sm btn-outline-danger rounded-pill" title="Supprimer">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="10" class="text-center py-4 text-muted">
+            <i class="bi bi-info-circle me-2"></i>Aucun voyage trouvé
+        </td>
+    </tr>
+{% endfor %}

@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Publication du trajet - {{ trip.departurePoint }} vers {{ trip.destination }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-lg overflow-hidden mb-4">
+                <div class="card-header bg-success text-white py-3" style="background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h4 mb-0 font-weight-light">
+                            <i class="bi bi-check-circle-fill mr-2"></i> Trajet publié avec succès !
+                        </h1>
+                    </div>
+                </div>
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                    <h2 class="h4 mt-3 mb-2">Votre trajet est maintenant visible</h2>
+                    <p class="text-muted">Les voyageurs peuvent voir votre offre et réserver des places.</p>
+                    
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="{{ path('app_trip_index') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="bi bi-list-ul me-1"></i> Voir tous les trajets
+                        </a>
+                        <a href="{{ path('app_trip_show', {'id': trip.id}) }}" class="btn btn-primary rounded-pill px-4">
+                            <i class="bi bi-eye me-1"></i> Voir la publication
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+# config/services.yaml
+parameters:
+    infobip_api_key: '%env(INFOBIP_API_KEY)%'
+    infobip_base_url: '%env(INFOBIP_BASE_URL)%'
+    infobip_sender: '%env(INFOBIP_SENDER)%'
+    test_phone_number: '%env(TEST_PHONE_NUMBER)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Service\InfobipService:
+        public: true  # <-- Ajoutez cette ligne
+        arguments:
+            $params: '@parameter_bag'
+            $logger: '@logger'
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            
+            
