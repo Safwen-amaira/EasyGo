@@ -34,6 +34,9 @@ public function setup2fa(EntityManagerInterface $em): Response
     /** @var Users $user */
     $user = $this->getUser();
     
+    if (!$user) {
+        return $this->redirectToRoute('app_auth');
+    }
     if (!$user->is2FAEnabled()) {
         $totp = TOTP::create();
         $user->setTotpSecret($totp->getSecret());

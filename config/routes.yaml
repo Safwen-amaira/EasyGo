@@ -98,5 +98,8 @@ app_trip_map:
 trip_show:
     path: /trip/{id}
     controller: App\Controller\TripController::show
-    
+
+
+
+# config/routes.yaml
 

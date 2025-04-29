@@ -231,5 +231,34 @@ class UserService
         $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);
         $user->setPassword($encodedPassword);
     }
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $googleId;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $avatar;
+
+    // Add these methods:
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): self
+    {
+        $this->googleId = $googleId;
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): self
+    {
+        $this->avatar = $avatar;
+        return $this;
+    }
 }
 

@@ -1,3 +1,10 @@
+# config/packages/knpu_oauth2_client.yaml
 knpu_oauth2_client:
     clients:
-        # configure your clients as described here: https://github.com/knpuniversity/oauth2-client-bundle#configuration
+        google:
+            type: google
+            client_id: '%env(GOOGLE_OAUTH_CLIENT_ID)%'
+            client_secret: '%env(GOOGLE_OAUTH_CLIENT_SECRET)%'
+            redirect_route: connect_google_check
+            user_fields: ['email', 'name', 'id', 'picture']  # This implicitly sets needed scopes
+            access_type: 'online'  # Optional
