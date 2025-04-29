@@ -1,0 +1,35 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Détails du Forum{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Détails du Forum</h2>
+        <a href="{{ path('app_forum_index') }}" class="btn btn-secondary">← Retour à la liste</a>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title">{{ forum.nom }}</h3>
+            <p class="card-text"><strong>Description :</strong> {{ forum.description }}</p>
+            <p class="card-text"><strong>Date de création :</strong> {{ forum.date ? forum.date|date('d/m/Y') : 'Non précisée' }}</p>
+        </div>
+    </div>
+
+    <h4 class="mt-5 mb-3">Feedbacks</h4>
+
+    {% if forum.feedback is not empty %}
+        {% for feedback in forum.feedback %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p class="mb-1"><strong>Note :</strong> <span class="text-success">{{ feedback.note }}/5</span></p>
+                    <p class="mb-0"><strong>Commentaire :</strong> {{ feedback.commentaire }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">Aucun feedback pour ce forum.</div>
+    {% endif %}
+</div>
+{% endblock %}

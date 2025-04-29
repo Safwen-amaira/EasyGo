@@ -6,9 +6,9 @@ use App\Entity\Reclamation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType; // ← ajouté
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class ReclamationType extends AbstractType
 {
@@ -17,33 +17,22 @@ class ReclamationType extends AbstractType
         $builder
             ->add('categorie', ChoiceType::class, [
                 'choices' => [
-                    'Technique' => 'technique',
-                    'Coût' => 'cout',
-                    'Communication' => 'communication',
+                    'Technique'      => 'technique',
+                    'Coût'           => 'cout',
+                    'Communication'  => 'communication',
                 ],
                 'label' => 'Catégorie',
-                'attr' => ['class' => 'form-control'],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'La catégorie est obligatoire.',
-                    ]),
-                ],
+                'attr'  => ['class' => 'form-control'],
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
-                'attr' => ['class' => 'form-control'],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'La description est obligatoire.',
-                    ]),
-                    new Assert\Length([
-                        'min' => 10,
-                        'max' => 1000,
-                        'minMessage' => 'La description doit faire au moins {{ limit }} caractères.',
-                        'maxMessage' => 'La description ne peut pas dépasser {{ limit }} caractères.',
-                    ]),
-                ],
-            ]);
+                'attr'  => ['class' => 'form-control'],
+            ])
+            ->add('email', EmailType::class, [    // ← nouveau champ
+                'label' => 'Adresse e-mail',
+                'attr'  => ['class' => 'form-control'],
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

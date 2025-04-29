@@ -3,23 +3,41 @@
 {% block title %}Nouveau Feedback{% endblock %}
 
 {% block body %}
-  <div class="container my-5">
-    <h1 class="text-center mb-4">Donner un Feedback</h1>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
 
-    {{ form_start(form) }}
-      <div class="mb-3">
-        {{ form_label(form.note) }}
-        {{ form_widget(form.note, {'attr': {'class': 'form-control'}}) }}
+      <h1 class="text-center mb-5">📝 Donner un Feedback</h1>
+
+      <div class="card shadow-sm p-4">
+        {{ form_start(form) }}
+
+          <div class="mb-4">
+            {{ form_label(form.note, 'Note', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.note, {'attr': {'class': 'form-control'}}) }}
+          </div>
+
+          <div class="mb-4">
+            {{ form_label(form.commentaire, 'Commentaire', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.commentaire, {'attr': {'class': 'form-control', 'rows': '4'}}) }}
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fas fa-paper-plane me-2"></i> Envoyer
+            </button>
+          </div>
+
+        {{ form_end(form) }}
       </div>
 
-      <div class="mb-3">
-        {{ form_label(form.commentaire) }}
-        {{ form_widget(form.commentaire, {'attr': {'class': 'form-control'}}) }}
+      <div class="text-center mt-4">
+        <a href="{{ path('app_feedback_index') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+        </a>
       </div>
 
-      <button type="submit" class="btn btn-primary">Envoyer</button>
-    {{ form_end(form) }}
+    </div>
   </div>
-        <a href="{{ path('app_feedback_index') }}" class="btn btn-outline-secondary">retour a la  liste</a>
-
+</div>
 {% endblock %}

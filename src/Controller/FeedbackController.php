@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Snipe\BanBuilder\CensorWords;
 
 #[Route('/feedback')]
 class FeedbackController extends AbstractController
@@ -28,8 +29,15 @@ class FeedbackController extends AbstractController
         $feedback = new Feedback();
         $form = $this->createForm(FeedbackType::class, $feedback);
         $form->handleRequest($request);
-
+        $censor = new CensorWords;
+        $langs = array('fr', 'it', 'en-us', 'en-uk', 'es');
+        $badwords = $censor->setDictionary($langs);
+        $censor->setReplaceChar("*");
         if ($form->isSubmitted() && $form->isValid()) {
+            $string = $censor->censorString($feedback->getCommentaire());
+            $feedback->setCommentaire($string['clean']);
+
+
             $entityManager->persist($feedback);
             $entityManager->flush();
 

@@ -8,8 +8,6 @@
             "ref": "64d8583af5ea57b7afa4aba4b159907f3a148b05"
         }
     },
-
-
     "doctrine/doctrine-bundle": {
         "version": "2.13",
         "recipe": {
@@ -37,7 +35,6 @@
             "./migrations/.gitignore"
         ]
     },
-
     "knplabs/knp-paginator-bundle": {
         "version": "v6.8.0"
     },
@@ -77,8 +74,6 @@
             "./config/packages/nelmio_cors.yaml"
         ]
     },
-
-
     "symfony/console": {
         "version": "6.4",
         "recipe": {
@@ -103,7 +98,6 @@
             "./config/packages/debug.yaml"
         ]
     },
-
     "symfony/flex": {
         "version": "2.5",
         "recipe": {
@@ -136,6 +130,18 @@
             "./src/Kernel.php"
         ]
     },
+    "symfony/mailer": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.3",
+            "ref": "09051cfde49476e3c12cd3a0e44289ace1c75a4f"
+        },
+        "files": [
+            "./config/packages/mailer.yaml"
+        ]
+    },
     "symfony/maker-bundle": {
         "version": "1.62",
         "recipe": {
@@ -145,7 +151,6 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
-
     "symfony/notifier": {
         "version": "6.4",
         "recipe": {
@@ -184,7 +189,6 @@
             "./config/routes/security.yaml"
         ]
     },
-
     "symfony/stimulus-bundle": {
         "version": "2.24",
         "recipe": {
@@ -225,7 +229,6 @@
             "./templates/base.html.twig"
         ]
     },
-
     "symfony/ux-chartjs": {
         "version": "v2.24.0"
     },

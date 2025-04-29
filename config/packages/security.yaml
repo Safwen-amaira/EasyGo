@@ -45,4 +45,3 @@ security:
         - { path: ^/admin/dashboard, roles: PUBLIC_ACCESS }
         - { path: ^/driver/dashboard, roles: PUBLIC_ACCESS }
         - { path: ^/rider/dashboard, roles: PUBLIC_ACCESS }
-

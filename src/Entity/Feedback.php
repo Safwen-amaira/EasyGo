@@ -19,6 +19,9 @@ class Feedback
     #[ORM\Column(length: 255)]
     private ?string $commentaire = null;
 
+    #[ORM\ManyToOne(inversedBy: 'feedback')]
+    private ?Forum $forum = null;
+
    
 
     public function getId(): ?int
@@ -46,6 +49,18 @@ class Feedback
     public function setCommentaire(string $commentaire): static
     {
         $this->commentaire = $commentaire;
+
+        return $this;
+    }
+
+    public function getForum(): ?Forum
+    {
+        return $this->forum;
+    }
+
+    public function setForum(?Forum $forum): static
+    {
+        $this->forum = $forum;
 
         return $this;
     }

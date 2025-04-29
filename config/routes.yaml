@@ -76,6 +76,7 @@ api_profile:
     path: /api/profile
     controller: App\Controller\AdminController::handleProfile
     methods: [GET, POST]
+
 controllers:
     resource:
         path: ../src/Controller/
@@ -98,3 +99,4 @@ trip_show:
     path: /trip/{id}
     controller: App\Controller\TripController::show
     
+
