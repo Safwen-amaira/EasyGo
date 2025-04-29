@@ -46,11 +46,35 @@ final class ForumController extends AbstractController
     #[Route('/{id}', name: 'app_forum_show', methods: ['GET'])]
     public function show(Forum $forum): Response
     {
+        $feedbacks = $forum->getFeedback();
+        
+        // Calcul des statistiques
+        $stats = [
+            'total' => count($feedbacks),
+            'average' => 0,
+            'distribution' => [0, 0, 0, 0, 0], // Pour les notes 1-5
+        ];
+        
+        if ($stats['total'] > 0) {
+            $sum = 0;
+            foreach ($feedbacks as $feedback) {
+                $note = $feedback->getNote();
+                $sum += $note;
+                $stats['distribution'][$note - 1]++;
+            }
+            $stats['average'] = round($sum / $stats['total'], 2);
+            
+            // Convertir les comptages en pourcentages pour l'affichage
+            foreach ($stats['distribution'] as &$count) {
+                $count = round(($count / $stats['total']) * 100, 1);
+            }
+        }
+        
         return $this->render('forum/show.html.twig', [
             'forum' => $forum,
+            'stats' => $stats,
         ]);
     }
-
     #[Route('/{id}/edit', name: 'app_forum_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Forum $forum, EntityManagerInterface $entityManager): Response
     {
