@@ -43,8 +43,8 @@ public function index(
 
     $pagination = $paginator->paginate(
         $qb,
-        $page,
-        $limit
+        $page, // la page actuelle
+        $limit // le nombre d’éléments par page
     );
 
     // Envoi des résultats à Twig
@@ -62,7 +62,7 @@ public function index(
         $reclamation = new Reclamation();
         $censor = new CensorWords;
         $langs = array('fr', 'it', 'en-us', 'en-uk', 'es');
-        $badwords = $censor->setDictionary($langs);
+        $badwords = $censor->setDictionary($langs); //	Charge les gros mots pour ces langues.
         $censor->setReplaceChar("*");
         // Définir la date de création à la date actuelle
         $reclamation->setDateCreation(new \DateTime());
@@ -134,11 +134,13 @@ public function index(
             ->select('r.statut AS statut, COUNT(r.id) AS count')
             ->groupBy('r.statut')
             ->getQuery()
-            ->getResult();
+            ->getResult(); //regroupe toutes les réclamations par statut, et compte combien il y en a pour chaque.
+
+
 
         // 2) On prépare deux tableaux : labels (statuts) et valeurs (nombre)
-        $labels = [];
-        $data   = [];
+        $labels = []; //les statuts
+        $data   = []; // le nombre de réclamations pour chaque statut
         foreach ($rawStats as $row) {
             $labels[] = $row['statut'];
             $data[]   = (int) $row['count'];
@@ -146,7 +148,7 @@ public function index(
 
         // 3) On construit la configuration Chart.js en PHP
         $chartConfig = [
-            'type'    => 'pie',
+            'type'    => 'pie', //// type du graphique : camembert
             'data'    => [
                 'labels'   => $labels,
                 'datasets' => [[
@@ -162,7 +164,7 @@ public function index(
 
         // 4) On crée l’URL QuickChart avec la config encodée
         $encodedConfig = urlencode(json_encode($chartConfig));
-        $chartUrl      = "https://quickchart.io/chart?c={$encodedConfig}&width=600&height=400";
+        $chartUrl      = "https://quickchart.io/chart?c={$encodedConfig}&width=600&height=400"; // Génération de l’image via QuickChart
 
         return $this->render('reclamation/stats.html.twig', [
             'chartUrl' => $chartUrl,

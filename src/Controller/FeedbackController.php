@@ -29,25 +29,38 @@ class FeedbackController extends AbstractController
         $feedback = new Feedback();
         $form = $this->createForm(FeedbackType::class, $feedback);
         $form->handleRequest($request);
+    
         $censor = new CensorWords;
         $langs = array('fr', 'it', 'en-us', 'en-uk', 'es');
         $badwords = $censor->setDictionary($langs);
         $censor->setReplaceChar("*");
+    
         if ($form->isSubmitted() && $form->isValid()) {
+            // Nettoyage commentaire
             $string = $censor->censorString($feedback->getCommentaire());
             $feedback->setCommentaire($string['clean']);
-
-
+    
             $entityManager->persist($feedback);
             $entityManager->flush();
-
+    
+            // 🔁 Réponse automatique selon la note
+            $note = $feedback->getNote();
+            if ($note >= 4) {
+                $this->addFlash('success', '🙏 Merci pour votre retour positif ! Cela nous motive énormément.');
+            } elseif ($note == 3) {
+                $this->addFlash('info', 'Merci pour votre retour. Nous ferons de notre mieux pour nous améliorer.');
+            } else {
+                $this->addFlash('warning', '😔 Nous sommes désolés que votre expérience n’ait pas été satisfaisante. Nous allons analyser votre feedback pour nous améliorer.');
+            }
+    
             return $this->redirectToRoute('app_feedback_index');
         }
-
+    
         return $this->render('feedback/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
+    
 
     #[Route('/edit/{id}', name: 'app_feedback_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Feedback $feedback, EntityManagerInterface $entityManager): Response

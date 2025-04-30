@@ -4,13 +4,12 @@
 
 {% block body %}
   <div class="container my-5">
-    <h1 class="text-center mb-4">Réclamations</h1>
+    <h1 class="text-center mb-4" style="color: #007bff;">Réclamations</h1>
 
-    <!-- Barre de recherche et tri -->
+    <!-- Barre de recherche et tri avec animation -->
     <div class="mb-4">
-      <input type="text" id="search" class="form-control mb-2" placeholder="Rechercher une réclamation..." value="{{ app.request.query.get('search') }}">
-
-      <select id="sort" class="form-select">
+      <input type="text" id="search" class="form-control mb-2" placeholder="Rechercher une réclamation..." value="{{ app.request.query.get('search') }}" data-aos="fade-up">
+      <select id="sort" class="form-select" data-aos="fade-up" data-aos-delay="200">
         <option value="id" {% if app.request.query.get('sort_by') == 'id' %}selected{% endif %}>Tri par ID</option>
         <option value="dateCreation" {% if app.request.query.get('sort_by') == 'dateCreation' %}selected{% endif %}>Tri par Date de création</option>
         <option value="categorie" {% if app.request.query.get('sort_by') == 'categorie' %}selected{% endif %}>Tri par Catégorie</option>
@@ -18,11 +17,21 @@
       </select>
     </div>
 
+    <!-- Affichage des messages flash -->
+    {% for type, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
     <!-- Zone des réclamations à mettre à jour dynamiquement -->
     <div id="reclamation-list" class="row">
       {% for reclamation in reclamations %}
-        <div class="col-md-4">
-          <div class="card mb-4">
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="card mb-4 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">Réclamation #{{ reclamation.id }}</h5>
               <h6 class="card-subtitle mb-2 text-muted">{{ reclamation.categorie }}</h6>
@@ -31,9 +40,9 @@
               <p><strong>Date de création:</strong> {{ reclamation.dateCreation ? reclamation.dateCreation|date('Y-m-d H:i:s') : 'N/A' }}</p>
 
               <div class="d-flex justify-content-between">
-                <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Acceptée'}) }}" class="btn btn-success">Accepter</a>
-                <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Refusée'}) }}" class="btn btn-danger">Refuser</a>
-                <a href="{{ path('admin_reclamation_reply', {'id': reclamation.id}) }}" class="btn btn-primary">Répondre</a>
+                <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Acceptée'}) }}" class="btn btn-success btn-sm">Accepter</a>
+                <a href="{{ path('admin_reclamation_change_status', {'id': reclamation.id, 'statut': 'Refusée'}) }}" class="btn btn-danger btn-sm">Refuser</a>
+                <a href="{{ path('admin_reclamation_reply', {'id': reclamation.id}) }}" class="btn btn-primary btn-sm">Répondre</a>
               </div>
             </div>
           </div>
@@ -46,9 +55,11 @@
     </div>
 
     <!-- Bouton voir statistiques -->
-    <a href="{{ path('app_reclamation_stats') }}" class="btn btn-info mt-4">
-      <i class="bi bi-bar-chart-line"></i> Voir les statistiques
-    </a>
+    <div class="text-center mt-4">
+      <a href="{{ path('app_reclamation_stats') }}" class="btn btn-info btn-lg">
+        <i class="bi bi-bar-chart-line"></i> Voir les statistiques
+      </a>
+    </div>
   </div>
 
   <!-- JS Ajax -->

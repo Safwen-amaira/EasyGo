@@ -1,13 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Reclamation{% endblock %}
+{% block title %}Modifier Réclamation{% endblock %}
 
 {% block body %}
-    <h1>Edit Reclamation</h1>
+  <div class="container my-5">
+    <h1 class="text-center mb-4" data-aos="fade-up" style="color: #007bff;">Modifier la Réclamation</h1>
 
-    {{ include('reclamation/_form.html.twig', {'button_label': 'Update'}) }}
+    <div data-aos="fade-up" data-aos-delay="200">
+      {{ include('reclamation/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+    </div>
 
-    <a href="{{ path('app_reclamation_index') }}">back to list</a>
+    <div class="mt-4 text-center" data-aos="fade-up" data-aos-delay="300">
+      <a href="{{ path('app_reclamation_index') }}" class="btn btn-outline-primary">Retour à la liste</a>
+    </div>
 
-    {{ include('reclamation/_delete_form.html.twig') }}
+    <div class="mt-4 text-center" data-aos="fade-up" data-aos-delay="400">
+      {{ include('reclamation/_delete_form.html.twig') }}
+    </div>
+  </div>
 {% endblock %}
