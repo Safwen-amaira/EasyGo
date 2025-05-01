@@ -47,34 +47,63 @@ final class ForumController extends AbstractController
     public function show(Forum $forum): Response
     {
         $feedbacks = $forum->getFeedback();
-        
-        // Calcul des statistiques
+    
         $stats = [
             'total' => count($feedbacks),
             'average' => 0,
-            'distribution' => [0, 0, 0, 0, 0], // Pour les notes 1-5
+            'distribution' => [0, 0, 0, 0, 0], // index 0 => note 1, index 4 => note 5
+            'most_common' => null,
+            'positive' => 0,
+            'neutral' => 0,
+            'negative' => 0,
+            'std_deviation' => 0,
         ];
-        
+    
         if ($stats['total'] > 0) {
             $sum = 0;
+            $notes = [];
+    
             foreach ($feedbacks as $feedback) {
                 $note = $feedback->getNote();
                 $sum += $note;
+                $notes[] = $note;
                 $stats['distribution'][$note - 1]++;
+    
+                // Catégorisation
+                if ($note >= 4) {
+                    $stats['positive']++;
+                } elseif ($note == 3) {
+                    $stats['neutral']++;
+                } else {
+                    $stats['negative']++;
+                }
             }
+    
+            // Moyenne
             $stats['average'] = round($sum / $stats['total'], 2);
-            
-            // Convertir les comptages en pourcentages pour l'affichage
-            foreach ($stats['distribution'] as &$count) {
-                $count = round(($count / $stats['total']) * 100, 1);
+    
+            // Répartition en %
+            foreach ($stats['distribution'] as $i => $count) {
+                $stats['distribution'][$i] = round(($count / $stats['total']) * 100, 1);
             }
+    
+            // Note la plus fréquente
+            $note_counts = array_count_values($notes);
+            arsort($note_counts);
+            $stats['most_common'] = array_key_first($note_counts);
+    
+            // Écart-type
+            $mean = $stats['average'];
+            $variance = array_reduce($notes, fn($carry, $n) => $carry + pow($n - $mean, 2), 0) / $stats['total'];
+            $stats['std_deviation'] = round(sqrt($variance), 2);
         }
-        
+    
         return $this->render('forum/show.html.twig', [
             'forum' => $forum,
             'stats' => $stats,
         ]);
     }
+    
     #[Route('/{id}/edit', name: 'app_forum_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Forum $forum, EntityManagerInterface $entityManager): Response
     {

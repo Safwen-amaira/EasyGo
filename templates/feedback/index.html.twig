@@ -1,4 +1,3 @@
-{% set active_page = 'feedback' %}
 {% extends 'base.html.twig' %}
 
 {% block title %}Liste des Feedbacks{% endblock %}
@@ -6,7 +5,7 @@
 {% block stylesheets %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ asset('css/feedback/index.html.css') }}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Ajout des icônes Bootstrap -->
 {% endblock %}
 
 {% block body %}
@@ -66,7 +65,7 @@
     document.querySelectorAll('.alert .btn-close').forEach(button => {
       button.addEventListener('click', function() {
         const alert = this.closest('.alert');
-        alert.style.display = 'none';
+        alert.style.display = 'none'; // Masquer immédiatement l'alerte
       });
     });
 

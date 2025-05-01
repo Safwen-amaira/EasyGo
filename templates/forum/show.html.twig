@@ -48,6 +48,43 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                {# Bar Chart QuickChart #}
+                <h5 class="mt-4">Graphique de répartition des notes</h5>
+                <img 
+                    src="https://quickchart.io/chart?c={{ {
+                        type: 'bar',
+                        data: {
+                            labels: ['1 ★', '2 ★', '3 ★', '4 ★', '5 ★'],
+                            datasets: [{
+                                label: 'Pourcentage des notes',
+                                data: stats.distribution,
+                                backgroundColor: [
+                                    '#ff4d4d', '#ff944d', '#ffd24d', '#b3e94d', '#4dff88'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                title: {
+                                    display: true,
+                                    text: 'Répartition des notes'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: { stepSize: 20 }
+                                }
+                            }
+                        }
+                    }|json_encode|url_encode }}" 
+                    alt="Graphique des feedbacks"
+                    class="img-fluid border rounded shadow-sm my-3"
+                />
             {% else %}
                 <div class="alert alert-info">Aucun feedback pour calculer les statistiques.</div>
             {% endif %}
