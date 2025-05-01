@@ -95,8 +95,10 @@ public function index(
     {
         return $this->render('reclamation/show.html.twig', [
             'reclamation' => $reclamation,
+            'reponses' => $reclamation->getReponses(),
         ]);
     }
+    
 
     #[Route('/{id}/edit', name: 'app_reclamation_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Reclamation $reclamation, EntityManagerInterface $entityManager): Response

@@ -1,45 +1,103 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reclamation{% endblock %}
+{% block title %}Réclamation{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <h1 class="mb-4 text-center">Détails de la Réclamation</h1>
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Détails de la Réclamation</h1>
 
-        <table class="table table-bordered table-striped shadow-sm">
-            <thead>
-                <tr>
-                    <th class="table-success">Id</th>
-                    <th>{{ reclamation.id }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th class="table-secondary">Catégorie</th>
-                    <td>{{ reclamation.categorie }}</td>
-                </tr>
-                <tr>
-                    <th class="table-secondary">Statut</th>
-                    <td>{{ reclamation.statut }}</td>
-                </tr>
-                <tr>
-                    <th class="table-secondary">Description</th>
-                    <td>{{ reclamation.description }}</td>
-                </tr>
-                <tr>
-                    <th class="table-secondary">Date de création</th>
-                    <td>{{ reclamation.dateCreation ? reclamation.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <table class="table table-bordered table-striped shadow-sm">
+        <thead>
+            <tr>
+                <th class="table-success">ID</th>
+                <th>{{ reclamation.id }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th class="table-secondary">Catégorie</th>
+                <td>{{ reclamation.categorie }}</td>
+            </tr>
+            <tr>
+                <th class="table-secondary">Statut</th>
+                <td>{{ reclamation.statut }}</td>
+            </tr>
+            <tr>
+                <th class="table-secondary">Description</th>
+                <td>{{ reclamation.description }}</td>
+            </tr>
+            <tr>
+                <th class="table-secondary">Date de création</th>
+                <td>{{ reclamation.dateCreation ? reclamation.dateCreation|date('Y-m-d H:i') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
 
-        <div class="d-flex justify-content-between mt-4">
-            <a href="{{ path('app_reclamation_index') }}" class="btn btn-primary">Retour à la liste</a>
-            <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning">Modifier</a>
-        </div>
+    <!-- Bouton Écouter pour la réclamation -->
+    <button class="btn btn-info mb-3" onclick="lireReclamation()">🎧 Écouter la réclamation</button>
 
-        <div class="mt-4">
-            {{ include('reclamation/_delete_form.html.twig') }}
-        </div>
+    <div class="mt-5">
+        <h3 class="text-primary">Réponses de l'administration</h3>
+
+        {% if reponses is empty %}
+            <div class="alert alert-info mt-3">Aucune réponse n’a encore été donnée.</div>
+        {% else %}
+            <ul class="list-group mt-3">
+                {% for reponse in reponses %}
+                    <li class="list-group-item">
+                        <strong>Le {{ reponse.dateCreation|date('d/m/Y H:i') }} :</strong><br>
+                        {{ reponse.contenu }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </div>
+
+    <!-- Bouton Écouter pour les réponses -->
+    <button class="btn btn-info mb-3 mt-3" onclick="lireReponses()">🎧 Écouter les réponses</button>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ path('app_reclamation_index') }}" class="btn btn-primary">Retour à la liste</a>
+        <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning">Modifier</a>
+    </div>
+
+    <div class="mt-4">
+        {{ include('reclamation/_delete_form.html.twig') }}
+    </div>
+</div>
+
+<!-- Script JavaScript pour la synthèse vocale -->
+<script>
+    function lireReclamation() {
+        const texte = `
+            Réclamation numéro {{ reclamation.id }},
+            Catégorie : {{ reclamation.categorie }},
+            Statut : {{ reclamation.statut }},
+            Description : {{ reclamation.description }},
+            Date de création : {{ reclamation.dateCreation ? reclamation.dateCreation|date('d/m/Y H:i') : 'non définie' }}
+        `;
+
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(texte);
+        utterance.lang = 'fr-FR';
+        synth.speak(utterance);
+    }
+
+    function lireReponses() {
+        let texteReponses = "Réponses de l'administration : ";
+        
+        {% for reponse in reponses %}
+            texteReponses += "Le {{ reponse.dateCreation|date('d/m/Y H:i') }} : {{ reponse.contenu }}. ";
+        {% endfor %}
+
+        if (texteReponses === "Réponses de l'administration : ") {
+            texteReponses += "Aucune réponse n'a été donnée.";
+        }
+
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(texteReponses);
+        utterance.lang = 'fr-FR';
+        synth.speak(utterance);
+    }
+</script>
 {% endblock %}
