@@ -1,11 +1,36 @@
 {% extends 'base1.html.twig' %}
 
-{% block title %}New Forum{% endblock %}
+{% block title %}Créer un Nouveau Forum{% endblock %}
 
 {% block body %}
-    <h1>Create new Forum</h1>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-primary">Créer un Nouveau Forum</h1>
+    </div>
 
-    {{ include('forum/_form.html.twig') }}
+    <!-- Formulaire de création -->
+    <div class="card shadow-sm rounded p-4">
+        <h4 class="mb-4">Veuillez remplir les informations du forum :</h4>
 
-    <a href="{{ path('app_forum_index') }}">back to list</a>
+        {# Afficher un message de succès ou d'erreur après la soumission du formulaire #}
+        {% if app.session.flashbag.has('success') %}
+            <div class="alert alert-success">
+                {{ app.session.flashbag.get('success')[0] }}
+            </div>
+        {% elseif app.session.flashbag.has('error') %}
+            <div class="alert alert-danger">
+                {{ app.session.flashbag.get('error')[0] }}
+            </div>
+        {% endif %}
+
+        {# Inclure le formulaire pour la création du forum #}
+        {{ include('forum/_form.html.twig') }}
+
+        <div class="mt-4">
+            <a href="{{ path('app_forum_index') }}" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-arrow-left"></i> Retour à la liste des forums
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

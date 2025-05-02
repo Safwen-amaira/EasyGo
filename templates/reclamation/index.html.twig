@@ -14,7 +14,32 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* Barre de navigation des onglets */
+    /* Nom de la société EasyGo */
+    .company-name {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+        z-index: 1000;
+    }
+
+    /* Barre de navigation des onglets centrée et fixe */
+    .nav-pills {
+        position: fixed;
+        top: 15px; /* Ajuster la distance du haut */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ffffff;
+        border-radius: 25px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 10px 20px;
+        z-index: 1000;
+        width: auto; /* Ajuste la largeur au contenu */
+    }
+
+    /* Design des liens de la barre de navigation */
     .nav-pills .nav-link {
         font-weight: bold;
         font-size: 1rem;
@@ -161,19 +186,17 @@
 {% endblock %}
 
 {% block body %}
-  <!-- Navbar only -->
-  <header id="header" class="header d-flex align-items-center fixed-top">
-    {# … inchangé … #}
-  </header>
+  <!-- Affichage du nom de la société EasyGo -->
+  <div class="company-name">EasyGo</div>
+
+  <!-- Barre de navigation -->
+  <nav class="nav nav-pills justify-content-center mb-4">
+    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_feedback_index' %}active{% endif %}" href="{{ path('app_feedback_index') }}">Feedback</a>
+    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reclamation_index' %}active{% endif %}" href="{{ path('app_reclamation_index') }}">Réclamations</a>
+  </nav>
 
   <div class="container my-5">
     
-    <!-- Barre d’onglets -->
-    <nav class="nav nav-pills justify-content-center mb-4">
-      <a class="nav-link {% if app.request.attributes.get('_route') == 'app_feedback_index' %}active{% endif %}" href="{{ path('app_feedback_index') }}">Feedback</a>
-      <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reclamation_index' %}active{% endif %}" href="{{ path('app_reclamation_index') }}">Réclamations</a>
-    </nav>
-
     <h1 class="text-center mb-4">Réclamations</h1>
     <p class="text-center mb-5">Liste des réclamations</p>
 

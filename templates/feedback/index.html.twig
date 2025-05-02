@@ -5,74 +5,155 @@
 {% block stylesheets %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ asset('css/feedback/index.html.css') }}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Ajout des icônes Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+  <style>
+    /* Amélioration du contraste pour les éléments textuels */
+    body {
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    .nav-link, .nav-link.active {
+      color: #ffffff;
+      background-color: #007bff;
+    }
+
+    .nav-link:hover {
+      background-color: #0056b3 !important;
+    }
+
+    .btn-add-feedback {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-add-feedback:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    .card-body {
+      font-size: 1.1rem;
+    }
+
+    .card {
+      border: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Améliorer l'espace pour les éléments importants */
+    .container {
+      padding-top: 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .alert {
+      font-size: 1.2rem;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
-<div class="container py-5">
-  <h1 class="text-center mb-5" style="color: #007bff;">📝 Feedbacks</h1>
+  <!-- Header Sticky avec EasyGo + nav centrée -->
+  <div class="position-sticky top-0 z-3 bg-white py-3 px-4 shadow-sm d-flex justify-content-between align-items-center mb-5" style="border-radius: 0 0 20px 20px; transition: background-color 0.3s;">
+    <!-- Logo ou Titre -->
+    <div class="fw-bold fs-4 text-primary" role="heading" aria-level="1">EasyGo</div>
 
-  <!-- Affichage des messages flash -->
-  {% for type, messages in app.flashes %}
-    {% for message in messages %}
-      <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
+    <!-- Navigation -->
+    <div class="nav nav-pills bg-light p-2 rounded-pill shadow-sm" style="gap: 10px;">
+      <a class="nav-link d-flex align-items-center gap-1 px-4 py-2 {% if app.request.attributes.get('_route') == 'app_feedback_index' %}active bg-primary text-white{% else %}text-dark{% endif %}" 
+         href="{{ path('app_feedback_index') }}" role="link" aria-label="Aller à la liste des feedbacks">
+        <i class="bi bi-star"></i> Feedback
+      </a>
+      <a class="nav-link d-flex align-items-center gap-1 px-4 py-2 {% if app.request.attributes.get('_route') == 'app_reclamation_index' %}active bg-primary text-white{% else %}text-dark{% endif %}" 
+         href="{{ path('app_reclamation_index') }}" role="link" aria-label="Aller à la liste des réclamations">
+        <i class="bi bi-chat-dots"></i> Réclamations
+      </a>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <h1 class="text-center mb-5" style="color: #007bff;">📝 Feedbacks</h1>
+
+    <!-- Messages flash -->
+    {% for type, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+      {% endfor %}
     {% endfor %}
-  {% endfor %}
 
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      {% if feedbacks is not empty %}
-        {% for feedback in feedbacks %}
-          <div class="card shadow-sm mb-4" data-aos="fade-up">
-            <div class="card-body">
-              <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="star-rating">
-                  {% for i in 1..5 %}
-                    <i class="bi {{ i <= feedback.note ? 'bi-star-fill text-warning' : 'bi-star text-secondary' }}"></i>
-                  {% endfor %}
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        {% if feedbacks is not empty %}
+          {% for feedback in feedbacks %}
+            <div class="card shadow-sm mb-4" data-aos="fade-up" style="transition: transform 0.3s ease, box-shadow 0.3s ease;" tabindex="0">
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="star-rating" aria-label="Note du feedback">
+                    {% for i in 1..5 %}
+                      <i class="bi {{ i <= feedback.note ? 'bi-star-fill text-warning' : 'bi-star text-secondary' }}" aria-hidden="true"></i>
+                    {% endfor %}
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="{{ path('app_feedback_edit', {'id': feedback.id}) }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Modifier" aria-label="Modifier ce feedback">
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                    {{ include('feedback/_delete.html.twig', {'feedback': feedback}) }}
+                  </div>
                 </div>
-                <div class="d-flex gap-2">
-                  <a href="{{ path('app_feedback_edit', {'id': feedback.id}) }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Modifier">
-                    <i class="bi bi-pencil-square"></i>
-                  </a>
-                  {{ include('feedback/_delete.html.twig', {'feedback': feedback}) }}
-                </div>
+                <p class="card-text small text-muted">{{ feedback.commentaire|default('Aucun commentaire.') }}</p>
               </div>
-              <p class="card-text small text-muted">{{ feedback.commentaire|default('Aucun commentaire.') }}</p>
             </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="alert alert-info text-center">Aucun feedback pour le moment.</div>
-      {% endif %}
+          {% endfor %}
+        {% else %}
+          <div class="alert alert-info text-center">Aucun feedback pour le moment.</div>
+        {% endif %}
 
-      <div class="text-center mt-5">
-        <a href="{{ path('app_feedback_new') }}" class="btn btn-success btn-lg">
-          <i class="fas fa-plus me-2"></i> Ajouter un feedback
-        </a>
+        <div class="text-center mt-5">
+          <a href="{{ path('app_feedback_new') }}" class="btn btn-success btn-lg btn-add-feedback" aria-label="Ajouter un nouveau feedback">
+            <i class="fas fa-plus me-2"></i> Ajouter un feedback
+          </a>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block javascripts %}
   <script>
-    // Assurer que le bouton close fonctionne immédiatement
+    // Fermer les alertes manuellement
     document.querySelectorAll('.alert .btn-close').forEach(button => {
       button.addEventListener('click', function() {
         const alert = this.closest('.alert');
-        alert.style.display = 'none'; // Masquer immédiatement l'alerte
+        alert.style.display = 'none';
       });
     });
 
-    // Initialiser les tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    // Initialiser les tooltips Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Fermer les alertes flash après un délai
+    document.querySelectorAll('.alert').forEach(alert => {
+      setTimeout(() => {
+        alert.classList.add('fade');
+        setTimeout(() => {
+          alert.style.display = 'none';
+        }, 500); // délai de disparition
+      }, 5000); // délai avant disparition
     });
   </script>
 {% endblock %}
