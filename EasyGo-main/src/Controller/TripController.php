@@ -64,7 +64,7 @@ final class TripController extends AbstractController
             ['Confirmées', 'En attente', 'Refusées'],
             [$reservationStats['confirmed'], $reservationStats['pending'], $reservationStats['rejected']],
             'Statut des réservations',
-            ['#1cc88a', '#f6c23e', '#e74a3b']
+            ['#228b22', '#f6c23e', '#e74a3b']
         );
     
         // Graphique des trajets
@@ -73,7 +73,7 @@ final class TripController extends AbstractController
             ['À venir', 'Effectués'],
             [$tripStats['active'], $tripStats['completed']],
             'Statut des trajets',
-            ['#36b9cc', '#1cc88a']
+            ['#87ceeb', '#228b22']
         );
     
         // Graphique des réservations mensuelles
@@ -148,7 +148,7 @@ final class TripController extends AbstractController
     public function home(Request $request, TripRepository $tripRepository): Response
     {
         $searchTerm = $request->query->get('search');
-        $order = $request->query->get('order', 'ASC'); // Par défaut ASC si non spécifié
+        $order = $request->query->get('order', 'DESC'); // Par défaut ASC si non spécifié
         
         if ($searchTerm) {
             $trips = $tripRepository->createQueryBuilder('t')
@@ -166,33 +166,60 @@ final class TripController extends AbstractController
             'current_order' => $order, // On passe l'ordre courant au template
         ]);
     }
-#[Route('/home_client', name: 'app_trip_home_client')]
-public function homeclient(Request $request, TripRepository $tripRepository): Response
-{
-    $searchTerm = $request->query->get('search');
-    $order = $request->query->get('order', 'ASC'); // Par défaut ASC si non spécifié
+    #[Route('/home_client', name: 'app_trip_home_client')]
+    public function homeclient(Request $request, TripRepository $tripRepository): Response
+    {
+        $searchCriteria = [
+            'departurePoint' => $request->query->get('departurePoint'),
+            'destination' => $request->query->get('destination'),
+            'tripDate' => $request->query->get('tripDate'),
+            'order' => $request->query->get('order', 'DESC'),
+        ];
     
-    if ($searchTerm) {
-        $trips = $tripRepository->createQueryBuilder('t')
-            ->where('LOWER(t.departure_point) LIKE LOWER(:search) OR LOWER(t.destination) LIKE LOWER(:search)')
-            ->setParameter('search', '%'.$searchTerm.'%')
-            ->orderBy('t.trip_date', $order)
-            ->getQuery()
-            ->getResult();
-    } else {
-        $trips = $tripRepository->findBy([], ['trip_date' => $order]);
+        $query = $tripRepository->createQueryBuilder('t');
+    
+        // Apply filters
+        if ($searchCriteria['departurePoint']) {
+            $query->andWhere('LOWER(t.departure_point) LIKE LOWER(:departurePoint)')
+                  ->setParameter('departurePoint', '%'.$searchCriteria['departurePoint'].'%');
+        }
+    
+        if ($searchCriteria['destination']) {
+            $query->andWhere('LOWER(t.destination) LIKE LOWER(:destination)')
+                  ->setParameter('destination', '%'.$searchCriteria['destination'].'%');
+        }
+    
+        if ($searchCriteria['tripDate']) {
+            try {
+                $tripDate = new \DateTime($searchCriteria['tripDate']);
+                $query->andWhere('t.trip_date = :tripDate')
+                      ->setParameter('tripDate', $tripDate);
+            } catch (\Exception $e) {
+                // Handle date parsing error if needed
+            }
+        }
+    
+        // Sorting
+        $query->orderBy('t.trip_date', $searchCriteria['order']);
+    
+        $trips = $query->getQuery()->getResult();
+    
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('trip/_trips_list.html.twig', [
+                'trips' => $trips,
+            ]);
+        }
+    
+        return $this->render('trip/home_client.html.twig', [
+            'trips' => $trips,
+            'searchCriteria' => $searchCriteria,
+        ]);
     }
-
-    return $this->render('trip/home_client.html.twig', [
-        'trips' => $trips,
-        'current_order' => $order, // On passe l'ordre courant au template
-    ]);
-}
 #[Route('/home_admin', name: 'app_trip_home_admin')]
 public function homeadmin(Request $request, TripRepository $tripRepository): Response
 {
     $searchTerm = $request->query->get('search');
-    $order = $request->query->get('order', 'ASC'); // Par défaut ASC si non spécifié
+    $order = $request->query->get('order', 'DESC'); // Par défaut ASC si non spécifié
     
     if ($searchTerm) {
         $trips = $tripRepository->createQueryBuilder('t')

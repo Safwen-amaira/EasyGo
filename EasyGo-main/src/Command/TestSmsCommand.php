@@ -52,9 +52,7 @@ class TestSmsCommand extends Command
 
        // Dans TestSmsCommand.php, réduisez le message à :
     $message = sprintf(
-        "EasyGo - Votre réservation a été confirmée avec succès. 
-        Accédez à votre compte pour plus de détails. 
-        Merci pour votre confiance !",
+        "EasyGo - Votre réservation a été confirmée avec succès.Accédez à votre compte pour plus de détails. Merci pour votre confiance !",
 
         );
 
