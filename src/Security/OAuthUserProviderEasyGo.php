@@ -18,14 +18,17 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
-class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
+class GoogleAuthenticatorEasyGo extends OAuth2Authenticator implements AuthenticationEntryPointInterface
 {
     private $clientRegistry;
     private $entityManager;
     private $router;
 
-    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router)
-    {
+    public function __construct(
+        ClientRegistry $clientRegistry,
+        EntityManagerInterface $entityManager,
+        RouterInterface $router
+    ) {
         $this->clientRegistry = $clientRegistry;
         $this->entityManager = $entityManager;
         $this->router = $router;
@@ -50,16 +53,12 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
                 $user = $this->entityManager->getRepository(Users::class)->findOneBy(['email' => $email]);
 
                 if (!$user) {
-                    // Create new user
                     $user = new Users();
                     $user->setEmail($email);
                     $user->setGoogleId($googleUser->getId());
                     $user->setNom($googleUser->getFirstName());
-                    $user->setPrenom($googleUser->getLastName());   
-                    $user->setIsRider(false);
-                    $user->setIsDriver(false);
-                    $user->setIsAdmin(false);
-
+                    $user->setPrenom($googleUser->getLastName());
+                    
                     $this->entityManager->persist($user);
                     $this->entityManager->flush();
                 }
@@ -73,46 +72,12 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
     {
         $user = $token->getUser();
         
-        // Check if profile is complete
         if (!$user->isProfileComplete()) {
             return new RedirectResponse($this->router->generate('complete_profile'));
         }
 
-       
-        // Redirect based on user role
-       if($user->isAdmin()){
-
-        $targetUrl = $this->router->generate('admin_dashboard');
-       }
-       if($user->isRider()){
-
-        $targetUrl = $this->router->generate('rider_dashboard');
-       } 
-          if($user->isDriver()){
-
-        $targetUrl = $this->router->generate('driver_dashboard');
-       }
-       $userData = [
-        'id' => $user->getId(),
-        'isAdmin' => $user->isAdmin(),
-        'isDriver' => $user->isDriver(),
-        'isRider' => $user->isRider(),
-        'cin' => $user->getCin(),
-        'email' => $user->getEmail(),
-        'nom' => $user->getNom(),
-        'prenom' => $user->getPrenom()
-    ];
-    $targetUrl = $this->router->generate($user->isAdmin() ? 'admin_dashboard' : 
-    ($user->isRider() ? 'rider_dashboard' : 'driver_dashboard'));
-    $content = sprintf(
-        '<script>
-            localStorage.setItem("user", JSON.stringify(%s));
-            window.location.href = "%s";
-        </script>',
-        json_encode($userData),
-        $targetUrl
-    );
-    return new Response($content);
+        $targetUrl = $this->router->generate('dashboard');
+        return new RedirectResponse($targetUrl);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response

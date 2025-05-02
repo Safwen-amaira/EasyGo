@@ -100,6 +100,18 @@ trip_show:
     controller: App\Controller\TripController::show
 
 
+connect_google:
+    path: /connect/google
+    controller: KnpU\OAuth2ClientBundle\Controller\ClientController::redirectAction
+    defaults:
+        service: google
+google_connection: 
+    path: /connect/google/auth
+    controller: App\Controller\GoogleAuthController::connectGoogleAction
+connect_google_check:
+    path: /connect/google/check
+    controller: KnpU\OAuth2ClientBundle\Controller\ClientController::checkAction
+    defaults:
+        service: google
 
-# config/routes.yaml
 

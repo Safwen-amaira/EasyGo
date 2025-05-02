@@ -1,0 +1,49 @@
+{# templates/profile/completion.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Complete Your Profile{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h1 class="h3 mb-4 text-center">Complete Your Profile</h1>
+                        
+                        {% if errors|length > 0 %}
+                            <div class="alert alert-danger">
+                                {% for error in errors %}
+                                    <p>{{ error.message }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {{ form_start(form) }}
+                            {{ form_row(form.email) }}
+                            {{ form_row(form.cin) }}
+                            {{ form_row(form.nom) }}
+                            {{ form_row(form.prenom) }}
+                            
+                            <div class="form-group">
+                                <label>Account Type</label>
+                                <div class="form-check">
+                                    {{ form_widget(form.isRider) }}
+                                    {{ form_label(form.isRider) }}
+                                </div>
+                                <div class="form-check">
+                                    {{ form_widget(form.isDriver) }}
+                                    {{ form_label(form.isDriver) }}
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 mt-3">
+                                Complete Registration
+                            </button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

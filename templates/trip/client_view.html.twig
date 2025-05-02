@@ -1,5 +1,5 @@
 {# templates/trip/client_view.html.twig #}
-{% extends 'auth/rider_dashboard.html.twig' %}
+{% extends 'dashboard/rider_dashboard.html.twig' %}
 
 {% block title %}Trajet {{ trip.departurePoint }} → {{ trip.destination }}{% endblock %}
 
@@ -64,7 +64,7 @@
 </style>
 {% endblock %}
 
-{% block body %}
+{% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">

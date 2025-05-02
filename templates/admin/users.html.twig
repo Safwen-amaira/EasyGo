@@ -5,20 +5,41 @@
     <h1 style="margin-bottom: 25px; font-size: 28px; font-weight: 600; color: #34495e;">
         <i class="fas fa-users" style="margin-right: 10px; color: #3498db;"></i> User Management
     </h1>
-
+<div style="margin-bottom: 20px; text-align: right;">
+    <a href="{{ path('admin_users_export_pdf') }}" class="btn btn-export" 
+       style="background: #3498db; color: white; padding: 10px 15px; border-radius: 6px; 
+              font-size: 14px; text-decoration: none; display: inline-flex; align-items: center;">
+        <i class="fas fa-file-pdf" style="margin-right: 8px;"></i> Export to PDF
+    </a>
+</div>
     <div style="overflow-x: auto;">
         <table class="data-table" style="width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 8px; overflow: hidden;">
             <thead style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
                 <tr>
-                    <th style="padding: 16px; text-align: left;">Name</th>
-                    <th style="padding: 16px; text-align: left;">Email</th>
-                    <th style="padding: 16px; text-align: left;">CIN</th>
+                    <th style="padding: 16px; text-align: left;">
+                        {{ knp_pagination_sortable(pagination, 'Name', 'u.nom') }}
+                        {% if pagination.isSorted('u.nom') %}
+                            <i class="fas fa-sort-{{ pagination.direction == 'asc' ? 'up' : 'down' }}" style="margin-left: 5px;"></i>
+                        {% endif %}
+                    </th>
+                    <th style="padding: 16px; text-align: left;">
+                        {{ knp_pagination_sortable(pagination, 'Email', 'u.email') }}
+                        {% if pagination.isSorted('u.email') %}
+                            <i class="fas fa-sort-{{ pagination.direction == 'asc' ? 'up' : 'down' }}" style="margin-left: 5px;"></i>
+                        {% endif %}
+                    </th>
+                    <th style="padding: 16px; text-align: left;">
+                        {{ knp_pagination_sortable(pagination, 'CIN', 'u.cin') }}
+                        {% if pagination.isSorted('u.cin') %}
+                            <i class="fas fa-sort-{{ pagination.direction == 'asc' ? 'up' : 'down' }}" style="margin-left: 5px;"></i>
+                        {% endif %}
+                    </th>
                     <th style="padding: 16px; text-align: left;">Roles</th>
                     <th style="padding: 16px; text-align: left;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for user in users %}
+                {% for user in pagination %}
                 <tr style="border-bottom: 1px solid #ecf0f1;">
                     <td style="padding: 14px;">{{ user.nom }} {{ user.prenom }}</td>
                     <td style="padding: 14px;">{{ user.email }}</td>
@@ -59,5 +80,53 @@
             </tbody>
         </table>
     </div>
+
+    {# Pagination controls #}
+    <div class="pagination" style="margin-top: 20px; display: flex; justify-content: center;">
+        {{ knp_pagination_render(pagination) }}
+    </div>
 </div>
+
+<style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 8px 16px;
+        margin: 0 4px;
+        border: 1px solid #3498db;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #3498db;
+    }
+
+    .pagination a:hover {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .pagination .active span {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
+    .pagination .disabled span {
+        color: #95a5a6;
+        border-color: #95a5a6;
+    }
+    
+    .sortable {
+        color: white;
+        text-decoration: none;
+    }
+    
+    .sortable:hover {
+        text-decoration: underline;
+    }
+</style>
 {% endblock %}

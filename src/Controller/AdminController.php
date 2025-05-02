@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse; 
 use App\Form\ProfileType;
+use Knp\Component\Pager\PaginatorInterface;
+use App\Service\PdfGenerator; 
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class AdminController extends AbstractController
 {
@@ -24,14 +28,56 @@ class AdminController extends AbstractController
         ]);
     }
 
+
     #[Route('/admin/users', name: 'admin_users')]
-    public function users(EntityManagerInterface $em): Response
-    {
+    public function index(
+        EntityManagerInterface $em,
+        PaginatorInterface $paginator,
+        Request $request
+    ): Response {
+        $queryBuilder = $em->getRepository(Users::class)->createQueryBuilder('u');
+        
+        // Sorting
+        $sortField = $request->query->get('sort', 'u.nom'); // Default sort by name
+        $sortDirection = $request->query->get('direction', 'asc'); // Default direction
+        
+        if ($sortField) {
+            $queryBuilder->orderBy($sortField, $sortDirection);
+        }
+        
+        // Pagination
+        $pagination = $paginator->paginate(
+            $queryBuilder, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            10 /*limit per page*/
+        );
+
         return $this->render('admin/users.html.twig', [
-            'users' => $em->getRepository(Users::class)->findAll()
+            'pagination' => $pagination
         ]);
     }
 
+
+    #[Route('/admin/users/export-pdf', name: 'admin_users_export_pdf')]
+    public function exportToPdf(EntityManagerInterface $em, PdfGenerator $pdfGenerator): BinaryFileResponse {
+        $users = $em->getRepository(Users::class)->findAll();
+    
+        $html = $this->renderView('admin/users_pdf.html.twig', [
+            'users' => $users,
+            'date' => new \DateTime()
+        ]);
+    
+        $pdfPath = $pdfGenerator->generatePdfFromHtml($html, 'users-list');
+    
+        $response = new BinaryFileResponse($pdfPath);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'users-list.pdf'
+        );
+    
+        return $response;
+    }
+    
     #[Route('/admin/user/edit/{id}', name: 'admin_user_edit', methods: ['GET', 'POST'])]
     public function editUser(Request $request, Users $user, EntityManagerInterface $em): Response
     {

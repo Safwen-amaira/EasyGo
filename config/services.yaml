@@ -9,13 +9,30 @@ parameters:
     infobip_base_url: '%env(INFOBIP_BASE_URL)%'
     infobip_sender: '%env(INFOBIP_SENDER)%'
     test_phone_number: '%env(TEST_PHONE_NUMBER)%'
+    pdf_directory: '%kernel.project_dir%/public/pdf'
 
 
 services:
+
+    App\Security\GoogleAuthenticator:
+        arguments:
+            $clientRegistry: '@knpu.oauth2.registry'
+            $entityManager: '@doctrine.orm.entity_manager'
+            $router: '@router.default'
+
+    # OAuth User Provider
+    app.oauth_user_provider:
+        class: App\Security\OAuthUserProviderEasyGo
+        arguments: ['@doctrine.orm.entity_manager']
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            string $pdfDir: '%pdf_directory%'
+            Symfony\Component\String\Slugger\SluggerInterface: '@Symfony\Component\String\Slugger\SluggerInterface'
+
     App\EventListener\JWTCreatedListener:
         tags:
             - { name: 'kernel.event_listener', event: 'lexik_jwt_authentication.on_authentication_success', method: onAuthenticationSuccess }
@@ -29,7 +46,11 @@ services:
             $params: '@parameter_bag'
             $logger: '@logger'
 
-
+    App\Service\PdfGenerator:
+        public: true
+        arguments:
+            - '@Symfony\Component\String\Slugger\SluggerInterface'
+            - '%pdf_directory%'
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
 

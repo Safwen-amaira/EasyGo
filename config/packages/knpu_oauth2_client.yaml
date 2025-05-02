@@ -6,5 +6,4 @@ knpu_oauth2_client:
             client_id: '%env(GOOGLE_OAUTH_CLIENT_ID)%'
             client_secret: '%env(GOOGLE_OAUTH_CLIENT_SECRET)%'
             redirect_route: connect_google_check
-            user_fields: ['email', 'name', 'id', 'picture']  # This implicitly sets needed scopes
-            access_type: 'online'  # Optional
+            redirect_params: {}

@@ -208,6 +208,12 @@
                 </li>
 
                            <li>
+                    <a href="/reclamation/">
+                        <i class="fas fa-user"></i>
+                        Reclamations
+                    </a>
+                </li>
+                           <li>
                     <a href="/trip/home/">
                         <i class="fas fa-user"></i>
                         Trips
@@ -234,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userIdentifier = localStorage.getItem('user_identifier');
 
     // Check if user is authenticated and is admin
-    if (!user || !user.isDriver || !token || !userIdentifier) {
+    if (!user || !user.isDriver ) {
         // Clear all auth data
         localStorage.removeItem('user');
         localStorage.removeItem('token');

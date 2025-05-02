@@ -30,10 +30,10 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 8)]
+    #[ORM\Column(length: 8, nullable: true)]
     #[Groups(['user:read'])]
     private ?string $cin = null;
     
@@ -159,7 +159,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->isRider;
     }
-
+    public function isProfileComplete(): bool
+    {
+        return $this->getCin() !== null 
+            && $this->getNom() !== null 
+            && $this->getPrenom() !== null;
+    }
     public function setIsRider(bool $isRider): static
     {
         $this->isRider = $isRider;
@@ -191,7 +196,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     public function getUserIdentifier(): string
     {
-        return $this->cin;
+        return $this->cin ?? $this->email ?? 'anonymous';
     }
 
     #[Groups(['user:read'])]
@@ -214,6 +219,23 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary sensitive data on the user, clear it here
     }
+// Add this property
+#[ORM\Column(type: 'string', nullable: true)]
+private ?string $googleId = null;
+
+// Getter
+public function getGoogleId(): ?string
+{
+    return $this->googleId;
+}
+
+// Setter
+public function setGoogleId(?string $googleId): self
+{
+    $this->googleId = $googleId;
+    return $this;
+}
+
 }
 
 
@@ -260,5 +282,12 @@ class UserService
         $this->avatar = $avatar;
         return $this;
     }
+    public function isProfileComplete(): bool
+    {
+        return $this->getCin() !== null 
+            && $this->getNom() !== null 
+            && $this->getPrenom() !== null;
+            }
+
 }
 
