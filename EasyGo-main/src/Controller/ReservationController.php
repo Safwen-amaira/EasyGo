@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use Knp\Component\Pager\PaginatorInterface;
-use App\Service\InfobipService;
+use App\Service\TwilioSmsService;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Psr\Log\LoggerInterface; 
 
@@ -313,91 +313,54 @@ final class ReservationController extends AbstractController
 
         return $this->redirectToRoute('app_reservation_index_driver');
     }
-    
     #[Route('/{id}/manage-driver', name: 'app_reservation_manage_driver', methods: ['GET', 'POST'])]
     public function manageDriver(
         Request $request, 
         Reservation $reservation,
-        InfobipService $infobipService,
+        TwilioSmsService $twilioSmsService,
         ParameterBagInterface $params,
         LoggerInterface $logger
     ): Response {
-        $logger->info('Entering manageDriver', ['reservation' => $reservation->getId()]);
+        $logger->info('Managing reservation', ['id' => $reservation->getId()]);
         
         if ($request->isMethod('POST')) {
             $action = $request->request->get('action');
-            $logger->info('Action received', ['action' => $action]);
             $trip = $reservation->getTrip();
             
             if ($action === 'confirm') {
-                $logger->debug('Confirming reservation');
-                
                 if ($reservation->getNombrePlaces() > $trip->getAvailableSeats()) {
-                    $this->addFlash('error', 'Pas assez de places disponibles pour confirmer cette réservation');
+                    $this->addFlash('error', 'Not enough available seats');
                     return $this->redirectToRoute('app_reservation_manage_driver', ['id' => $reservation->getId()]);
                 }
                 
                 $reservation->setEtatReservation('confirmé');
                 $trip->setAvailableSeats($trip->getAvailableSeats() - $reservation->getNombrePlaces());
-                $this->addFlash('success', 'Réservation confirmée avec succès');
                 
-                // Envoi du SMS modifié
+                // Send confirmation SMS
                 $user = $reservation->getUser();
                 $phoneNumber = $user?->getPhoneNumber() ?? $params->get('test_phone_number');
-                if (!empty($phoneNumber)) {
-                    // Ajoutez ce logging
-                    $logger->info('Phone number to use', [
-                        'phone' => $phoneNumber,
-                        'source' => $user ? 'user profile' : 'test number'
-                    ]);
-                    
+                
+                if ($phoneNumber) {
                     $message = sprintf(
-                        "EasyGo - Confirmation de réservation\n\n" .
-                        "Votre réservation N°%d est confirmée :\n" .
-                        "Départ: %s\n" .
-                        "Arrivée: %s\n" .
-                        "Date: %s\n" .
-                        "Détails: %d place(s) - %.2f DNT\n\n" .
-                        "Merci de voyager avec EasyGo!",
-                        $reservation->getId(),
-                        $trip->getDeparturePoint(),
-                        $trip->getDestination(),
-                        $trip->getTripDate()->format('d/m/Y H:i'),
-                        $reservation->getNombrePlaces(),
-                        $reservation->getMontantTotal()
+                        "EasyGo - Votre réservation a été confirmée avec succès. Accédez à votre compte pour plus de détails. Merci pour votre confiance !"
                     );
-
-                    $logger->debug('Attempting to send SMS', [
-                        'phone' => $phoneNumber,
-                        'message' => $message
-                    ]);
-                    
+    
                     try {
-                        $smsSent = $infobipService->sendSms($phoneNumber, $message);
-                        
-                        if ($smsSent) {
-                            $logger->info('SMS successfully sent');
-                            $this->addFlash('success', 'SMS de confirmation envoyé au passager');
+                        if ($twilioSmsService->sendSms($phoneNumber, $message)) {
+                            $this->addFlash('success', 'SMS de confirmation envoyé');
                         } else {
-                            $logger->error('SMS sending failed (no exception)');
-                            $this->addFlash('warning', 'Réservation confirmée mais échec d\'envoi du SMS');
+                            $this->addFlash('warning', 'Réservation confirmée mais SMS non envoyé');
                         }
                     } catch (\Exception $e) {
-                        $logger->error('SMS sending error', [
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString()
-                        ]);
-                        $this->addFlash('warning', 'Réservation confirmée mais erreur lors de l\'envoi du SMS');
+                        $logger->error('SMS sending error', ['error' => $e->getMessage()]);
+                        $this->addFlash('warning', 'Erreur lors de l\'envoi du SMS');
                     }
                 } else {
-                    $logger->warning('No phone number available for SMS', [
-                        'user_id' => $user?->getId(),
-                        'has_phone' => !empty($phoneNumber)
-                    ]);
-                    $this->addFlash('warning', 'Réservation confirmée mais SMS non envoyé (numéro non disponible)');
+                    $this->addFlash('warning', 'Aucun numéro de téléphone disponible');
                 }
+                
+                $this->addFlash('success', 'Réservation confirmée');
             } elseif ($action === 'reject') {
-                $logger->debug('Rejecting reservation');
                 $reservation->setEtatReservation('refusé');
                 $this->addFlash('warning', 'Réservation refusée');
             }

@@ -1,8 +1,7 @@
-# config/services.yaml
 parameters:
-    infobip_api_key: '%env(INFOBIP_API_KEY)%'
-    infobip_base_url: '%env(INFOBIP_BASE_URL)%'
-    infobip_sender: '%env(INFOBIP_SENDER)%'
+    twilio_account_sid: '%env(TWILIO_ACCOUNT_SID)%'
+    twilio_auth_token: '%env(TWILIO_AUTH_TOKEN)%'
+    twilio_from_number: '%env(TWILIO_FROM_NUMBER)%'
     test_phone_number: '%env(TEST_PHONE_NUMBER)%'
 
 services:
@@ -10,8 +9,7 @@ services:
         autowire: true
         autoconfigure: true
 
-    App\Service\InfobipService:
-        public: true  # <-- Ajoutez cette ligne
+    App\Service\TwilioSmsService:
         arguments:
             $params: '@parameter_bag'
             $logger: '@logger'
@@ -22,5 +20,3 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-            
-            

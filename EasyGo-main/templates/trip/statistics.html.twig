@@ -3,352 +3,364 @@
 {% block title %}Tableau de Bord - Statistiques{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-2">
+<div class="container-fluid py-3">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                    <h1 class="h5 mb-0 text-primary">
+            <!-- Header Section -->
+            <div class="page-header mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h3 text-primary fw-bold">
                         <i class="bi bi-bar-chart-line me-2"></i>Tableau de Bord Statistique
                     </h1>
-                    <span class="badge bg-primary bg-opacity-10 text-primary">
-                        <i class="bi bi-calendar me-1"></i> {{ "now"|date("d/m/Y") }}
-                    </span>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-primary bg-opacity-10 text-primary fs-6 py-2 px-3">
+                            <i class="bi bi-calendar me-1"></i> {{ "now"|date("d/m/Y") }}
+                        </span>
+                    </div>
                 </div>
-                
-                <div class="card-body p-3">
-                    <!-- Section Réservations -->
-                    <section class="mb-2">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h2 class="h5 mb-0 text-primary">
-                                <i class="bi bi-journal-check me-2"></i> Statistiques des Réservations
+                <hr class="mt-2 mb-3 border-primary border-opacity-25">
+            </div>
+
+            <!-- Main Dashboard Content -->
+            <div class="row g-4">
+                <!-- Revenue Summary Section -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-bottom">
+                            <h2 class="h5 mb-0 text-primary fw-semibold">
+                                <i class="bi bi-cash-coin me-2"></i> Performance Financière
                             </h2>
                         </div>
-                        
-                        <div class="row g-2">
-                            <!-- Carte Total Réservations -->
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card border-start border-primary border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h6 class="text-muted mb-2">Total Réservations</h6>
-                                                <h3 class="mb-0 text-primary">{{ reservation_stats.total }}</h3>
-                                            </div>
-                                            <div class="flex-shrink-0">
-                                                <i class="bi bi-journal-text text-primary fs-1"></i>
-                                            </div>
+                        <div class="card-body">
+                            <div class="row align-items-center h-100">
+                                <div class="col-md-5">
+                                    <div class="d-flex flex-column h-100 justify-content-between">
+                                        <div class="mb-4">
+                                            <h3 class="display-5 fw-bold text-success mb-1">{{ total_revenue|number_format(2, ',', ' ') }} DNT</h3>
+                                            <p class="text-muted mb-2">Revenus totaux des réservations confirmées</p>
+                                            <span class="badge bg-success bg-opacity-15 text-success fs-6 py-2">
+                                                <i class="bi bi-graph-up-arrow me-1"></i> Performance financière
+                                            </span>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Carte Réservations Confirmées -->
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card border-start border-success border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h6 class="text-muted mb-2">Confirmées</h6>
-                                                <h3 class="mb-0 text-success">{{ reservation_stats.confirmed }}</h3>
-                                                <small class="text-muted">{{ ((reservation_stats.confirmed/reservation_stats.total)*100)|number_format(1) }}% du total</small>
-                                            </div>
-                                            <div class="flex-shrink-0">
-                                                <i class="bi bi-check-circle text-success fs-1"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Carte En Attente -->
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card border-start border-warning border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h6 class="text-muted mb-2">En Attente</h6>
-                                                <h3 class="mb-0 text-warning">{{ reservation_stats.pending }}</h3>
-                                                <small class="text-muted">{{ ((reservation_stats.pending/reservation_stats.total)*100)|number_format(1) }}% du total</small>
-                                            </div>
-                                            <div class="flex-shrink-0">
-                                                <i class="bi bi-hourglass-split text-warning fs-1"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Carte Refusées -->
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card border-start border-danger border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h6 class="text-muted mb-2">Refusées</h6>
-                                                <h3 class="mb-0 text-danger">{{ reservation_stats.rejected }}</h3>
-                                                <small class="text-muted">{{ ((reservation_stats.rejected/reservation_stats.total)*100)|number_format(1) }}% du total</small>
-                                            </div>
-                                            <div class="flex-shrink-0">
-                                                <i class="bi bi-x-circle text-danger fs-1"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Graphique des réservations par statut -->
-                        <div class="row mt-2">
-                            <div class="col-md-6">
-                                <div class="card h-100 border-0 shadow-sm mb-2">
-                                    <div class="card-header bg-white">
-                                        <h3 class="h6 mb-0 text-primary">
-                                            <i class="bi bi-pie-chart me-2"></i> Répartition des Réservations
-                                        </h3>
-                                    </div>
-                                    <div class="card-body d-flex align-items-center justify-content-center p-2">
-                                        <img src="{{ reservation_chart }}" 
-                                             alt="Statut des réservations" 
-                                             class="img-fluid chart-img"
-                                             style="max-height: 220px;">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Tableau mensuel -->
-                            <div class="col-md-6">
-                                <div class="card h-100 border-0 shadow-sm mb-2">
-                                    <div class="card-header bg-transparent border-bottom-0">
-                                        <h3 class="h5 mb-0 text-primary">
-                                            <i class="bi bi-calendar-month me-2"></i> Répartition Mensuelle
-                                            <span class="badge bg-primary bg-opacity-10 text-primary ms-2">{{ reservation_stats.monthly|length }} mois</span>
-                                        </h3>
-                                    </div>
-                                    <div class="card-body pt-0">
-                                        <div class="table-responsive">
-                                            <table class="table table-borderless table-hover align-middle">
-                                                <thead>
-                                                    <tr class="text-uppercase" style="background: rgba(78, 115, 223, 0.05);">
-                                                        <th class="ps-4 text-muted fw-medium" style="width: 25%;">Mois</th>
-                                                        <th class="text-muted fw-medium" style="width: 20%;">Nombre</th>
-                                                        <th class="text-muted fw-medium" style="width: 20%;">Pourcentage</th>
-                                                        <th class="pe-4 text-muted fw-medium" style="width: 35%;">Répartition</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for month in reservation_stats.monthly %}
-                                                    <tr class="position-relative" style="border-bottom: 1px solid rgba(0,0,0,0.03);">
-                                                        <td class="ps-4 fw-medium text-dark">
-                                                            <span class="badge bg-primary bg-opacity-10 text-primary me-2">{{ loop.index }}</span>
-                                                            {{ month.month|month_name }}
-                                                        </td>
-                                                        <td class="text-dark">{{ month.count }}</td>
-                                                        <td class="text-primary fw-bold">{{ ((month.count/reservation_stats.total)*100)|number_format(1) }}%</td>
-                                                        <td class="pe-4">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="progress flex-grow-1" style="height: 10px; border-radius: 5px;">
-                                                                    <div class="progress-bar bg-gradient-primary progress-bar-striped progress-bar-animated" 
-                                                                         style="width: {{ (month.count/reservation_stats.total)*100 }}%"
-                                                                         role="progressbar" 
-                                                                         aria-valuenow="{{ (month.count/reservation_stats.total)*100 }}" 
-                                                                         aria-valuemin="0" 
-                                                                         aria-valuemax="100">
-                                                                    </div>
-                                                                </div>
-                                                                <small class="text-muted ms-2">{{ (month.count/reservation_stats.total)*100|number_format(1) }}%</small>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    <!-- Section Trajets -->
-                    <section class="mb-2">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h2 class="h5 mb-0 text-primary">
-                                <i class="bi bi-car-front me-2"></i> Statistiques des Trajets
-                            </h2>
-                        </div>
-                        
-                        <div class="row g-2">
-                            <!-- Carte Total Trajets -->
-                            <div class="col-md-4">
-                                <div class="card border-start border-primary border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h6 class="text-muted mb-2">Total Trajets</h6>
-                                                <h3 class="mb-0 text-primary">{{ trip_stats.total }}</h3>
-                                            </div>
-                                            <div class="flex-shrink-0">
-                                                <i class="bi bi-signpost-2 text-primary fs-1"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Carte Trajets à Venir -->
-                            <div class="col-md-4">
-                                <div class="card border-start border-info border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h6 class="text-muted mb-2">À Venir</h6>
-                                                <h3 class="mb-0 text-info">{{ trip_stats.active }}</h3>
-                                                <small class="text-muted">{{ ((trip_stats.active/trip_stats.total)*100)|number_format(1) }}% du total</small>
-                                            </div>
-                                            <div class="flex-shrink-0">
-                                                <i class="bi bi-arrow-up-right-circle text-info fs-1"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Carte Trajets Effectués -->
-                            <div class="col-md-4">
-                                <div class="card border-start border-success border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h6 class="text-muted mb-2">Effectués</h6>
-                                                <h3 class="mb-0 text-success">{{ trip_stats.completed }}</h3>
-                                                <small class="text-muted">{{ ((trip_stats.completed/trip_stats.total)*100)|number_format(1) }}% du total</small>
-                                            </div>
-                                            <div class="flex-shrink-0">
-                                                <i class="bi bi-check-circle text-success fs-1"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Graphique des trajets -->
-                        <div class="row mt-2">
-                            <div class="col-md-6">
-                                <div class="card h-100 border-0 shadow-sm mb-2">
-                                    <div class="card-header bg-white">
-                                        <h3 class="h6 mb-0 text-primary">
-                                            <i class="bi bi-graph-up me-2"></i> Statut des Trajets
-                                        </h3>
-                                    </div>
-                                    <div class="card-body d-flex align-items-center justify-content-center p-2">
-                                        <img src="{{ trip_chart }}" 
-                                             alt="Statut des trajets" 
-                                             class="img-fluid chart-img"
-                                             style="max-height: 220px;">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Destinations populaires -->
-                            <div class="col-md-6">
-                                <div class="card h-100 border-0 shadow-sm mb-2">
-                                    <div class="card-header bg-white border-bottom">
-                                        <h2 class="h5 mb-0 text-primary">
-                                            <i class="bi bi-map me-2"></i> Destinations Populaires
-                                        </h2>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            {% for destination in trip_stats.popular_destinations %}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="d-flex align-items-center p-3 bg-light rounded-3">
-                                                    <div class="flex-grow-1">
-                                                        <h6 class="mb-1 fw-medium">{{ destination.destination }}</h6>
-                                                        <div class="progress" style="height: 6px;">
-                                                            <div class="progress-bar bg-gradient-primary" 
-                                                                 style="width: {{ (destination.tripCount/trip_stats.total)*100 }}%">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-shrink-0 ms-3">
-                                                        <span class="badge bg-primary rounded-pill px-3 py-2">
-                                                            {{ destination.tripCount }} trajets
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                        <div class="revenue-visualization">
+                                            {% set max_count = max(reservation_stats.monthly|map(m => m.count)) %}
+                                            {% for month in reservation_stats.monthly %}
+                                            <div class="revenue-column" 
+                                                 style="height: {{ (month.count/max_count) * 100 }}%;"
+                                                 data-bs-toggle="tooltip" 
+                                                 title="{{ month.month|month_name }}: {{ month.count }} réservations">
+                                                <div class="revenue-bar bg-gradient-success"></div>
                                             </div>
                                             {% endfor %}
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-7">
+                                    <div class="chart-container position-relative" style="height: 250px;">
+                                        <img src="{{ monthly_chart }}" 
+                                             alt="Évolution mensuelle des réservations" 
+                                             class="img-fluid w-100 h-100 object-fit-contain"
+                                             loading="lazy">
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </section>
-                    
-                    <!-- Section Revenus et Graphique Mensuel -->
-                    <section>
-                        <div class="row g-2">
-                            <!-- Revenus -->
-                            <div class="col-md-6">
-                                <div class="card border-0 shadow-sm h-100 mb-2">
-                                    <div class="card-header bg-white border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h2 class="h5 mb-0 text-primary">
-                                                <i class="bi bi-cash-coin me-2"></i> Revenus
-                                            </h2>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Section -->
+                <div class="col-lg-4">
+                    <div class="row g-3 h-100">
+                        <!-- Total Reservations Card -->
+                        <div class="col-md-6 col-lg-12">
+                            <div class="card border-start border-primary border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-muted mb-2">Total Réservations</h6>
+                                            <h3 class="mb-0 text-primary">{{ reservation_stats.total }}</h3>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-journal-text text-primary fs-1"></i>
                                         </div>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row align-items-center h-100">
-                                            <div class="col-md-6">
-                                                <h3 class="display-5 fw-bold text-success mb-2">{{ total_revenue|number_format(2, ',', ' ') }} DNT</h3>
-                                                <p class="text-muted mb-0">Revenus totaux des réservations confirmées</p>
-                                                <div class="mt-2">
-                                                    <span class="badge bg-success bg-opacity-10 text-success">
-                                                        <i class="bi bi-arrow-up me-1"></i> Performance financière
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Confirmed Reservations Card -->
+                        <div class="col-md-6 col-lg-6">
+                            <div class="card border-start border-success border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-muted mb-2">Confirmées</h6>
+                                            <h3 class="mb-0 text-success">{{ reservation_stats.confirmed }}</h3>
+                                            <small class="text-muted">{{ ((reservation_stats.confirmed/reservation_stats.total)*100)|number_format(1) }}% du total</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-check-circle text-success fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Reservations Card -->
+                        <div class="col-md-6 col-lg-6">
+                            <div class="card border-start border-warning border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-muted mb-2">En Attente</h6>
+                                            <h3 class="mb-0 text-warning">{{ reservation_stats.pending }}</h3>
+                                            <small class="text-muted">{{ ((reservation_stats.pending/reservation_stats.total)*100)|number_format(1) }}% du total</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-hourglass-split text-warning fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Statistics Sections -->
+            <div class="row mt-4 g-4">
+                <!-- Reservations Analysis -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                            <h2 class="h5 mb-0 text-primary fw-semibold">
+                                <i class="bi bi-journal-check me-2"></i> Statistiques des Réservations
+                            </h2>
+                            <span class="badge bg-primary bg-opacity-10 text-primary py-2">
+                                Total: {{ reservation_stats.total }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-4 mb-md-0">
+                                    <div class="chart-container" style="height: 220px;">
+                                        <img src="{{ reservation_chart }}" 
+                                             alt="Répartition des réservations" 
+                                             class="img-fluid h-100 w-100 object-fit-contain"
+                                             loading="lazy">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex flex-column h-100">
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="badge bg-success me-2" style="width: 15px; height: 15px;"></span>
+                                                <h6 class="mb-0 fw-semibold">Confirmées</h6>
+                                                <span class="ms-auto fw-bold text-success">{{ reservation_stats.confirmed }}</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-success" 
+                                                     style="width: {{ (reservation_stats.confirmed/reservation_stats.total)*100 }}%"></div>
+                                            </div>
+                                            <small class="text-muted">{{ ((reservation_stats.confirmed/reservation_stats.total)*100)|number_format(1) }}% du total</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="badge bg-warning me-2" style="width: 15px; height: 15px;"></span>
+                                                <h6 class="mb-0 fw-semibold">En Attente</h6>
+                                                <span class="ms-auto fw-bold text-warning">{{ reservation_stats.pending }}</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-warning" 
+                                                     style="width: {{ (reservation_stats.pending/reservation_stats.total)*100 }}%"></div>
+                                            </div>
+                                            <small class="text-muted">{{ ((reservation_stats.pending/reservation_stats.total)*100)|number_format(1) }}% du total</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="badge bg-danger me-2" style="width: 15px; height: 15px;"></span>
+                                                <h6 class="mb-0 fw-semibold">Refusées</h6>
+                                                <span class="ms-auto fw-bold text-danger">{{ reservation_stats.rejected }}</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-danger" 
+                                                     style="width: {{ (reservation_stats.rejected/reservation_stats.total)*100 }}%"></div>
+                                            </div>
+                                            <small class="text-muted">{{ ((reservation_stats.rejected/reservation_stats.total)*100)|number_format(1) }}% du total</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Breakdown -->
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-transparent border-bottom-0">
+                            <h3 class="h5 mb-0 text-primary">
+                                <i class="bi bi-calendar-month me-2"></i> Répartition Mensuelle
+                                <span class="badge bg-primary bg-opacity-10 text-primary ms-2">{{ reservation_stats.monthly|length }} mois</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-hover align-middle">
+                                    <thead>
+                                        <tr class="text-uppercase" style="background: rgba(78, 115, 223, 0.05);">
+                                            <th class="ps-4 text-muted fw-medium" style="width: 25%;">Mois</th>
+                                            <th class="text-muted fw-medium" style="width: 20%;">Nombre</th>
+                                            <th class="text-muted fw-medium" style="width: 20%;">Pourcentage</th>
+                                            <th class="pe-4 text-muted fw-medium" style="width: 35%;">Répartition</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for month in reservation_stats.monthly %}
+                                        <tr class="position-relative" style="border-bottom: 1px solid rgba(0,0,0,0.03);">
+                                            <td class="ps-4 fw-medium text-dark">
+                                                <span class="badge bg-primary bg-opacity-10 text-primary me-2">{{ loop.index }}</span>
+                                                {{ month.month|month_name }}
+                                            </td>
+                                            <td class="text-dark">{{ month.count }}</td>
+                                            <td class="text-primary fw-bold">{{ ((month.count/reservation_stats.total)*100)|number_format(1) }}%</td>
+                                            <td class="pe-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1" style="height: 10px; border-radius: 5px;">
+                                                        <div class="progress-bar bg-gradient-primary progress-bar-striped progress-bar-animated" 
+                                                             style="width: {{ (month.count/reservation_stats.total)*100 }}%"
+                                                             role="progressbar" 
+                                                             aria-valuenow="{{ (month.count/reservation_stats.total)*100 }}" 
+                                                             aria-valuemin="0" 
+                                                             aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted ms-2">{{ (month.count/reservation_stats.total)*100|number_format(1) }}%</small>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combined Section: Popular Destinations and Trip Status - Modifié pour aligner la hauteur -->
+                <div class="col-lg-8">
+                    <div class="row g-4 h-100">
+                        <!-- Popular Destinations - Agrandi -->
+                        <div class="col-md-8 h-100">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-white border-bottom">
+                                    <h2 class="h5 mb-0 text-primary">
+                                        <i class="bi bi-map me-2"></i> Destinations Populaires
+                                    </h2>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <div class="row flex-grow-1">
+                                        {% for destination in trip_stats.popular_destinations %}
+                                        <div class="col-md-6 mb-3 d-flex">
+                                            <div class="d-flex align-items-center p-3 bg-light rounded-3 w-100">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-medium">{{ destination.destination }}</h6>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-gradient-primary" 
+                                                             style="width: {{ (destination.tripCount/trip_stats.total)*100 }}%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-shrink-0 ms-3">
+                                                    <span class="badge bg-primary rounded-pill px-2 py-1">
+                                                        {{ destination.tripCount }}
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="revenue-visualization">
-                                                    {% set max_count = max(reservation_stats.monthly|map(m => m.count)) %}
-                                                    {% for month in reservation_stats.monthly %}
-                                                    <div class="revenue-column" 
-                                                         style="height: {{ (month.count/max_count) * 100 }}%;"
-                                                         data-bs-toggle="tooltip" 
-                                                         title="{{ month.month|month_name }}: {{ month.count }} réservations">
-                                                        <div class="revenue-bar bg-gradient-success"></div>
-                                                    </div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
                                         </div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Graphique mensuel -->
-                            <div class="col-md-6">
-                                <div class="card border-0 shadow-sm h-100 mb-2">
-                                    <div class="card-header bg-white">
-                                        <h3 class="h6 mb-0 text-primary">
-                                            <i class="bi bi-calendar-month me-2"></i> Évolution Mensuelle des Réservations
-                                        </h3>
-                                    </div>
-                                    <div class="card-body p-2 d-flex align-items-center">
-                                        <div class="text-center w-100">
-                                            <img src="{{ monthly_chart }}" 
-                                                 alt="Réservations par mois" 
-                                                 class="img-fluid" 
-                                                 style="max-height: 250px;">
+                        </div>
+
+                        <!-- Trip Status Chart - Agrandi -->
+                        <div class="col-md-4 h-100">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-white">
+                                    <h3 class="h6 mb-0 text-primary">
+                                        <i class="bi bi-graph-up me-2"></i> Statut des Trajets
+                                    </h3>
+                                </div>
+                                <div class="card-body d-flex align-items-center justify-content-center p-3">
+                                    <img src="{{ trip_chart }}" 
+                                         alt="Statut des trajets" 
+                                         class="img-fluid w-100 h-auto"
+                                         style="max-height: 100%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trips Analysis Cards - Hauteur ajustée -->
+                <div class="col-lg-4">
+                    <div class="row g-3 h-100">
+                        <!-- Total Trips -->
+                        <div class="col-12">
+                            <div class="card border-start border-primary border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-muted mb-2">Total Trajets</h6>
+                                            <h3 class="mb-0 text-primary">{{ trip_stats.total }}</h3>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-signpost-2 text-primary fs-1"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </section>
+                        
+                        <!-- Active Trips -->
+                        <div class="col-md-6 col-lg-12">
+                            <div class="card border-start border-info border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-muted mb-2">À Venir</h6>
+                                            <h3 class="mb-0 text-info">{{ trip_stats.active }}</h3>
+                                            <small class="text-muted">{{ ((trip_stats.active/trip_stats.total)*100)|number_format(1) }}% du total</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-arrow-up-right-circle text-info fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Completed Trips -->
+                        <div class="col-md-6 col-lg-12">
+                            <div class="card border-start border-success border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-muted mb-2">Effectués</h6>
+                                            <h3 class="mb-0 text-success">{{ trip_stats.completed }}</h3>
+                                            <small class="text-muted">{{ ((trip_stats.completed/trip_stats.total)*100)|number_format(1) }}% du total</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-check-circle text-success fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -359,47 +371,99 @@
 {% block stylesheets %}
 {{ parent() }}
 <style>
-    /* Styles de base */
-    body {
-        background-color: #f8f9fa;
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
     }
+    
+    body {
+        background-color: #f8f9fc;
+    }
+    
+    .page-header hr {
+        border-top-width: 2px;
+    }
+    
     .card {
         border-radius: 0.5rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
     }
+    
     .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.08);
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
     }
+    
     .card-header {
+        padding: 1rem 1.5rem;
         background-color: #fff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        padding: 0.75rem 1.25rem;
     }
-    .table th {
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
+    
+    .chart-container {
+        position: relative;
+    }
+    
+    .progress {
+        background-color: #f0f3f7;
+    }
+    
+    .progress-bar {
+        border-radius: 0.25rem;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(to right, var(--primary-color), #224abe);
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(to right, var(--secondary-color), #13855c);
+    }
+    
+    .bg-gradient-info {
+        background: linear-gradient(to right, var(--info-color), #258ea1);
+    }
+    
+    .bg-gradient-warning {
+        background: linear-gradient(to right, var(--warning-color), #dda20a);
+    }
+    
+    .bg-gradient-danger {
+        background: linear-gradient(to right, var(--danger-color), #be2617);
+    }
+    
+    .badge {
+        font-weight: 500;
         letter-spacing: 0.5px;
     }
     
-    /* Barres de progression */
-    .progress {
-        height: 6px;
-        border-radius: 3px;
-        background-color: #f0f2f5;
-    }
-    .progress-bar {
-        border-radius: 3px;
-    }
-    .bg-gradient-primary {
-        background: linear-gradient(to right, #4e73df, #224abe);
-    }
-    .bg-gradient-success {
-        background: linear-gradient(to bottom, #1cc88a, #13855c);
+    .table th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
     }
     
-    /* Visualisation des revenus */
+    .table td {
+        vertical-align: middle;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .table tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .object-fit-contain {
+        object-fit: contain;
+        object-position: center;
+    }
+    
+    /* Revenue visualization styles */
     .revenue-visualization {
         display: flex;
         align-items: flex-end;
@@ -407,6 +471,7 @@
         gap: 6px;
         padding-top: 10px;
     }
+    
     .revenue-column {
         flex: 1;
         display: flex;
@@ -415,6 +480,7 @@
         height: 100%;
         position: relative;
     }
+    
     .revenue-bar {
         height: var(--height);
         border-radius: 4px 4px 0 0;
@@ -422,6 +488,7 @@
         position: relative;
         overflow: hidden;
     }
+    
     .revenue-bar::after {
         content: "";
         position: absolute;
@@ -432,41 +499,31 @@
         background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
     }
     
-    /* Styles des graphiques */
-    .chart-img {
-        max-height: 220px;
-        width: auto;
-        transition: opacity 0.5s ease;
+    /* Border cards */
+    .border-4 {
+        border-width: 4px !important;
     }
     
-    /* Animation */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    /* Animation classes */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
-    .fade-in {
-        animation: fadeIn 0.8s ease-in-out;
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
     }
     
-    /* Bordures colorées */
-    .border-primary { border-color: #4e73df !important; }
-    .border-success { border-color: #1cc88a !important; }
-    .border-info { border-color: #36b9cc !important; }
-    .border-warning { border-color: #f6c23e !important; }
-    .border-danger { border-color: #e74a3b !important; }
-    
-    /* Icônes */
-    .fs-1 { font-size: 2.5rem !important; }
-    
-    /* Espacement réduit entre les sections */
-    section {
-        margin-bottom: 1rem !important;
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
-        margin-bottom: 0.5rem !important;
-    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
 </style>
 {% endblock %}
 
@@ -474,6 +531,30 @@
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Add animations to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.classList.add('animate-fade-in-up', `delay-${index % 4}`);
+    });
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover'
+        });
+    });
+    
+    // Lazy loading for images
+    if ('loading' in HTMLImageElement.prototype) {
+        const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+        lazyImages.forEach(img => {
+            img.addEventListener('load', () => {
+                img.classList.add('loaded');
+            });
+        });
+    }
+    
     // Animation des barres de revenus
     const revenueColumns = document.querySelectorAll('.revenue-column');
     revenueColumns.forEach(col => {
@@ -484,22 +565,6 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             col.style.height = finalHeight;
         }, 100);
-    });
-    
-    // Animation des graphiques
-    const charts = document.querySelectorAll('.chart-img, .card img.img-fluid');
-    charts.forEach((chart, index) => {
-        chart.style.opacity = '0';
-        setTimeout(() => {
-            chart.classList.add('fade-in');
-            chart.style.opacity = '1';
-        }, index * 200);
-    });
-    
-    // Tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 });
 </script>

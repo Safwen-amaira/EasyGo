@@ -64,7 +64,7 @@ final class TripController extends AbstractController
             ['Confirmées', 'En attente', 'Refusées'],
             [$reservationStats['confirmed'], $reservationStats['pending'], $reservationStats['rejected']],
             'Statut des réservations',
-            ['#4e73df', '#1cc88a', '#e74a3b']
+            ['#1cc88a', '#f6c23e', '#e74a3b']
         );
     
         // Graphique des trajets
@@ -73,7 +73,7 @@ final class TripController extends AbstractController
             ['À venir', 'Effectués'],
             [$tripStats['active'], $tripStats['completed']],
             'Statut des trajets',
-            ['#36b9cc', '#f6c23e']
+            ['#36b9cc', '#1cc88a']
         );
     
         // Graphique des réservations mensuelles
