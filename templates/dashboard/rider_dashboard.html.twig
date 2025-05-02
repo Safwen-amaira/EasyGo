@@ -141,14 +141,12 @@
         .form-group {
             margin-bottom: 20px;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 8px;
             color: #2c3e50;
             font-weight: 500;
         }
-
         .form-group input[type="text"],
         .form-group input[type="email"] {
             width: 100%;
@@ -214,7 +212,7 @@
                 </li>
 
    <li>
-
+                            
                     <a href="/recompense/mon-profil">
                         <i class="fas fa-user"></i>
                         Fidelity
@@ -222,13 +220,8 @@
                 </li>
 
 
-
-
-
-
-
-
-
+        
+                                
                 <li>
             <a href="#" id="logout-btn">
         <i class="fas fa-sign-out-alt"></i>
@@ -259,7 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/auth';
         return; // Stop execution
     }
-
     // Logout functionality
     const logoutButton = document.getElementById('logout-btn');
     if (logoutButton) {
@@ -271,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/auth'; 
         });
     }
-
     // Profile link setup
     const profileLink = document.getElementById('profile-link');
     if (profileLink && user?.id) {
@@ -281,5 +272,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
-
 </html>
