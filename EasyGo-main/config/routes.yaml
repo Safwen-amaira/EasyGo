@@ -6,11 +6,15 @@ controllers:
 reservation_stats:
     path: /reservations/statistiques
     controller: App\Controller\ReservationController::statistics
-app_trip_qrcode:
-    path: /trip/{id}/qrcode
-    controller: App\Controller\TripController::generateQrCode
-
 app_trip_map:
     path: /trip/{id}/map
     controller: App\Controller\TripController::showMap
-    
+app_reservation_qrcode:
+    path: /reservation/qrcode/{id}
+    controller: App\Controller\QrCodeController::generateQrCode
+    methods: GET
+
+app_reservation_validate:
+    path: /reservation/validate/{id}
+    controller: App\Controller\QrCodeController::validateReservation
+    methods: GET

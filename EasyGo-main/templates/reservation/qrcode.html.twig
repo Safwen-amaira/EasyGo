@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}QR Code Réservation{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-qr-code me-2"></i> Validation Réservation 
+                    </h2>
+                </div>
+                <div class="card-body text-center">
+                    <!-- Conteneur du QR Code -->
+                    <div id="qrcode-container" style="width: 256px; height: 256px; margin: 0 auto; border: 1px solid #ddd; padding: 10px;">
+                        <img id="qrcode-image" src="" alt="QR Code de la réservation" style="width: 100%; height: 100%;">
+                    </div>
+
+                    <!-- Détails de la réservation -->
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="bg-light">Trajet</th>
+                                <td>{{ trip.departurePoint }} → {{ trip.destination }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Date</th>
+                                <td>{{ reservation.dateReservation|date('d/m/Y') }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Places</th>
+                                <td>{{ reservation.nombrePlaces }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Montant</th>
+                                <td>{{ reservation.montantTotal|number_format(2) }} DNT</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-center gap-3">
+                        <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i> Retour
+                        </a>
+                        <button onclick="window.print()" class="btn btn-primary">
+                            <i class="bi bi-printer me-2"></i> Imprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- contenue avec API QR Code -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const qrData = `Trajet: {{ trip.departurePoint }} → {{ trip.destination }}
+Date: {{ reservation.dateReservation|date('d/m/Y') }}
+Places: {{ reservation.nombrePlaces }} , Montant: {{ reservation.montantTotal|number_format(2) }} DNT`;
+    
+    const qrImage = document.getElementById('qrcode-image');
+    
+    // Encodage des données pour URL
+    const encodedData = encodeURIComponent(qrData);
+    
+    // Génération via API externe
+    qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodedData}`;
+    
+    // Fallback si l'image ne charge pas
+    qrImage.onerror = function() {
+        this.src = 'https://via.placeholder.com/256?text=QR+Code+Non+Disponible';
+        this.alt = 'Erreur de génération du QR Code';
+    };
+});
+</script>
+
+<!-- Alternative si JavaScript est désactivé -->
+<noscript>
+    <div class="alert alert-warning mt-3">
+        <h4>QR Code non disponible</h4>
+        <p>JavaScript est nécessaire pour générer le QR Code. Voici les informations :</p>
+Trajet: {{ trip.departurePoint }} → {{ trip.destination }}
+Date: {{ reservation.dateReservation|date('d/m/Y') }}
+Places: {{ reservation.nombrePlaces }}
+Montant: {{ reservation.montantTotal|number_format(2) }} DNT</pre>
+    </div>
+</noscript>
+{% endblock %}

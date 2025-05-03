@@ -29,7 +29,17 @@ final class ReservationController extends AbstractController
         private EntityManagerInterface $entityManager
     ) {
     }
+    #[Route('/reservation/{id}/validate', name: 'app_reservation_validate')]
+public function validateReservation(Reservation $reservation): Response
+{
+    $user = $reservation->getUser();
     
+    return $this->render('reservation/validate.html.twig', [
+        'reservation' => $reservation,
+        'passenger_name' => $user ? $user->getPrenom().' '.$user->getNom() : 'Inconnu',
+        'passenger_phone' => $user ? ($user->getPhoneNumber() ?? 'Non renseigné') : 'Non renseigné'
+    ]);
+}
     #[Route('/', name: 'app_reservation_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository, PaginatorInterface $paginator, Request $request): Response
     {
